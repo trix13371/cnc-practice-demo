@@ -7,6 +7,9 @@ const files = {
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/model.js': ['model.js', 'text/javascript; charset=utf-8'],
+  '/lab-model.js': ['lab-model.js', 'text/javascript; charset=utf-8'],
+  '/lab-ui.js': ['lab-ui.js', 'text/javascript; charset=utf-8'],
+  '/viewer3d.js': ['viewer3d.js', 'text/javascript; charset=utf-8'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/demo/cnc-demo.html': ['demo/cnc-demo.html', 'text/html; charset=utf-8'],
   '/docs/preview.jpg': ['docs/preview.jpg', 'image/jpeg']

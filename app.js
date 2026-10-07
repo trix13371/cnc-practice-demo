@@ -1,6 +1,9 @@
 (function () {
   'use strict';
   const $ = id => document.getElementById(id), model = window.CNCModel;
+  const allTasks=[...model.tasks.map(t=>({...t,level:'easy'})),...window.CNCLabModel.tasks.map(t=>({...t,advanced:true}))];
+  const basicViewer=new window.PartViewer($('basic-viewer'));let basicView='2d',basicShape='target';
+  window.CNCLabUI.init((id,help)=>{const prev=completed[id];completed[id]={at:new Date().toISOString(),assisted:prev?.assisted===false?false:help};updateProgress();save();});
   const fields = ['x','offset','feed','rpm','tool'], storageKey = 'cnc-practice-v2';
   let task = model.tasks[0], mode = 'learn', hintLevel = 0, assisted = false;
   let completed = {}, history = [], exam = null, examDraft = null, report = null, trainingTask = 'diameter';
@@ -18,10 +21,10 @@
   function restore() {
     try {
       const s=JSON.parse(localStorage.getItem(storageKey)||'null');if(!s||s.version!==2)return null;
-      for(const t of model.tasks){const c=s.completed?.[t.id];if(c&&typeof c.assisted==='boolean'&&Number.isFinite(Date.parse(c.at)))completed[t.id]={assisted:c.assisted,at:c.at};}
+      for(const t of allTasks){const c=s.completed?.[t.id];if(c&&typeof c.assisted==='boolean'&&Number.isFinite(Date.parse(c.at)))completed[t.id]={assisted:c.assisted,at:c.at};}
       history=Array.isArray(s.history)?s.history.map(model.restoreExam).filter(e=>e&&e.answers.length===3).slice(0,10):[];
       exam=model.restoreExam(s.exam);if(exam?.answers.length===3){if(!history.some(h=>h.startedAt===exam.startedAt))history.unshift(exam);exam=null;}
-      if(model.tasks.some(t=>t.id===s.trainingTask))trainingTask=s.trainingTask;
+      if(allTasks.some(t=>t.id===s.trainingTask))trainingTask=s.trainingTask;
       mode=s.mode==='exam'?'exam':'learn';
       if(exam&&model.evaluate(s.examDraft||{},model.examTask(exam)).valid)examDraft=s.examDraft;
       return {values:s.draft,assisted:s.assisted===true,hintLevel:Number.isInteger(s.hintLevel)?Math.max(0,Math.min(3,s.hintLevel)):0};
@@ -35,8 +38,8 @@
     $('step').disabled=playing;$('submit-answer').disabled=!!exam?.awaitingNext;
   }
   function updateProgress() {
-    $('learning-progress').textContent=`Освоено: ${Object.keys(completed).length} из 3`;
-    document.querySelectorAll('[data-task]').forEach(b=>{const active=b.dataset.task===task.id;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));const c=completed[b.dataset.task];b.querySelector('.lesson-done').textContent=c?'✓':'';b.querySelector('small').textContent=c?(c.assisted?'Пройдено с помощью':'Пройдено самостоятельно'):{diameter:'Диаметр и припуск',offset:'Поиск ошибки настройки',feed:'Подача и обороты'}[b.dataset.task];});
+    $('learning-progress').textContent=`Освоено: ${Object.keys(completed).length} из ${allTasks.length}`;
+    document.querySelectorAll('[data-task]').forEach(b=>{const active=b.dataset.task===task.id,spec=allTasks.find(t=>t.id===b.dataset.task);b.dataset.difficulty=spec.level;b.classList.toggle('active',active);b.setAttribute('aria-pressed',String(active));const c=completed[b.dataset.task];b.querySelector('.lesson-done').textContent=c?'✓':'';b.querySelector('small').textContent=({easy:'Лёгкий',medium:'Средний',hard:'Сложный'}[spec.level])+' · '+(c?(c.assisted?'с помощью':'самостоятельно'):{diameter:'диаметр',offset:'коррекция',feed:'режим',shoulder:'проходы',sleeve:'расточка',taper:'маршрут',calibration:'диагностика'}[b.dataset.task]);});
   }
   function geometry(r,progress=0) {
     const scale=96/task.stock,actual=r.valid?Math.max(.5,Math.min(60,r.actual)):task.stock;
@@ -71,19 +74,23 @@
   }
   function clearFeedback() { $('check-result').className='check-result';$('check-result').textContent=mode==='exam'?'Ответ будет проверен после завершения экзамена.':'Настройки ещё не проверены'; }
   function settingsChanged(persist=true) {
+    if(task.advanced)return;
     const p=values(),r=model.evaluate(p,task);lastResult=r;part=0;
     $('actual').innerHTML=fmt(r.finalDiameter)+' <small>мм</small>';$('depth').innerHTML=fmt(r.depth)+' <small>мм</small>';
     program(p);geometry(mode==='exam'?model.evaluate({...task.defaults,x:task.stock,offset:0},task):r);clearFeedback();
     $('machine-status').textContent=mode==='exam'?'Экзамен':'Ожидание';$('machine-status').className='machine-status';
     $('phase-description').textContent='Нажмите «Следующий шаг», чтобы разобрать движение резца.';
-    lock();if(persist)save();
+    lock();updateBasicViewer();if(persist)save();
   }
+  function updateBasicViewer(){if(task.advanced)return;const r=model.evaluate(values(),task),diameter=basicShape==='target'?task.target:(r.finalDiameter||task.stock);basicViewer.set({segments:[{length:15,diameter:task.stock},{length:task.length,diameter}],bore:0},basicShape==='target'?'Целевая деталь':'Геометрия по настройкам');}
+  function renderBasicView(){const visible=mode==='learn'&&basicView==='3d';$('basic-3d-panel').hidden=!visible;document.querySelector('.drawing').hidden=visible;document.querySelector('.view-toolbar').hidden=visible;document.querySelector('.legend').hidden=visible;$('basic-2d').setAttribute('aria-pressed',String(!visible));$('basic-3d').setAttribute('aria-pressed',String(visible));if(visible)updateBasicViewer();}
   function loadTask(nextTask,persist=true) {
+    if(nextTask.advanced){cancel();task=nextTask;window.CNCLabUI.open(task);updateProgress();renderMode();if(persist)save();return;}
     cancel();task=nextTask;hintLevel=0;assisted=false;setValues(task.defaults);
     $('goal').textContent=task.goal;$('description').textContent=task.description;
     $('stock-tag').textContent=`Заготовка Ø${task.stock}`;$('target-tag').textContent=`Цель Ø${task.target} ±0,1`;$('length-tag').textContent=`Длина ${task.length} мм`;
     $('hint-count').textContent='0 / 3';$('hint').disabled=false;$('mentor-answer').textContent='Попробуйте настроить проход самостоятельно. Если застрянете, откройте первую подсказку.';
-    settingsChanged(false);updateProgress();if(persist)save();
+    settingsChanged(false);updateProgress();renderMode();if(persist)save();
   }
   function feedback(r,finished=false) {
     const box=$('check-result');box.className='check-result '+(r.success?'success':'error');box.replaceChildren();
@@ -93,6 +100,7 @@
   }
   function check() {
     if(mode!=='learn')throw new Error('Проверка доступна только в обучении');
+    if(task.advanced)return window.CNCLabUI.check();
     if(pass)throw new Error('Сначала завершите или сбросьте проход');
     assisted=true;const r=model.evaluate(values(),task);lastResult=r;feedback(r);$('mentor-answer').textContent=model.mentor(values(),'Что исправить?',true,task);save();return r;
   }
@@ -133,23 +141,24 @@
     const isExam=mode==='exam',active=isExam&&!!exam;
     $('mode-learn').setAttribute('aria-pressed',String(!isExam));$('mode-exam').setAttribute('aria-pressed',String(isExam));
     document.querySelector('.lessons').hidden=isExam;$('exam-banner').hidden=!isExam;
-    $('workspace').hidden=isExam&&!active;$('exam-results').hidden=!isExam||!report||!!exam;
+    $('difficulty-bar').hidden=isExam;$('lab-workspace').hidden=isExam||!task.advanced;
+    $('workspace').hidden=(isExam&&!active)||(!isExam&&!!task.advanced);$('exam-results').hidden=!isExam||!report||!!exam;
     $('exam-start').hidden=active;$('exam-start').textContent=report?'Повторить экзамен':'Начать экзамен';
     $('exam-counter').hidden=!active;$('exam-counter').textContent=active?`Задание ${exam.index+1} из 3`:'';
-    $('exam-title').textContent=active?'Экзамен идёт':'Самопроверка: 3 задания';
+    $('exam-title').textContent=active?'Базовый экзамен идёт':'Базовый экзамен: 3 лёгких задания';
     $('check').hidden=isExam;$('submit-answer').hidden=!active||exam.awaitingNext;$('next-question').hidden=!active||!exam.awaitingNext;
     for(const id of ['runbar','readouts','phase-list','phase-description','mentor-panel'])$(id).hidden=isExam;
     $('trajectory').style.visibility=isExam?'hidden':'visible';
     document.querySelector('.bottom-grid').classList.toggle('exam-code',isExam);
     $('machine-title').textContent=isExam?'Схема задания':'Пробный проход';
-    lock();
+    $('basic-view-switch').hidden=isExam;renderBasicView();lock();
   }
   function showAccepted() {
     $('check-result').className='check-result';$('check-result').textContent='Ответ сохранён. Разбор будет доступен после третьего задания.';lock();
   }
   function changeMode(next) {
     if(next===mode)return;if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
-    if(mode==='learn')loadTask(model.tasks.find(t=>t.id===trainingTask),false);
+    if(mode==='learn')loadTask(allTasks.find(t=>t.id===trainingTask),false);
     else if(exam){loadTask(model.examTask(exam),false);if(examDraft&&model.evaluate(examDraft,task).valid){setValues(examDraft);settingsChanged(false);}if(exam.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}}
     renderMode();save();
   }
@@ -187,7 +196,10 @@
     g.answers.forEach((a,i)=>{lines.push(`${i+1}. ${a.task.title}`,`Цель: Ø${a.task.target} мм. X: ${a.settings.x}; коррекция: ${a.settings.offset}; подача: ${a.settings.feed}; обороты: ${a.settings.rpm}; инструмент: ${a.settings.tool}.`,a.result.success?'Выполнено верно.':a.result.errors.map(e=>e.title+': '+e.detail).join('\n'),'');});
     const url=URL.createObjectURL(new Blob(['\ufeff'+lines.join('\n')],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='cnc-exam-report.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
   }
-  document.querySelectorAll('[data-task]').forEach(b=>b.addEventListener('click',()=>{if(mode!=='learn')return;trainingTask=b.dataset.task;loadTask(model.tasks.find(t=>t.id===trainingTask));}));
+  document.querySelectorAll('[data-task]').forEach(b=>b.addEventListener('click',()=>{if(mode!=='learn')return;trainingTask=b.dataset.task;loadTask(allTasks.find(t=>t.id===trainingTask));}));
+  document.querySelectorAll('[data-level]').forEach(b=>b.addEventListener('click',()=>{const level=b.dataset.level;document.querySelectorAll('[data-level]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));document.querySelectorAll('[data-task]').forEach(n=>n.hidden=level!=='all'&&n.dataset.difficulty!==level);}));
+  for(const v of ['2d','3d'])$('basic-'+v).addEventListener('click',()=>{basicView=v;renderBasicView();});
+  for(const v of ['target','result'])$('basic-'+v).addEventListener('click',()=>{basicShape=v;$('basic-target').setAttribute('aria-pressed',String(v==='target'));$('basic-result').setAttribute('aria-pressed',String(v==='result'));updateBasicViewer();});
   fields.forEach(k=>$(k).addEventListener('input',()=>{if(!pass)settingsChanged();}));
   $('settings').addEventListener('submit',e=>{e.preventDefault();if(mode==='learn'&&!pass)check();});
   $('run').addEventListener('click',run);$('step').addEventListener('click',step);$('reset').addEventListener('click',()=>loadTask(task));
@@ -197,18 +209,18 @@
   $('mode-learn').addEventListener('click',()=>changeMode('learn'));$('mode-exam').addEventListener('click',()=>changeMode('exam'));
   $('exam-start').addEventListener('click',startExam);$('submit-answer').addEventListener('click',submit);$('next-question').addEventListener('click',nextQuestion);$('export-report').addEventListener('click',exportReport);
   const draft=restore();report=history[0]||null;
-  loadTask(mode==='exam'&&exam?model.examTask(exam):model.tasks.find(t=>t.id===trainingTask),false);
-  if(draft?.values&&model.evaluate(draft.values,task).valid){setValues(draft.values);settingsChanged(false);}
-  if(mode==='learn'&&draft){assisted=draft.assisted;hintLevel=draft.hintLevel;$('hint-count').textContent=hintLevel+' / 3';$('hint').disabled=hintLevel===3;if(hintLevel)$('mentor-answer').textContent=task.hints[hintLevel-1];}
+  loadTask(mode==='exam'&&exam?model.examTask(exam):allTasks.find(t=>t.id===trainingTask),false);
+  if(!task.advanced&&draft?.values&&model.evaluate(draft.values,task).valid){setValues(draft.values);settingsChanged(false);}
+  if(!task.advanced&&mode==='learn'&&draft){assisted=draft.assisted;hintLevel=draft.hintLevel;$('hint-count').textContent=hintLevel+' / 3';$('hint').disabled=hintLevel===3;if(hintLevel)$('mentor-answer').textContent=task.hints[hintLevel-1];}
   if(mode==='exam'&&exam?.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}
   renderHistory();renderReport();renderMode();
-  function readState(){return {mode,task:task.id,settings:values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'?lastResult:null};}
+  function readState(){return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
   window.CNCDemo={readState};
   const context=document.modelContext;
   if(context?.registerTool){const lifecycle=new AbortController();const empty=input=>{if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected empty object');};
     const specs=[
       {name:'read_cnc_training_state',description:'Read visible exercise state. Exam feedback is withheld until final submission.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute(input){empty(input);return readState();}},
-      {name:'configure_cnc_training',description:'Set training parameters. Available only in learning mode, not during an exam or pass.',inputSchema:{type:'object',properties:{task:{type:'string',enum:['diameter','offset','feed']},x:{type:'number',minimum:1,maximum:60},offset:{type:'number',minimum:-10,maximum:10},feed:{type:'number',minimum:.01,maximum:1},rpm:{type:'number',minimum:100,maximum:2000},tool:{type:'string',enum:['turning','drill']}},additionalProperties:false},annotations:{readOnlyHint:false},execute(input){if(mode!=='learn'||pass)throw new Error('Only idle learning mode permits configuration');if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>!['task',...fields].includes(k)))throw new Error('Invalid settings');const selected=input.task?model.tasks.find(t=>t.id===input.task):task;if(!selected)throw new Error('Unknown task');const p={...(input.task?selected.defaults:values()),...input};if(!model.evaluate(p,selected).valid)throw new Error('Invalid values');if(input.task){trainingTask=selected.id;loadTask(selected,false);}setValues(p);settingsChanged();return readState();}},
+      {name:'configure_cnc_training',description:'Set training parameters. Available only in learning mode, not during an exam or pass.',inputSchema:{type:'object',properties:{task:{type:'string',enum:['diameter','offset','feed']},x:{type:'number',minimum:1,maximum:60},offset:{type:'number',minimum:-10,maximum:10},feed:{type:'number',minimum:.01,maximum:1},rpm:{type:'number',minimum:100,maximum:2000},tool:{type:'string',enum:['turning','drill']}},additionalProperties:false},annotations:{readOnlyHint:false},execute(input){if(mode!=='learn'||pass)throw new Error('Only idle learning mode permits configuration');if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).some(k=>!['task',...fields].includes(k)))throw new Error('Invalid settings');const selected=input.task?model.tasks.find(t=>t.id===input.task):task;if(!selected||selected.advanced)throw new Error('Use the operation cards for this task');const p={...(input.task?selected.defaults:values()),...input};if(!model.evaluate(p,selected).valid)throw new Error('Invalid values');if(input.task){trainingTask=selected.id;loadTask(selected,false);}setValues(p);settingsChanged();return readState();}},
       {name:'check_cnc_training_settings',description:'Check current learning parameters and reveal hints. Unavailable in exam mode.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:false},execute(input){empty(input);return check();}}
     ];for(const spec of specs){try{Promise.resolve(context.registerTool(spec,{signal:lifecycle.signal})).catch(()=>{});}catch{}}window.addEventListener('pagehide',()=>lifecycle.abort(),{once:true});
   }
