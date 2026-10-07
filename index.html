@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ЧПУ Практика — учебный тренажёр</title>
+  <meta name="description" content="Интерактивная демка токарного тренажёра: настройка инструмента, пробный проход и учебный наставник.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230e273b'/%3E%3Cpath d='M7 11h18v10H7z' fill='%235de0ba'/%3E%3Cpath d='M13 8v16M20 8v16' stroke='%230e273b' stroke-width='2'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">⌘</span><span>ЧПУ <b>Практика</b></span></a><div class="top-meta"><span>Токарный станок</span><span class="version">Демка 0.1</span></div></header>
+  <main>
+    <div class="intro"><div><p class="eyebrow">УЧЕБНАЯ МАСТЕРСКАЯ / ПЕНЗА</p><h1>Сначала практика.<br><span>Потом — реальный станок.</span></h1></div><p class="intro-copy">Настройте проход, проверьте траекторию<br>и разберите ошибки вместе с наставником.</p></div>
+    <nav class="lessons" aria-label="Упражнения">
+      <button type="button" class="lesson active" data-task="diameter" aria-pressed="true"><span class="lesson-no">01</span><span>Первый проход<small>Диаметр и припуск</small></span><span class="lesson-done" aria-hidden="true"></span></button>
+      <button type="button" class="lesson" data-task="offset" aria-pressed="false"><span class="lesson-no">02</span><span>Коррекция инструмента<small>Поиск ошибки настройки</small></span><span class="lesson-done" aria-hidden="true"></span></button>
+      <button type="button" class="lesson" data-task="feed" aria-pressed="false"><span class="lesson-no">03</span><span>Режим обработки<small>Подача и обороты</small></span><span class="lesson-done" aria-hidden="true"></span></button>
+    </nav>
+    <div class="workspace">
+      <section class="setup panel" aria-labelledby="setup-title">
+        <div class="panel-heading"><h2 id="setup-title">Настройка прохода</h2><span class="label-mini">X / Z</span></div>
+        <div class="task-brief"><span class="eyebrow">ЗАДАНИЕ</span><h3 id="goal">Получите диаметр 28 мм</h3><p id="description"></p><div class="target-tags"><span>Заготовка Ø32</span><span>Длина 45 мм</span><span>Цель Ø28 ±0,1</span></div></div>
+        <form id="settings" novalidate>
+          <label class="field">Инструмент<select id="tool" name="tool"><option value="turning">T01 · Проходной резец</option><option value="drill">T02 · Сверло</option></select></label>
+          <div class="field-row"><label class="field">Конечный X <span class="unit">мм, диаметр</span><input id="x" name="x" type="number" min="1" max="60" step="0.1" value="30" required></label><label class="field">Коррекция X <span class="unit">мм, по диаметру</span><input id="offset" name="offset" type="number" min="-10" max="10" step="0.1" value="0" required></label></div>
+          <div class="field-row"><label class="field">Подача <span class="unit">мм/об</span><input id="feed" name="feed" type="number" min="0.01" max="1" step="0.01" value="0.2" required></label><label class="field">Шпиндель <span class="unit">об/мин</span><input id="rpm" name="rpm" type="number" min="100" max="2000" step="50" value="800" required></label></div>
+          <details class="conditions"><summary>Условия упражнения</summary><p>Подача: 0,10–0,25 мм/об.<br>Обороты: 600–1000 об/мин.<br>Съём за проход: до 2 мм на радиус.<br>Правильная коррекция X: 0 мм.<br>Это учебные ограничения, а не режим для реального оборудования.</p></details>
+          <button class="button secondary wide" id="check" type="submit">Проверить настройки</button>
+        </form>
+        <div class="check-result" id="check-result" aria-live="polite"><span class="neutral-dot"></span> Настройки ещё не проверены</div>
+      </section>
+      <div class="right-column">
+        <section class="machine panel" aria-labelledby="machine-title">
+          <div class="panel-heading"><h2 id="machine-title">Пробный проход</h2><span class="machine-status" id="machine-status">Ожидание</span></div>
+          <div class="view-toolbar"><span>Продольное точение · вид сбоку</span><span>X — диаметр / Z — длина</span></div>
+          <div class="drawing"><svg id="machine-svg" viewBox="0 0 760 310" role="img" aria-labelledby="drawing-title drawing-desc"><title id="drawing-title">Схема учебного токарного прохода</title><desc id="drawing-desc">Заготовка диаметром 32 миллиметра закреплена слева. Резец перемещается справа налево по участку длиной 45 миллиметров.</desc>
+            <defs><pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M30 0H0V30" fill="none" stroke="#294456" stroke-width="0.6"/></pattern><linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a8bdc9"/><stop offset="0.45" stop-color="#e0ebf1"/><stop offset="1" stop-color="#7f9baa"/></linearGradient><linearGradient id="chuck-fill" x1="0" y1="0" x2="1" y2="0"><stop stop-color="#395368"/><stop offset="1" stop-color="#687f90"/></linearGradient></defs>
+            <rect width="760" height="310" fill="url(#grid)"/><path d="M95 160H707" stroke="#617b8c" stroke-width="1" stroke-dasharray="7 7"/>
+            <rect x="64" y="83" width="67" height="154" rx="5" fill="url(#chuck-fill)"/><rect x="122" y="96" width="31" height="35" rx="2" fill="#8196a5"/><rect x="122" y="189" width="31" height="35" rx="2" fill="#8196a5"/>
+            <rect id="stock" x="151" y="112" width="438" height="96" fill="url(#metal)"/><path id="cut-profile" d="" fill="url(#metal)"/>
+            <path d="M260 118H589M260 202H589" stroke="#54dcbc" stroke-width="1.5" stroke-dasharray="5 5" fill="none"/><text x="439" y="103" fill="#82eacf" font-size="13">Цель Ø28 мм</text>
+            <path id="trajectory" d="M630 88V118H260" stroke="#f4c56e" stroke-width="2" stroke-dasharray="5 6" fill="none"/>
+            <g id="tool-shape" transform="translate(630 88)"><path d="M0 0L-12 -15L9 -15Z" fill="#f4c56e"/><path d="M-12 -15V-50H13V-15Z" fill="#69889a"/><circle cx="0" cy="0" r="4" fill="#f4c56e"/></g>
+            <path d="M260 247H589M260 241V253M589 241V253" stroke="#9db2c0"/><text x="388" y="270" fill="#c7d6df" font-size="14">45 мм</text><text x="559" y="291" fill="#9db2c0" font-size="13">Z = 0</text><text x="235" y="291" fill="#9db2c0" font-size="13">Z = −45</text>
+            <path d="M686 243V209M686 243H647" stroke="#c7d6df" stroke-width="1.5"/><text x="693" y="211" fill="#c7d6df" font-size="13">X</text><text x="635" y="247" fill="#c7d6df" font-size="13">Z−</text><text x="64" y="269" fill="#9db2c0" font-size="13">Патрон</text>
+          </svg></div>
+          <div class="legend"><span><i class="line dashed"></i>Заданный проход</span><span><i class="line target"></i>Целевой диаметр</span><span class="scale-note">Схема, не цифровой двойник станка</span></div>
+          <div class="readouts"><div><span>Расчётный диаметр</span><strong id="actual">30,0 <small>мм</small></strong></div><div><span>Съём на радиус</span><strong id="depth">1,0 <small>мм</small></strong></div><div><span>Проход в симуляции</span><strong id="progress-value">0 <small>%</small></strong></div></div>
+          <div class="runbar"><button class="button primary" id="run" type="button">▶ Пробный проход</button><button class="button icon-button" id="reset" type="button" aria-label="Начать упражнение заново">↺ Сначала</button><span id="run-note">Можно запустить с ошибками и увидеть результат.</span></div>
+          <div class="progress-track" role="progressbar" aria-label="Пробный проход" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div id="progress-fill"></div></div>
+        </section>
+        <div class="bottom-grid">
+          <section class="code-panel panel" aria-labelledby="code-title"><div class="panel-heading"><h2 id="code-title">Учебная программа</h2><span class="label-mini">G-код</span></div><pre id="gcode" aria-label="Иллюстрация программы прохода"></pre><p class="small-note">Фрагмент для иллюстрации. Код не предназначен для загрузки в реальный станок.</p></section>
+          <section class="mentor-panel panel" aria-labelledby="mentor-title"><div class="panel-heading"><h2 id="mentor-title">Наставник</h2><span class="local-badge">Локальная демка</span></div><p class="mentor-disclosure">Подсказки по правилам. Нейросеть пока не подключена.</p><div class="mentor-answer" id="mentor-answer" aria-live="polite">Проверьте конечный диаметр X. Цель задания — Ø28 мм. Настройте проход и посмотрите, какой диаметр получится.</div><div class="quick-questions"><button type="button" data-question="Что исправить?">Что исправить?</button><button type="button" data-question="Как работает коррекция?">Коррекция X</button><button type="button" data-question="Как выбрать подачу?">Подача</button></div><form id="mentor-form" class="ask-row"><label class="sr-only" for="question">Вопрос наставнику</label><input id="question" maxlength="300" placeholder="Например: почему размер неверный?"><button type="submit" aria-label="Задать вопрос наставнику">↵</button></form></section>
+        </div>
+      </div>
+    </div>
+    <footer><span>ЧПУ Практика · концепция студенческого стартапа</span><span>Учебная модель: один проход, без расчёта сил резания и шероховатости.</span></footer>
+  </main>
+  <script src="model.js"></script><script src="app.js"></script>
+</body>
+</html>
