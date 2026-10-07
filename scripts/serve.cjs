@@ -5,6 +5,7 @@ const root = path.resolve(__dirname, '..');
 const files = {
   '/': ['index.html', 'text/html; charset=utf-8'],
   '/index.html': ['index.html', 'text/html; charset=utf-8'],
+  '/workshop.js': ['workshop.js', 'text/javascript; charset=utf-8'],
   '/app.js': ['app.js', 'text/javascript; charset=utf-8'],
   '/model.js': ['model.js', 'text/javascript; charset=utf-8'],
   '/lab-model.js': ['lab-model.js', 'text/javascript; charset=utf-8'],

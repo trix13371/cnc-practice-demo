@@ -152,10 +152,10 @@
     $('check').hidden=isExam;$('submit-answer').hidden=!active||exam.awaitingNext;$('next-question').hidden=!active||!exam.awaitingNext;
     for(const id of ['runbar','readouts','phase-list','phase-description','mentor-panel'])$(id).hidden=isExam;
     $('trajectory').style.visibility=isExam?'hidden':'visible';
-    document.querySelector('.bottom-grid').classList.toggle('exam-code',isExam);
     $('machine-title').textContent=isExam?'Схема задания':'Пробный проход';
     $('basic-gauge').hidden=isExam;$('basic-view-switch').hidden=isExam;renderBasicView();lock();
     if(isExam&&$('exam-level').value!=='easy')routeExam.render();else routeExam.hide();
+    window.CNCWorkshop?.sync();
   }
   function showAccepted() {
     $('check-result').className='check-result';$('check-result').textContent='Ответ сохранён. Разбор будет доступен после третьего задания.';lock();
@@ -222,7 +222,7 @@
   if(mode==='exam'&&exam?.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}
   renderHistory();renderReport();renderMode();
   function readState(){if(mode==='exam'&&$('exam-level').value!=='easy')return {mode,exam:routeExam.readState(),result:null};return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
-  window.CNCDemo={readState};
+  window.CNCDemo={readState,pauseWorkshop:()=>{if(playing)pause();window.CNCLabUI.pause();}};
   const context=document.modelContext;
   if(context?.registerTool){const lifecycle=new AbortController();const empty=input=>{if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected empty object');};
     const specs=[

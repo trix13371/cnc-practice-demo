@@ -8,9 +8,9 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">⌘</span><span>ЧПУ <b>Практика</b></span></a><div class="top-meta"><span>Токарный станок</span><span class="version">Версия 0.4</span></div></header>
+  <header class="topbar"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">⌘</span><span>ЧПУ <b>Практика</b></span></a><div class="top-meta"><span>Токарный станок</span><span class="version">Версия 0.5</span></div></header>
   <main>
-    <div class="intro"><div><p class="eyebrow">УЧЕБНАЯ МАСТЕРСКАЯ / ПЕНЗА</p><h1>Освойте наладку.<br><span>Проверьте себя на практике.</span></h1></div><p class="intro-copy">Разберите проход по шагам,<br>затем выполните задания самостоятельно.</p></div>
+    <div class="intro"><div><p class="eyebrow">УЧЕБНАЯ МАСТЕРСКАЯ / ПЕНЗА</p><h1>Практика наладки</h1></div><p class="intro-copy">От чертежа до готовой детали</p></div>
     <div class="learning-bar"><div class="mode-switch" role="group" aria-label="Режим тренажёра"><button id="mode-learn" type="button" aria-pressed="true">Обучение</button><button id="mode-exam" type="button" aria-pressed="false">Экзамен</button></div><span id="learning-progress">Освоено: 0 из 7</span><span class="storage-note" id="storage-note">Прогресс хранится в этом браузере</span></div>
     <div id="exam-level-bar" class="exam-level-bar" hidden><label for="exam-level">Уровень экзамена</label><select id="exam-level"><option value="easy">Лёгкий · 3 задания</option><option value="medium">Средний · 2 детали</option><option value="hard">Сложный · 2 детали</option></select><p>Для маршрутов: точность 40, технология 25, порядок 15, экономичность 20 баллов. Подсказки и пробные проходы отключены.</p></div><section id="route-exam-results" class="panel" hidden></section><section id="exam-banner" class="exam-banner" hidden aria-labelledby="exam-title"><div><h2 id="exam-title">Самопроверка: 3 задания</h2><p id="exam-description">Одна сдача на задание. Подсказки и пробный запуск недоступны. Разбор — после последнего ответа.</p></div><button id="exam-start" class="button primary" type="button">Начать экзамен</button><span id="exam-counter" class="exam-counter" hidden></span></section>
     <div id="difficulty-bar" class="difficulty-bar" role="group" aria-label="Сложность заданий"><span>Сложность</span><button type="button" data-level="all" aria-pressed="true">Все · 7</button><button type="button" data-level="easy" aria-pressed="false">Лёгкие · 3</button><button type="button" data-level="medium" aria-pressed="false">Средние · 2</button><button type="button" data-level="hard" aria-pressed="false">Сложные · 2</button></div>
@@ -74,6 +74,6 @@
     <section class="panel history-panel" aria-labelledby="history-title"><div class="panel-heading"><h2 id="history-title">История экзаменов</h2><span class="label-mini">Последние попытки по уровням</span></div><div id="history-list" class="history-list"></div><div id="route-history" class="history-list"></div></section>
     <footer><span>ЧПУ Практика · концепция студенческого стартапа</span><span>Учебная самопроверка. Результаты хранятся только в этом браузере.</span></footer>
   </main>
-  <script src="model.js"></script><script src="lab-model.js"></script><script src="process-model.js"></script><script src="route-exam-model.js"></script><script src="viewer3d.js"></script><script src="lab-session.js"></script><script src="lab-ui.js"></script><script src="route-exam-ui.js"></script><script src="app.js"></script>
+  <script src="model.js"></script><script src="lab-model.js"></script><script src="process-model.js"></script><script src="route-exam-model.js"></script><script src="viewer3d.js"></script><script src="lab-session.js"></script><script src="lab-ui.js"></script><script src="route-exam-ui.js"></script><script src="app.js"></script><script src="workshop.js"></script>
 </body>
 </html>
