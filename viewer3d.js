@@ -28,14 +28,15 @@
       const faces=[],N=64,start=this.section?N/2:0;
       const add=(points,cut=false)=>{const p=points.map(rotate);faces.push({p,z:p.reduce((s,v)=>s+v[2],0)/p.length,cut});};
       const cap=(x,outer,inner)=>{if(Math.abs(outer-inner)<.00001)return;for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,outer,a),ring(x,outer,b),ring(x,inner,b),ring(x,inner,a)]);}};
-      let x=0,prior=bore;
-      for(const s of segments){const r=s.diameter/2,r2=(s.endDiameter||s.diameter)/2;cap(x,Math.max(r,prior),Math.min(r,prior));
+      let x=0,prior=segments[0].diameter/2,priorBore=(segments[0].bore??this.profile.bore??0)/2;cap(0,prior,priorBore);
+      for(const s of segments){const bore=(s.bore??this.profile.bore??0)/2;cap(x,Math.max(bore,priorBore),Math.min(bore,priorBore));const r=s.diameter/2,r2=(s.endDiameter||s.diameter)/2;cap(x,Math.max(r,prior),Math.min(r,prior));
         for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,r2,b),ring(x,r,b)]);if(bore)add([ring(x,bore,b),ring(x+s.length,bore,b),ring(x+s.length,bore,a),ring(x,bore,a)]);}
         if(this.section)for(const a of [0,Math.PI])add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,bore,a),ring(x,bore,a)],true);
-        x+=s.length;prior=r2;
-      }cap(x,prior,bore);
+        x+=s.length;prior=r2;priorBore=bore;
+      }cap(x,prior,priorBore);
       faces.sort((a,b)=>a.z-b.z);
       for(const f of faces){const [a,b,c0]=f.p,u=b.map((v,i)=>v-a[i]),v=c0.map((n,i)=>n-a[i]);const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n)||1,light=.3+.7*Math.abs((n[0]*-.2+n[1]*.65+n[2]*.73)/len);ctx.fillStyle=f.cut?'#d7ad64':`rgb(${Math.round(106+90*light)},${Math.round(130+85*light)},${Math.round(142+85*light)})`;ctx.beginPath();f.p.forEach((p,i)=>{const q=project(p);if(i)ctx.lineTo(...q);else ctx.moveTo(...q);});ctx.closePath();ctx.fill();ctx.strokeStyle=f.cut?'#e9c17c':'rgba(12,35,49,.10)';ctx.lineWidth=.5;ctx.stroke();}
+      if(this.measurement){const m=this.measurement,r=m.actual/2,pts=[ring(m.x,r,0),ring(m.x,r,Math.PI)].map(v=>project(rotate(v)));ctx.strokeStyle='#ffce73';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(...pts[0]);ctx.lineTo(...pts[1]);for(const q of pts){ctx.moveTo(q[0]-8,q[1]);ctx.lineTo(q[0]+8,q[1]);}ctx.stroke();ctx.fillStyle='#ffce73';ctx.font='bold 14px Segoe UI';ctx.fillText('Место замера',16,24);}
       ctx.fillStyle='#b5cdd9';ctx.font='13px Segoe UI, sans-serif';ctx.fillText(`L ${Number(total.toFixed(1))} мм${bore?' · отверстие Ø'+Number((bore*2).toFixed(1)):''}`,16,h-17);
     }
   }

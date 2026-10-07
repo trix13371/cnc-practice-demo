@@ -14,14 +14,17 @@
 .difficulty-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:0 0 12px;font-size:14px}.difficulty-bar>span{margin-right:8px;color:var(--muted)}.difficulty-bar button,.part-switch button{font-size:14px;padding:8px 13px;border:1px solid var(--line);background:#fff;border-radius:6px;color:var(--muted);min-height:40px}.difficulty-bar button[aria-pressed=true],.part-switch button[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:white}.lessons{grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.lesson{padding:11px 12px;font-size:14px}.lesson small{font-size:12px}.lesson-no{font-size:14px}.lesson[data-difficulty=medium]{border-top:3px solid #c78b2f}.lesson[data-difficulty=hard]{border-top:3px solid #8a68bc}.lesson[data-difficulty=easy]{border-top:3px solid #55a998}.part-switch{display:flex;gap:7px;padding:12px 16px;flex-wrap:wrap;border-bottom:1px solid var(--line)}.lab-workspace{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.05fr);gap:20px;align-items:start}.lab-detail{position:sticky;top:16px}.lab-brief{font-size:16px;padding:18px 20px 10px}.lab-stock{margin:0 20px;padding:9px 12px;background:#edf4f7;border-radius:6px;font-size:14px;font-weight:600}.lab-dimensions{padding:10px 20px 12px 39px;font-size:14px;line-height:1.9;margin:0}.difficulty-badge{font-size:12px;white-space:nowrap;padding:4px 8px;background:#eee9f5;color:#654491;border-radius:5px}.part-viewer{background:#102a3b;color:#dbeaf1;min-width:0}.part-viewer canvas{display:block;width:100%;height:320px;touch-action:none;cursor:grab;outline-offset:-4px}.part-viewer canvas:active{cursor:grabbing}.part-viewer canvas:focus-visible{outline:3px solid #7ce4cb}.viewer-toolbar,.viewer-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 14px;flex-wrap:wrap;font-size:13px}.viewer-toolbar{border-bottom:1px solid #315263}.viewer-caption{font-size:14px}.viewer-toolbar>div,.viewer-bottom>div{display:flex;gap:5px;flex-wrap:wrap}.part-viewer button{background:#1e3d50;color:#d9ebf2;border:1px solid #476374;border-radius:5px;font-size:13px;padding:7px 9px;min-height:36px}.part-viewer button[aria-pressed=true]{background:#b98539;color:white}.viewer-bottom{border-top:1px solid #315263;color:#b6cbd7}.lab-hints{padding:18px 20px;border-top:1px solid var(--line)}.lab-hints span{margin-left:10px;font-size:14px;color:var(--muted)}.lab-hints p{margin-top:12px;font-size:14px;color:var(--muted)}.lab-global{display:grid;grid-template-columns:1fr 1fr;gap:15px;padding:18px 20px 0}.lab-global>.field:last-child{grid-column:1/-1}.lab-global input{margin-top:auto}.lab-global .field{display:flex;flex-direction:column}.plan-note{padding:0 20px 16px;color:var(--muted);font-size:14px}.operation-card{margin:0 16px 14px;border:1px solid var(--line);border-radius:8px;overflow:hidden}.op-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#edf3f6;padding:11px 14px}.op-heading h3{font-size:16px;margin:0}.op-heading>div{display:flex;gap:5px}.op-heading .button{font-size:12px;min-height:32px;padding:5px 8px}.op-limit{font-size:13px;color:var(--muted);padding:10px 14px 0}.op-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 12px;padding:12px 14px 0}.op-fields>.field:first-child{grid-column:1/-1}.op-fields .field{font-size:14px}.op-fields input{padding:8px 10px;font-size:16px}.lab-actions{display:flex;gap:10px;flex-wrap:wrap;padding:3px 16px 16px}.lab-feedback{padding:18px 20px;background:#f6f9fb;border-top:1px solid var(--line);font-size:14px}.lab-feedback.success{background:var(--green-pale);color:#075940}.lab-feedback.error{background:var(--amber-pale);color:#754704}.lab-feedback ul{margin:10px 0 0;padding-left:20px}.lab-feedback li+li{margin-top:7px}.lab-feedback p{margin-top:8px}.intro h1{font-size:25px}.intro{margin-bottom:16px}.intro-copy{font-size:14px}
 @media(max-width:1000px){.lessons{grid-template-columns:repeat(3,minmax(0,1fr))}.lab-workspace{grid-template-columns:1fr}.lab-detail{position:static}.part-viewer canvas{height:340px}}
 @media(max-width:600px){.lessons{grid-template-columns:repeat(2,minmax(0,1fr))}.lesson small{display:block;font-size:12px}.lesson{font-size:14px;padding:10px;min-height:72px}.lesson-done{display:block}.difficulty-bar{gap:6px}.difficulty-bar>span{flex-basis:100%}.difficulty-bar button{padding:7px 10px}.part-viewer canvas{height:280px}.lab-brief{padding:16px;font-size:16px}.lab-stock{margin:0 16px}.lab-dimensions{padding-left:33px}.op-fields{gap:0 10px}.viewer-toolbar,.viewer-bottom{padding:10px}.op-heading{flex-wrap:wrap}.lab-global{padding:16px 16px 0;gap:10px}.lab-actions>.button{flex:1}.lab-plan>.panel-heading{gap:6px}}
+.simulation-controls,.measurement-panel{padding:16px 20px;border-bottom:1px solid var(--line);background:#f7fafb}.simulation-controls .lab-actions{padding:0 0 12px}.simulation-controls label{font-size:14px;display:block}.simulation-controls input[type=range]{width:100%;margin:12px 0}.simulation-controls p{font-size:14px;color:var(--green);font-weight:600}.measurement-panel{background:#fff}.measurement-panel h3{margin:0 0 16px}.measurement-panel output{display:inline-block;min-width:130px;margin-left:14px;padding:8px 12px;border-radius:6px;background:#102a3b;color:#80e5c7;font:600 23px Consolas,monospace}.measurement-panel>p{font-size:14px;color:var(--muted);margin:12px 0}.measurement-panel #gauge-log{padding-left:20px;font-size:14px;max-height:180px;overflow:auto}.measurement-panel li+li{margin-top:8px}.measurement-panel input[type=range]{padding:0}.measurement-panel .small-note{padding:0}.exam-level-bar{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px;font-size:14px}.exam-level-bar select{padding:10px 14px;border:1px solid #b8c8d2;border-radius:6px;background:#fff;color:var(--ink)}.exam-level-bar p{flex-basis:100%;color:var(--muted)}#route-exam-results{margin-bottom:20px}#lab-workspace .lab-detail{position:static}#gauge-message{min-height:20px}#route-history:empty{display:none}
+@media(max-width:600px){.simulation-controls,.measurement-panel{padding:14px 16px}.simulation-controls .lab-actions{display:grid;grid-template-columns:1fr 1fr}.simulation-controls .button{font-size:12px;padding:8px}.measurement-panel .field-row{grid-template-columns:1fr}.measurement-panel output{font-size:21px;min-width:110px}.exam-level-bar select{width:100%}}
+.basic-gauge{display:flex;gap:12px;align-items:end;flex-wrap:wrap;padding:16px 20px;border-bottom:1px solid var(--line);font-size:14px}.basic-gauge label{flex:1;min-width:160px}.basic-gauge select{display:block;width:100%;padding:9px;margin-top:5px;background:white;border:1px solid #b8c8d2;border-radius:6px}.basic-gauge output{flex-basis:100%;color:var(--green);font-weight:600}
 </style>
 </head>
 <body>
-  <header class="topbar"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">⌘</span><span>ЧПУ <b>Практика</b></span></a><div class="top-meta"><span>Токарный станок</span><span class="version">Версия 0.3</span></div></header>
+  <header class="topbar"><a class="brand" href="#"><span class="brand-mark" aria-hidden="true">⌘</span><span>ЧПУ <b>Практика</b></span></a><div class="top-meta"><span>Токарный станок</span><span class="version">Версия 0.4</span></div></header>
   <main>
     <div class="intro"><div><p class="eyebrow">УЧЕБНАЯ МАСТЕРСКАЯ / ПЕНЗА</p><h1>Освойте наладку.<br><span>Проверьте себя на практике.</span></h1></div><p class="intro-copy">Разберите проход по шагам,<br>затем выполните задания самостоятельно.</p></div>
     <div class="learning-bar"><div class="mode-switch" role="group" aria-label="Режим тренажёра"><button id="mode-learn" type="button" aria-pressed="true">Обучение</button><button id="mode-exam" type="button" aria-pressed="false">Экзамен</button></div><span id="learning-progress">Освоено: 0 из 7</span><span class="storage-note" id="storage-note">Прогресс хранится в этом браузере</span></div>
-    <section id="exam-banner" class="exam-banner" hidden aria-labelledby="exam-title"><div><h2 id="exam-title">Самопроверка: 3 задания</h2><p id="exam-description">Одна сдача на задание. Подсказки и пробный запуск недоступны. Разбор — после последнего ответа.</p></div><button id="exam-start" class="button primary" type="button">Начать экзамен</button><span id="exam-counter" class="exam-counter" hidden></span></section>
+    <div id="exam-level-bar" class="exam-level-bar" hidden><label for="exam-level">Уровень экзамена</label><select id="exam-level"><option value="easy">Лёгкий · 3 задания</option><option value="medium">Средний · 2 детали</option><option value="hard">Сложный · 2 детали</option></select><p>Для маршрутов: точность 40, технология 25, порядок 15, экономичность 20 баллов. Подсказки и пробные проходы отключены.</p></div><section id="route-exam-results" class="panel" hidden></section><section id="exam-banner" class="exam-banner" hidden aria-labelledby="exam-title"><div><h2 id="exam-title">Самопроверка: 3 задания</h2><p id="exam-description">Одна сдача на задание. Подсказки и пробный запуск недоступны. Разбор — после последнего ответа.</p></div><button id="exam-start" class="button primary" type="button">Начать экзамен</button><span id="exam-counter" class="exam-counter" hidden></span></section>
     <div id="difficulty-bar" class="difficulty-bar" role="group" aria-label="Сложность заданий"><span>Сложность</span><button type="button" data-level="all" aria-pressed="true">Все · 7</button><button type="button" data-level="easy" aria-pressed="false">Лёгкие · 3</button><button type="button" data-level="medium" aria-pressed="false">Средние · 2</button><button type="button" data-level="hard" aria-pressed="false">Сложные · 2</button></div>
     <nav class="lessons" aria-label="Упражнения">
       <button type="button" class="lesson active" data-task="diameter" aria-pressed="true"><span class="lesson-no">01</span><span>Первый проход<small>Диаметр и припуск</small></span><span class="lesson-done" aria-hidden="true"></span></button>
@@ -33,7 +36,7 @@
       <button type="button" class="lesson" data-task="calibration" aria-pressed="false"><span class="lesson-no">07</span><span>Вал по замерам<small>Сложный · диагностика</small></span><span class="lesson-done" aria-hidden="true"></span></button>
     </nav>
     <section id="lab-workspace" class="lab-workspace" hidden aria-labelledby="lab-title">
-      <div class="lab-detail panel"><div class="panel-heading"><h2 id="lab-title"></h2><span id="lab-level" class="difficulty-badge"></span></div><p id="lab-brief" class="lab-brief"></p><p id="lab-stock" class="lab-stock"></p><ul id="lab-dimensions" class="lab-dimensions"></ul><div class="part-switch" role="group" aria-label="Сравнение детали"><button id="lab-target" type="button" aria-pressed="true">Целевая деталь</button><button id="lab-result" type="button" aria-pressed="false">Мои настройки</button></div><div id="lab-viewer" class="part-viewer"></div><p class="small-note">Геометрия по заданным размерам. 3D не моделирует столкновения, порядок снятия металла и шероховатость. Правильность технологии проверяется отдельно.</p><div class="lab-hints"><button id="lab-hint" class="button secondary" type="button">Подсказка</button><span id="lab-hint-count">0 / 3</span><p id="lab-hint-text"></p></div></div>
+      <div class="lab-detail panel"><div class="panel-heading"><h2 id="lab-title"></h2><span id="lab-level" class="difficulty-badge"></span></div><p id="lab-brief" class="lab-brief"></p><p id="lab-stock" class="lab-stock"></p><ul id="lab-dimensions" class="lab-dimensions"></ul><div class="part-switch" role="group" aria-label="Сравнение детали"><button id="lab-target" type="button" aria-pressed="true">Целевая деталь</button><button id="lab-result" type="button" aria-pressed="false">Обрабатываемая деталь</button></div><div id="lab-viewer" class="part-viewer"></div><p class="small-note">Материал снимается по проходам. Анимация ускорена; столкновения и шероховатость не моделируются.</p><div class="lab-hints"><button id="lab-hint" class="button secondary" type="button">Подсказка</button><span id="lab-hint-count">0 / 3</span><p id="lab-hint-text"></p></div></div>
       <div class="lab-plan panel"><div class="panel-heading"><h2>Маршрут обработки</h2><button id="lab-reset" class="button secondary" type="button">Сначала</button></div><div class="lab-global"><label class="field">Общая коррекция X, мм<input id="lab-offset" type="number" min="-5" max="5" step="0.1" value="0"></label><label class="field">Обороты <span id="lab-rpm-range" class="unit"></span><input id="lab-rpm" type="number" min="100" max="2000" step="50" value="800"></label><label id="lab-diagnosis-label" class="field" hidden>Причина отклонения<select id="lab-diagnosis"><option value="none">Выберите причину</option><option value="offset">Постоянное смещение X</option><option value="feed">Завышенная подача</option><option value="program">Ошибка отдельного размера в программе</option></select></label></div><p class="plan-note">Операции идут сверху вниз. Припуск делится поровну между указанными проходами. Длины ступеней отсчитываются последовательно от левого торца.</p><div id="lab-operations"></div><div class="lab-actions"><button id="lab-check" class="button secondary" type="button">Проверить маршрут</button><button id="lab-finish" class="button primary" type="button" disabled>Выполнить маршрут</button></div><div id="lab-feedback" class="lab-feedback" aria-live="polite"></div></div>
     </section>
     <section id="exam-results" class="panel exam-results" hidden aria-labelledby="exam-result-title"><div class="panel-heading"><h2 id="exam-result-title">Результат экзамена</h2><button id="export-report" class="button secondary" type="button">Скачать разбор</button></div><div id="exam-summary" class="exam-summary" aria-live="polite"></div><div id="exam-review"></div></section>
@@ -80,7 +83,7 @@
         </div>
       </div>
     </div>
-    <section class="panel history-panel" aria-labelledby="history-title"><div class="panel-heading"><h2 id="history-title">История экзаменов</h2><span class="label-mini">Последние 10 попыток</span></div><div id="history-list" class="history-list"></div></section>
+    <section class="panel history-panel" aria-labelledby="history-title"><div class="panel-heading"><h2 id="history-title">История экзаменов</h2><span class="label-mini">Последние попытки по уровням</span></div><div id="history-list" class="history-list"></div><div id="route-history" class="history-list"></div></section>
     <footer><span>ЧПУ Практика · концепция студенческого стартапа</span><span>Учебная самопроверка. Результаты хранятся только в этом браузере.</span></footer>
   </main>
   <script>(function (root) {
@@ -252,6 +255,71 @@
   }
   const api={tasks,tools,defaults,validate,evaluate,profile};root.CNCLabModel=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
+</script><script>(function(root){
+  'use strict';
+  const lab=root.CNCLabModel||(typeof require==='function'?require('./lab-model.js'):null);
+  const lerp=(a,b,t)=>a+(b-a)*t;
+  function surfaces(task){let z=0;const list=[];for(const o of task.operations.filter(o=>!['bore','groove'].includes(o.kind))){list.push({...o,start:z});z+=o.length;}for(const o of task.operations.filter(o=>['bore','groove'].includes(o.kind)))list.push({...o,start:o.kind==='bore'?0:(list.find(s=>s.id===o.parent)?.start||0)+o.position});return list;}
+  function stock(t){return {segments:[{length:t.length,diameter:t.stock,endDiameter:t.stock,bore:t.bore}],bore:t.bore};}
+  function timeline(t,p){if(!lab.validate(t,p))throw new Error('Заполните допустимыми числами все поля маршрута.');const result=[];for(const o of p.operations){const spec=t.operations.find(s=>s.id===o.id);if(o.tool!==spec.tool)throw new Error(`${spec.title}: неверный инструмент. Исправьте его перед запуском.`);for(let n=1;n<=o.passes;n++)result.push({id:o.id,pass:n,total:o.passes,title:spec.title,tool:o.tool});}return result;}
+  function cut(t,p,state,step){
+    const spec=surfaces(t).find(o=>o.id===step.id),op=p.operations.find(o=>o.id===step.id),shift=p.offset+t.bias;
+    const start=spec.start,end=start+op.length;
+    if(end>t.length+1e-6)throw new Error(`${spec.title}: участок выходит за длину заготовки.`);
+    const base=spec.kind==='bore'?t.bore:spec.parent?p.operations.find(o=>o.id===spec.parent).diameter+shift:t.stock;
+    const ratio=step.pass/step.total,d=lerp(base,op.diameter+shift,ratio),de=lerp(base,(op.endDiameter||op.diameter)+shift,ratio);
+    if(Math.min(d,de)<=0)throw new Error('Траектория пересекает ось. Исправьте диаметры или коррекцию.');
+    const desired=x=>lerp(d,de,(x-start)/op.length),out=[];let x=0;
+    for(const s of state.segments){const x0=x,x1=x+s.length;x=x1;const outer=q=>lerp(s.diameter,s.endDiameter||s.diameter,(q-x0)/s.length);const breaks=[x0,x1];for(const b of [start,end])if(b>x0+1e-8&&b<x1-1e-8)breaks.push(b);
+      const lo=Math.max(start,x0),hi=Math.min(end,x1);if(hi>lo&&spec.kind!=='bore'){const va=outer(lo)-desired(lo),vb=outer(hi)-desired(hi);if(va*vb<0)breaks.push(lo+(hi-lo)*va/(va-vb));}
+      breaks.sort((a,b)=>a-b);
+      for(let i=0;i<breaks.length-1;i++){const a=breaks[i],b=breaks[i+1];if(b-a<1e-8)continue;const inCut=a>=start-1e-8&&b<=end+1e-8;let da=outer(a),db=outer(b),bore=s.bore??state.bore;
+        if(inCut){if(spec.kind==='bore')bore=Math.max(bore,d);else{da=Math.min(da,desired(a));db=Math.min(db,desired(b));}}
+        if(bore>=Math.min(da,db)-1e-8)throw new Error('Обработка уничтожает стенку детали. Проверьте внутренний и наружный диаметры.');
+        out.push({length:b-a,diameter:da,endDiameter:db,bore});
+      }
+    }
+    return {segments:out,bore:out[0]?.bore||0};
+  }
+  function stateAt(t,p,count){const steps=timeline(t,p);if(!Number.isInteger(count)||count<0||count>steps.length)throw new Error('Недопустимый номер прохода');let state=stock(t);for(const step of steps.slice(0,count))state=cut(t,p,state,step);return state;}
+  function measure(t,state,id,fraction,instrument){const s=surfaces(t).find(o=>o.id===id);if(!s||!Number.isFinite(fraction)||fraction<0||fraction>1||!['caliper','micrometer'].includes(instrument))throw new Error('Выберите поверхность, положение и инструмент.');if(s.kind==='bore'&&instrument==='micrometer')throw new Error('Наружный микрометр не измеряет отверстия. Выберите штангенциркуль.');
+    const x=s.start+s.length*Math.max(.001,Math.min(.999,fraction));let z=0,seg=state.segments.at(-1),local=1;for(const a of state.segments){if(x<z+a.length+1e-8){seg=a;local=(x-z)/a.length;break;}z+=a.length;}
+    const groove=surfaces(t).find(g=>g.kind==='groove'&&g.parent===s.id&&x>=g.start&&x<=g.start+g.length);
+    const actual=s.kind==='bore'?(seg.bore??state.bore):lerp(seg.diameter,seg.endDiameter||seg.diameter,local),target=groove?groove.diameter:lerp(s.diameter,s.endDiameter||s.diameter,Math.max(.001,Math.min(.999,fraction))),resolution=instrument==='micrometer'?.01:.1,reading=Math.round(actual/resolution)*resolution;
+    return {id,title:groove?groove.title:s.title,x,actual,reading:+reading.toFixed(2),target:+target.toFixed(3),instrument,resolution,kind:s.kind==='bore'?'inside':'outside',verdict:actual<target-.10000001?'small':actual>target+.10000001?'large':'ok'};
+  }
+  const api={surfaces,stock,timeline,cut,stateAt,measure};root.CNCProcess=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(typeof window!=='undefined'?window:globalThis);
+</script><script>(function(root){
+  'use strict';
+  const lab=root.CNCLabModel||(typeof require==='function'?require('./lab-model.js'):null);
+  function taskFor(level,seed,index){if(!['medium','hard'].includes(level)||!Number.isInteger(seed)||seed<0||seed>4294967295||![0,1].includes(index))throw new Error('Неверный вариант');const t=JSON.parse(JSON.stringify(lab.tasks.filter(t=>t.level===level)[index]));
+    const shift=2*(1+(seed+index)%3),extra=5*(1+((seed>>>3)+index)%2);t.stock+=shift;t.operations.forEach(o=>{o.diameter+=shift;if(o.endDiameter)o.endDiameter+=shift;if(o.kind!=='groove')o.length+=extra;});if(t.bore)t.bore+=shift;
+    t.length=t.operations.filter(o=>!['bore','groove'].includes(o.kind)).reduce((sum,o)=>sum+o.length,0);t.hints=[];
+    if(t.diagnosis){t.bias=[-.6,-.2,.2,.6][seed%4];t.brief='Контроль при нулевой коррекции: '+t.operations.map(o=>`X ${o.diameter} → замер ${(o.diameter+t.bias).toFixed(1)} мм`).join('; ')+'. Определите причину и общую коррекцию. Программные диаметры оставьте по чертежу.';}
+    else t.brief=t.id==='sleeve'?`Заготовка с отверстием Ø${t.bore}. Сначала расточите отверстие, затем наружную поверхность. Стенка не менее ${t.minWall} мм. Размеры и режимы указаны ниже.`:t.id==='taper'?'Обработайте поясок перед канавкой. Рассчитайте проходы для каждой поверхности; соблюдайте размеры чертежа и ограничения режимов.':'Рассчитайте проходы для двух ступеней из исходного диаметра заготовки. Соблюдайте размеры и ограничения режимов.';
+    return t;
+  }
+  function create(level,seed,at=new Date().toISOString()){taskFor(level,seed,0);return {version:1,level,seed,at,index:0,answers:[],draft:null};}
+  function submit(e,plan){if(e.answers.length!==e.index||e.index>1)throw new Error('Ответ уже сдан');const t=taskFor(e.level,e.seed,e.index);if(!lab.validate(t,plan))throw new Error('Заполните все поля допустимыми числами.');return {...e,answers:[...e.answers,JSON.parse(JSON.stringify(plan))],draft:null};}
+  function advance(e){if(e.index!==0||e.answers.length!==1)throw new Error('Переход недоступен');return {...e,index:1,draft:null};}
+  function gradeTask(t,p){
+    if(!lab.validate(t,p))throw new Error('Недопустимый ответ');const r=lab.evaluate(t,p),by=Object.fromEntries(p.operations.map(o=>[o.id,o])),near=(a,b)=>Math.abs(a-b)<=.10000001;
+    let geometry=0,geometryMax=0,technology=0,technologyMax=2+(t.diagnosis?1:0),extra=0;
+    technology+=p.rpm>=t.rpm[0]&&p.rpm<=t.rpm[1]?1:0;technology+=Math.abs(p.offset+t.bias)<1e-6?1:0;if(t.diagnosis)technology+=p.diagnosis==='offset'?1:0;
+    for(const s of t.operations){const o=by[s.id],row=r.rows.find(a=>a.id===s.id);geometryMax+=2+(s.endDiameter?1:0);geometry+=near(row.actual,s.diameter)?1:0;geometry+=near(o.length,s.length)?1:0;if(s.endDiameter)geometry+=near(row.end,s.endDiameter)?1:0;
+      technologyMax+=3+(t.diagnosis?1:0);technology+=o.tool===s.tool?1:0;technology+=o.feed>=s.feed[0]&&o.feed<=s.feed[1]?1:0;technology+=row.perPass>=0&&row.perPass<=s.maxDepth+1e-9?1:0;if(t.diagnosis)technology+=near(o.diameter,s.diameter)?1:0;
+      const start=s.kind==='bore'?t.bore:s.parent?t.operations.find(a=>a.id===s.parent).diameter:t.stock,minimum=Math.ceil(Math.abs(start-(s.kind==='bore'?s.diameter:Math.min(s.diameter,s.endDiameter||s.diameter)))/(2*s.maxDepth)-1e-9);extra+=Math.max(0,o.passes-minimum);
+    }
+    if(t.minWall){technologyMax++;technology+=(by.outer.diameter-by.bore.diameter)/2>=t.minWall-1e-9?1:0;}
+    const order=t.order.every(([a,b])=>p.operations.findIndex(o=>o.id===a)<p.operations.findIndex(o=>o.id===b));
+    const parts={accuracy:Math.round(40*geometry/geometryMax),technology:Math.round(25*technology/technologyMax),order:order?15:0,economy:Math.max(0,20-extra*2)};
+    return {...r,parts,extra,score:Object.values(parts).reduce((a,b)=>a+b,0),hints:0};
+  }
+  function grade(e){if(e.answers.length!==2)throw new Error('Завершите оба задания');const answers=e.answers.map((p,i)=>({task:taskFor(e.level,e.seed,i),plan:p,result:gradeTask(taskFor(e.level,e.seed,i),p)}));return {answers,score:Math.round(answers.reduce((s,a)=>s+a.result.score,0)/2)};}
+  function restore(e){try{if(!e||e.version!==1||!Number.isFinite(Date.parse(e.at))||![0,1].includes(e.index)||!Array.isArray(e.answers)||e.answers.length<e.index||e.answers.length>e.index+1)return null;taskFor(e.level,e.seed,0);if(e.answers.some((p,i)=>!lab.validate(taskFor(e.level,e.seed,i),p)))return null;return {...create(e.level,e.seed,e.at),index:e.index,answers:e.answers,draft:e.answers.length===e.index&&lab.validate(taskFor(e.level,e.seed,e.index),e.draft)?e.draft:null};}catch{return null;}}
+  const api={taskFor,create,submit,advance,gradeTask,grade,restore};root.CNCRouteExam=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+})(typeof window!=='undefined'?window:globalThis);
 </script><script>(function(){
   'use strict';
   class PartViewer {
@@ -282,14 +350,15 @@
       const faces=[],N=64,start=this.section?N/2:0;
       const add=(points,cut=false)=>{const p=points.map(rotate);faces.push({p,z:p.reduce((s,v)=>s+v[2],0)/p.length,cut});};
       const cap=(x,outer,inner)=>{if(Math.abs(outer-inner)<.00001)return;for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,outer,a),ring(x,outer,b),ring(x,inner,b),ring(x,inner,a)]);}};
-      let x=0,prior=bore;
-      for(const s of segments){const r=s.diameter/2,r2=(s.endDiameter||s.diameter)/2;cap(x,Math.max(r,prior),Math.min(r,prior));
+      let x=0,prior=segments[0].diameter/2,priorBore=(segments[0].bore??this.profile.bore??0)/2;cap(0,prior,priorBore);
+      for(const s of segments){const bore=(s.bore??this.profile.bore??0)/2;cap(x,Math.max(bore,priorBore),Math.min(bore,priorBore));const r=s.diameter/2,r2=(s.endDiameter||s.diameter)/2;cap(x,Math.max(r,prior),Math.min(r,prior));
         for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,r2,b),ring(x,r,b)]);if(bore)add([ring(x,bore,b),ring(x+s.length,bore,b),ring(x+s.length,bore,a),ring(x,bore,a)]);}
         if(this.section)for(const a of [0,Math.PI])add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,bore,a),ring(x,bore,a)],true);
-        x+=s.length;prior=r2;
-      }cap(x,prior,bore);
+        x+=s.length;prior=r2;priorBore=bore;
+      }cap(x,prior,priorBore);
       faces.sort((a,b)=>a.z-b.z);
       for(const f of faces){const [a,b,c0]=f.p,u=b.map((v,i)=>v-a[i]),v=c0.map((n,i)=>n-a[i]);const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n)||1,light=.3+.7*Math.abs((n[0]*-.2+n[1]*.65+n[2]*.73)/len);ctx.fillStyle=f.cut?'#d7ad64':`rgb(${Math.round(106+90*light)},${Math.round(130+85*light)},${Math.round(142+85*light)})`;ctx.beginPath();f.p.forEach((p,i)=>{const q=project(p);if(i)ctx.lineTo(...q);else ctx.moveTo(...q);});ctx.closePath();ctx.fill();ctx.strokeStyle=f.cut?'#e9c17c':'rgba(12,35,49,.10)';ctx.lineWidth=.5;ctx.stroke();}
+      if(this.measurement){const m=this.measurement,r=m.actual/2,pts=[ring(m.x,r,0),ring(m.x,r,Math.PI)].map(v=>project(rotate(v)));ctx.strokeStyle='#ffce73';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(...pts[0]);ctx.lineTo(...pts[1]);for(const q of pts){ctx.moveTo(q[0]-8,q[1]);ctx.lineTo(q[0]+8,q[1]);}ctx.stroke();ctx.fillStyle='#ffce73';ctx.font='bold 14px Segoe UI';ctx.fillText('Место замера',16,24);}
       ctx.fillStyle='#b5cdd9';ctx.font='13px Segoe UI, sans-serif';ctx.fillText(`L ${Number(total.toFixed(1))} мм${bore?' · отверстие Ø'+Number((bore*2).toFixed(1)):''}`,16,h-17);
     }
   }
@@ -297,14 +366,43 @@
 })();
 </script><script>(function(){
   'use strict';
+  const $=id=>document.getElementById(id),process=window.CNCProcess,lab=window.CNCLabModel;
+  let t,p,viewer,steps=[],frames=[],cursor=0,reached=0,playing=false,raf=null,disabled=false,readOnly=false,done=()=>{},persist=()=>{},logs=[],measurement=null;
+  const fmt=n=>n.toLocaleString('ru-RU',{maximumFractionDigits:2,minimumFractionDigits:2});
+  function pause(){if(raf!==null)cancelAnimationFrame(raf);raf=null;playing=false;render();}
+  function state(){return frames[cursor]||process.stock(t);}
+  function render(){if(!t)return;$('lab-finish').textContent=playing?'Пауза':cursor===steps.length&&steps.length?'Повторить обработку':cursor?'Продолжить обработку':'Запустить обработку';$('sim-step').disabled=playing||disabled;$('sim-back').disabled=playing||!cursor||disabled;$('sim-stage').disabled=playing||!reached;$('sim-stage').max=reached;$('sim-stage').value=cursor;$('sim-status').textContent=cursor?`${cursor} / ${steps.length} · ${steps[cursor-1]?.title} · проход ${steps[cursor-1]?.pass} из ${steps[cursor-1]?.total}`:'Исходная заготовка';$('gauge-read').disabled=playing||disabled;document.querySelectorAll('#lab-operations input,#lab-operations select,#lab-operations button,#lab-global-fields input').forEach(e=>{if(e.tagName!=='BUTTON')e.disabled=playing||readOnly;});for(const id of ['lab-offset','lab-rpm','lab-diagnosis','lab-check','lab-reset'])$(id).disabled=playing||readOnly;}
+  function show(){measurement=null;$('gauge-record').disabled=true;$('gauge-value').textContent='—';viewer.measurement=null;viewer.set(state(),cursor?`После прохода ${cursor} / ${steps.length}`:'Исходная заготовка');$('lab-target').setAttribute('aria-pressed','false');$('lab-result').setAttribute('aria-pressed','true');render();}
+  function prepare(){if(disabled)return false;p=window.CNCLabUI.getPlan();try{steps=process.timeline(t,p);frames=[process.stock(t)];for(const step of steps)frames.push(process.cut(t,p,frames.at(-1),step));return true;}catch(e){$('lab-feedback').textContent=e.message;$('lab-feedback').className='lab-feedback error';return false;}}
+  function complete(){playing=false;raf=null;render();persist();if(cursor===steps.length&&steps.length){const r=lab.evaluate(t,p);if(r.success)done();else{$('lab-feedback').className='lab-feedback error';$('lab-feedback').textContent='Обработка завершена с ошибками. Измерьте деталь и проверьте маршрут.';}}}
+  function advance(){if(disabled||playing||!prepare())return;if(cursor>=steps.length){cursor=0;reached=0;logs=[];renderLogs();}cursor++;reached=Math.max(reached,cursor);show();complete();}
+  function run(){if(disabled)return;if(playing){pause();show();persist();return;}if(!prepare())return;if(cursor>=steps.length){cursor=0;reached=0;logs=[];renderLogs();}playing=true;render();let began=null;const duration=matchMedia('(prefers-reduced-motion: reduce)').matches?200:1000;
+    function tick(now){if(!playing)return;if(began===null)began=now;const f=Math.min(1,(now-began)/duration),step=steps[cursor];viewer.measurement=null;viewer.set(process.cut(t,p,frames[cursor],{...step,pass:step.pass-1+f}),`${step.title} · проход ${step.pass} / ${step.total}`);if(f===1){cursor++;reached=cursor;show();persist();if(cursor===steps.length){complete();return;}began=now;}raf=requestAnimationFrame(tick);}raf=requestAnimationFrame(tick);
+  }
+  function renderLogs(){const list=$('gauge-log');list.replaceChildren();for(const m of logs){const li=document.createElement('li');li.textContent=`Проход ${m.stage}: ${m.title}, ${fmt(m.reading)} мм · ${m.instrument==='micrometer'?'микрометр':'штангенциркуль'} · ${m.correct?'вывод верный':'вывод неверный'}`;list.append(li);}}
+  function readGauge(){if(playing||disabled)return;show();try{measurement=process.measure(t,state(),$('gauge-surface').value,Number($('gauge-position').value)/100,$('gauge-tool').value);viewer.measurement=measurement;viewer.draw();$('gauge-value').textContent=fmt(measurement.reading)+' мм';$('gauge-target').textContent=`Цель в этой точке: ${fmt(measurement.target)} ±0,10 мм. Цена деления: ${measurement.resolution} мм.`;$('gauge-message').textContent='Сравните размер с допуском и запишите свой вывод.';$('gauge-record').disabled=false;}catch(e){measurement=null;$('gauge-value').textContent='—';$('gauge-message').textContent=e.message;$('gauge-record').disabled=true;}}
+  function changed(){pause();cursor=0;reached=0;steps=[];frames=[];logs=[];measurement=null;viewer.measurement=null;$('gauge-value').textContent='—';$('gauge-target').textContent='Измеряется текущая заготовка после выполненных проходов.';$('gauge-message').textContent='';$('gauge-record').disabled=true;renderLogs();render();}
+  function open(task,partViewer,options={}){pause();t=task;viewer=partViewer;disabled=!!options.exam;readOnly=!!options.readonly;cursor=0;reached=0;steps=[];frames=[];logs=[];measurement=null;viewer.measurement=null;done=options.done||(()=>{});persist=options.persist||(()=>{});
+    const select=$('gauge-surface');select.replaceChildren(...process.surfaces(t).map(s=>{const o=document.createElement('option');o.value=s.id;o.textContent=s.title+(s.kind==='bore'?' · внутри':' · снаружи');return o;}));$('gauge-position').value=50;$('gauge-record').disabled=true;$('gauge-value').textContent='—';$('gauge-target').textContent='Измеряется текущая заготовка после выполненных проходов.';$('gauge-message').textContent='';
+    $('simulation-controls').hidden=disabled;$('measurement-panel').hidden=disabled;if(!disabled&&options.saved&&prepare()){const n=options.saved.cursor;if(Number.isInteger(n)&&n>=0&&n<=steps.length)cursor=reached=n;}renderLogs();render();}
+  function init(){
+    $('lab-viewer').insertAdjacentHTML('afterend','<div id="simulation-controls" class="simulation-controls"><div class="lab-actions"><button id="sim-back" type="button" class="button secondary">Предыдущий проход</button><button id="sim-step" type="button" class="button secondary">Следующий проход</button></div><label>Осмотр выполненных проходов<input id="sim-stage" type="range" min="0" max="0" value="0" step="1"></label><p id="sim-status" aria-live="polite"></p></div><section id="measurement-panel" class="measurement-panel" aria-labelledby="gauge-title"><h3 id="gauge-title">Измерение детали</h3><div class="field-row"><label class="field">Поверхность<select id="gauge-surface"></select></label><label class="field">Инструмент<select id="gauge-tool"><option value="caliper">Штангенциркуль · 0,1 мм</option><option value="micrometer">Наружный микрометр · 0,01 мм</option></select></label></div><label class="field">Положение вдоль поверхности, %<input id="gauge-position" type="range" min="0" max="100" value="50"></label><button id="gauge-read" type="button" class="button secondary">Измерить</button><output id="gauge-value">—</output><p id="gauge-target"></p><label class="field">Мой вывод<select id="gauge-verdict"><option value="ok">В допуске</option><option value="large">Размер больше допуска</option><option value="small">Размер меньше допуска</option></select></label><button id="gauge-record" type="button" class="button secondary" disabled>Записать замер</button><p id="gauge-message" aria-live="polite"></p><ol id="gauge-log"></ol><p class="small-note">Учебная модель прибора: округление до цены деления, без случайной погрешности. Пограничный размер уточняйте более точным прибором.</p></section>');
+    $('sim-step').addEventListener('click',advance);$('sim-back').addEventListener('click',()=>{if(!playing&&cursor){cursor--;show();}});$('sim-stage').addEventListener('input',()=>{if(!playing){cursor=Number($('sim-stage').value);show();}});$('gauge-read').addEventListener('click',readGauge);
+    for(const id of ['gauge-surface','gauge-position','gauge-tool'])$(id).addEventListener('input',()=>{measurement=null;viewer.measurement=null;viewer.draw();$('gauge-record').disabled=true;$('gauge-value').textContent='—';});
+    $('gauge-record').addEventListener('click',()=>{if(!measurement||playing||disabled)return;const correct=$('gauge-verdict').value===measurement.verdict;logs.unshift({...measurement,correct,stage:cursor});logs=logs.slice(0,12);$('gauge-message').textContent=correct?'Верно. Замер записан.':'Вывод неверный. Сравните размер с границами допуска.';renderLogs();$('gauge-record').disabled=true;});
+  }
+  window.CNCLabSession={init,open,changed,run,pause,show,state:()=>({cursor,reached,playing}),snapshot:()=>({cursor}),active:()=>playing};
+})();
+</script><script>(function(){
+  'use strict';
   const model=window.CNCLabModel,$=id=>document.getElementById(id),key='cnc-lab-v1';
-  let task=null,plan=null,hints=0,assisted=false,checked=false,view='target',drafts={},onComplete=()=>{},viewer;
+  let options={},task=null,plan=null,hints=0,assisted=false,checked=false,view='target',drafts={},onComplete=()=>{},viewer;
   const node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
   try{const raw=JSON.parse(localStorage.getItem(key)||'{}');for(const t of model.tasks){if(model.validate(t,raw[t.id]?.plan))drafts[t.id]=raw[t.id];}}catch{}
-  function save(){if(!task)return;drafts[task.id]={plan,assisted,hints};try{localStorage.setItem(key,JSON.stringify(drafts));}catch{$('storage-note').textContent='Хранилище недоступно: изменения останутся только до закрытия страницы';}}
+  function save(){if(!task)return;if(options.exam){options.onDraft?.(plan);return;}drafts[task.id]={plan,assisted,hints,simulation:window.CNCLabSession.snapshot()};try{localStorage.setItem(key,JSON.stringify(drafts));}catch{$('storage-note').textContent='Хранилище недоступно: изменения останутся только до закрытия страницы';}}
   function read(){const numeric=id=>$(id).value.trim()===''?NaN:Number($(id).value);return {offset:numeric('lab-offset'),rpm:numeric('lab-rpm'),diagnosis:$('lab-diagnosis').value,operations:plan.operations.map(o=>{const card=document.querySelector(`[data-op="${o.id}"]`),p={id:o.id,endDiameter:null};for(const k of ['diameter','length','passes','feed','endDiameter','tool']){const f=card.querySelector(`[data-field="${k}"]`);if(f)p[k]=k==='tool'?f.value:f.value.trim()===''?NaN:Number(f.value);}return p;})};}
-  function showGeometry(){if(!viewer)return;const valid=model.validate(task,plan);viewer.set(model.profile(task,view==='result'&&valid?plan:null),view==='result'?(valid?'Размеры по вашим настройкам':'Заполните поля — показана цель'):'Целевая деталь');$('lab-target').setAttribute('aria-pressed',String(view==='target'));$('lab-result').setAttribute('aria-pressed',String(view==='result'));}
-  function changed(){plan=read();checked=false;$('lab-finish').disabled=true;$('lab-feedback').className='lab-feedback';$('lab-feedback').textContent='Маршрут изменён. Проверьте его перед выполнением.';showGeometry();save();}
+  function showGeometry(){if(!viewer)return;if(view==='result'&&!options.exam){window.CNCLabSession.show();return;}viewer.measurement=null;const valid=model.validate(task,plan);viewer.set(model.profile(task,view==='result'&&valid?plan:null),view==='result'?(valid?'Размеры по вашим настройкам':'Заполните поля — показана цель'):'Целевая деталь');$('lab-target').setAttribute('aria-pressed',String(view==='target'));$('lab-result').setAttribute('aria-pressed',String(view==='result'));}
+  function changed(){if(options.readonly)return;plan=read();checked=false;window.CNCLabSession.changed();$('lab-finish').disabled=!!options.exam;$('lab-feedback').className='lab-feedback';$('lab-feedback').textContent='Маршрут изменён. Проверьте его перед выполнением.';showGeometry();save();}
   function field(card,label,key,value,min,max,step){const wrap=node('label',label,'field'),f=node('input');f.type='number';f.min=min;f.max=max;f.step=step;f.value=value;f.dataset.field=key;f.setAttribute('aria-label',card.dataset.title+': '+label);wrap.append(f);card.querySelector('.op-fields').append(wrap);}
   function renderRows(){const list=$('lab-operations');list.replaceChildren();plan.operations.forEach((o,i)=>{const spec=task.operations.find(s=>s.id===o.id),card=node('article',undefined,'operation-card');card.dataset.op=o.id;card.dataset.title=spec.title;const head=node('div',undefined,'op-heading');head.append(node('h3',`${i+1}. ${spec.title}`));const moves=node('div');for(const [direction,label] of [[-1,'Раньше'],[1,'Позже']]){const b=node('button',label);b.type='button';b.className='button secondary';b.setAttribute('aria-label',`${spec.title}: ${label}`);b.disabled=i+direction<0||i+direction>=plan.operations.length;b.addEventListener('click',()=>{plan=read();[plan.operations[i],plan.operations[i+direction]]=[plan.operations[i+direction],plan.operations[i]];renderRows();changed();});moves.append(b);}head.append(moves);card.append(head);
       card.append(node('p',`Съём ≤ ${spec.maxDepth} мм/радиус · подача ${spec.feed[0]}–${spec.feed[1]} мм/об`,'op-limit'));const fields=node('div',undefined,'op-fields');card.append(fields);const label=node('label','Инструмент','field'),select=node('select');select.dataset.field='tool';select.setAttribute('aria-label',`${spec.title}: Инструмент`);for(const [v,t] of Object.entries(model.tools)){const opt=node('option',t);opt.value=v;select.append(opt);}select.value=o.tool;label.append(select);fields.append(label);
@@ -312,20 +410,46 @@
       if(spec.endDiameter)field(card,'Конечный Ø, мм','endDiameter',o.endDiameter,1,60,.1);
       field(card,spec.kind==='groove'?'Ширина, мм':'Длина, мм','length',o.length,1,100,.1);field(card,'Проходы','passes',o.passes,1,20,1);field(card,'Подача, мм/об','feed',o.feed,.01,1,.01);list.append(card);
     });}
-  function open(t){task=t;const saved=drafts[t.id];plan=saved&&model.validate(t,saved.plan)?structuredClone(saved.plan):model.defaults(t);assisted=saved?.assisted===true;hints=Number.isInteger(saved?.hints)?Math.max(0,Math.min(3,saved.hints)):0;checked=false;view='target';
+  function open(t,opts={}){options=opts;task=t;const saved=options.exam?null:drafts[t.id];plan=options.plan?structuredClone(options.plan):saved&&model.validate(t,saved.plan)?structuredClone(saved.plan):model.defaults(t);assisted=saved?.assisted===true;hints=Number.isInteger(saved?.hints)?Math.max(0,Math.min(3,saved.hints)):0;checked=false;view='target';
     $('lab-title').textContent=t.title;$('lab-level').textContent=t.level==='medium'?'Средний уровень':'Сложный уровень';$('lab-brief').textContent=t.brief;$('lab-stock').textContent=`Заготовка Ø${t.stock} × ${t.length} мм${t.bore?' · отверстие Ø'+t.bore:''} · допуск ±0,1 мм`;
     $('lab-dimensions').replaceChildren(...t.operations.map(o=>node('li',`${o.title}: ${o.endDiameter?'Ø'+o.diameter+' → Ø'+o.endDiameter:'Ø'+o.diameter} × ${o.length} мм${o.kind==='groove'?' · начало в 12 мм от левого торца':''}`)));
     $('lab-offset').value=plan.offset;$('lab-rpm').value=plan.rpm;$('lab-diagnosis').value=plan.diagnosis;$('lab-diagnosis-label').hidden=!t.diagnosis;$('lab-rpm-range').textContent=`${t.rpm[0]}–${t.rpm[1]} об/мин`;
-    $('lab-finish').disabled=true;$('lab-feedback').className='lab-feedback';$('lab-feedback').textContent='Составьте маршрут, затем проверьте настройки и выполните его.';$('lab-hint-text').textContent=hints?t.hints[hints-1]:'Подсказки открываются постепенно. Попробуйте сначала самостоятельно.';$('lab-hint').disabled=hints===3;$('lab-hint-count').textContent=`${hints} / 3`;
-    renderRows();showGeometry();
+    $('lab-finish').disabled=!!options.exam;$('lab-feedback').className='lab-feedback';$('lab-feedback').textContent='Составьте маршрут, затем проверьте настройки и выполните его.';$('lab-hint-text').textContent=hints?t.hints[hints-1]:'Подсказки открываются постепенно. Попробуйте сначала самостоятельно.';$('lab-hint').disabled=hints===3;$('lab-hint-count').textContent=`${hints} / 3`;
+    renderRows();window.CNCLabSession.open(t,viewer,{exam:options.exam,readonly:options.readonly,saved:saved?.simulation,persist:save,done:()=>{onComplete(task.id,assisted);$('lab-feedback').className='lab-feedback success';$('lab-feedback').textContent='Обработка завершена. Деталь соответствует заданию. Проверьте размеры измерительным инструментом.';}});document.querySelector('.lab-hints').hidden=!!options.exam;$('lab-check').hidden=!!options.exam;$('lab-finish').hidden=!!options.exam;$('lab-reset').hidden=!!options.exam;$('lab-result').hidden=!!options.exam;document.querySelectorAll('#lab-operations input,#lab-operations select,#lab-operations button,#lab-offset,#lab-rpm,#lab-diagnosis').forEach(e=>{if(options.readonly)e.disabled=true;else if(e.tagName!=='BUTTON')e.disabled=false;});showGeometry();
   }
-  function check(){plan=read();const r=model.evaluate(task,plan);checked=r.success;if(!r.success)assisted=true;const box=$('lab-feedback');box.className='lab-feedback '+(r.success?'success':'error');box.replaceChildren(node('strong',r.success?'Маршрут готов к выполнению':'Исправьте маршрут'));if(r.success)box.append(node('p','Размеры, режимы и порядок операций соответствуют заданию.'));else{const list=node('ul');r.errors.forEach(e=>list.append(node('li',e)));box.append(list);}$('lab-finish').disabled=!checked;save();return r;}
-  function init(done){onComplete=done;viewer=new window.PartViewer($('lab-viewer'));$('lab-operations').addEventListener('input',changed);for(const id of ['lab-offset','lab-rpm','lab-diagnosis'])$(id).addEventListener('input',changed);
-    $('lab-check').addEventListener('click',check);$('lab-finish').addEventListener('click',()=>{if(!checked||!model.evaluate(task,read()).success)return;onComplete(task.id,assisted);$('lab-feedback').className='lab-feedback success';$('lab-feedback').replaceChildren(node('strong','Деталь принята — задание выполнено'),node('p',`${assisted?'С помощью подсказок и разбора.':'Самостоятельно.'} Проверены ${plan.operations.length} операции. Это расчётная проверка маршрута, без симуляции движения станка.`));view='result';showGeometry();$('lab-finish').disabled=true;});
-    $('lab-hint').addEventListener('click',()=>{assisted=true;hints=Math.min(3,hints+1);$('lab-hint-text').textContent=task.hints[hints-1];$('lab-hint-count').textContent=`${hints} / 3`;$('lab-hint').disabled=hints===3;save();});
-    $('lab-reset').addEventListener('click',()=>{delete drafts[task.id];open(task);save();});for(const v of ['target','result'])$('lab-'+v).addEventListener('click',()=>{view=v;showGeometry();});
+  function check(){if(options.exam)throw new Error('Проверка скрыта до завершения экзамена');plan=read();const r=model.evaluate(task,plan);checked=r.success;if(!r.success)assisted=true;const box=$('lab-feedback');box.className='lab-feedback '+(r.success?'success':'error');box.replaceChildren(node('strong',r.success?'Маршрут готов к выполнению':'Исправьте маршрут'));if(r.success)box.append(node('p','Размеры, режимы и порядок операций соответствуют заданию.'));else{const list=node('ul');r.errors.forEach(e=>list.append(node('li',e)));box.append(list);}$('lab-finish').disabled=false;save();return r;}
+  function init(done){onComplete=done;window.CNCLabSession.init();viewer=new window.PartViewer($('lab-viewer'));$('lab-operations').addEventListener('input',changed);for(const id of ['lab-offset','lab-rpm','lab-diagnosis'])$(id).addEventListener('input',changed);
+    $('lab-check').addEventListener('click',check);$('lab-finish').addEventListener('click',()=>{if(!options.exam){view='result';window.CNCLabSession.run();}});
+    $('lab-hint').addEventListener('click',()=>{if(options.exam)return;assisted=true;hints=Math.min(3,hints+1);$('lab-hint-text').textContent=task.hints[hints-1];$('lab-hint-count').textContent=`${hints} / 3`;$('lab-hint').disabled=hints===3;save();});
+    $('lab-reset').addEventListener('click',()=>{if(options.exam)return;delete drafts[task.id];open(task);save();});for(const v of ['target','result'])$('lab-'+v).addEventListener('click',()=>{window.CNCLabSession.pause();view=v;showGeometry();});
   }
-  window.CNCLabUI={init,open,check,readState:()=>({task:task?.id,plan:task?read():null,checked})};
+  window.CNCLabUI={init,open,check,getPlan:read,pause:()=>window.CNCLabSession.pause(),readState:()=>({task:task?.id,plan:task?read():null,checked})};
+})();
+</script><script>(function(){
+  'use strict';
+  const $=id=>document.getElementById(id),model=window.CNCRouteExam,lab=window.CNCLabModel,key='cnc-route-exams-v1';
+  let active=null,history=[],report=null,opened=null,notify=()=>{},review=()=>{};
+  const name=l=>l==='medium'?'Средний':'Сложный',node=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
+  try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s){active=model.restore(s.active);history=(Array.isArray(s.history)?s.history:[]).map(model.restore).filter(e=>e?.answers.length===2).slice(0,10);if(active?.answers.length===2){if(!history.some(e=>e.at===active.at))history.unshift(active);active=null;}if(['easy','medium','hard'].includes(s.level))$('exam-level').value=s.level;if(active)$('exam-level').value=active.level;report=history[0]||null;}}catch{}
+  function save(){try{localStorage.setItem(key,JSON.stringify({active,history,level:$('exam-level').value}));}catch{$('storage-note').textContent='Хранилище недоступно: экзамен сохраняется только до закрытия страницы';}}
+  function start(){if(active)return;const seed=crypto.getRandomValues(new Uint32Array(1))[0];active=model.create($('exam-level').value,seed);report=null;opened=null;save();notify();renderHistory();}
+  function submit(){if(!active||active.answers.length!==active.index)return;try{active=model.submit(active,window.CNCLabUI.getPlan());if(active.answers.length===2){history.unshift(active);history=history.slice(0,10);report=active;active=null;}opened=null;save();notify();renderHistory();}catch(e){$('lab-feedback').textContent=e.message;}}
+  function next(){if(!active)return;active=model.advance(active);opened=null;save();notify();}
+  function render(){
+    if(report?.level!==$('exam-level').value)report=history.find(h=>h.level===$('exam-level').value)||null;
+    $('workspace').hidden=true;$('exam-results').hidden=true;$('lab-workspace').hidden=!active;$('route-exam-results').hidden=!report||!!active;$('exam-start').hidden=!!active;$('exam-start').textContent=report?'Новый вариант':'Начать экзамен';$('exam-counter').hidden=!active;$('exam-counter').textContent=active?`Деталь ${active.index+1} из 2`:'';$('exam-title').textContent=`${name($('exam-level').value)} экзамен${active?' идёт':': 2 детали'}`;
+    $('route-submit').hidden=!active||active.answers.length!==active.index;$('route-next').hidden=!active||active.answers.length===active.index;
+    if(active){const k=`${active.at}/${active.index}/${active.answers.length}`;if(opened!==k){const t=model.taskFor(active.level,active.seed,active.index),accepted=active.answers.length>active.index;window.CNCLabUI.open(t,{exam:true,readonly:accepted,plan:accepted?active.answers[active.index]:active.draft||lab.defaults(t),onDraft:p=>{if(active&&active.answers.length===active.index){active.draft=p;save();}}});opened=k;}$('lab-feedback').className='lab-feedback';$('lab-feedback').textContent=active.answers.length>active.index?'Ответ сохранён. Оценка появится после второй детали.':'Одна сдача на деталь. Подсказки, измерения и пробная обработка в экзамене отключены.';}
+    else if(report)renderReport();
+  }
+  function renderReport(){const result=model.grade(report),box=$('route-exam-results');box.replaceChildren();const header=node('div',undefined,'panel-heading');header.append(node('h2',`${name(report.level)} экзамен — результат`));const exp=node('button','Скачать разбор','button secondary');exp.type='button';exp.addEventListener('click',exportReport);header.append(exp);box.append(header);const summary=node('div',undefined,'exam-summary');summary.append(node('strong',`${result.score} / 100`),node('p','Средний балл двух деталей. Подсказки: 0. Каждая категория оценивается отдельно.'));box.append(summary);
+    for(const a of result.answers){const row=node('article',undefined,'review-row');row.append(node('h3',`${a.task.title} · ${a.result.score} / 100`),node('p',`Точность ${a.result.parts.accuracy}/40 · Технология ${a.result.parts.technology}/25 · Порядок ${a.result.parts.order}/15 · Экономичность ${a.result.parts.economy}/20`),node('p',`Лишние проходы: ${a.result.extra}. За каждый снимаются 2 балла экономичности (до 20).`));row.append(node('p',`Ответ: коррекция ${a.plan.offset} мм, обороты ${a.plan.rpm}. Порядок: ${a.plan.operations.map(o=>a.task.operations.find(s=>s.id===o.id).title).join(' → ')}.`));for(const e of a.result.errors)row.append(node('p',e,'review-error'));if(a.result.success)row.append(node('p','Все условия детали соблюдены.'));const b=node('button','Повторить тему','button secondary');b.type='button';b.addEventListener('click',()=>review(a.task.id));row.append(b);box.append(row);}
+  }
+  function renderHistory(blocked=false){const box=$('route-history');box.replaceChildren();for(const h of history){const row=node('div',undefined,'history-row');row.append(node('span',`${name(h.level)} · ${new Date(h.at).toLocaleString('ru-RU')}`),node('strong',`${model.grade(h).score} / 100`));const b=node('button','Разбор','button secondary');b.type='button';b.disabled=blocked||!!active;b.addEventListener('click',()=>{report=h;$('exam-level').value=h.level;opened=null;save();notify(true);});row.append(b);box.append(row);}}
+  function exportReport(){if(!report)return;const g=model.grade(report),lines=[`${name(report.level)} экзамен: ${g.score}/100`,new Date(report.at).toLocaleString('ru-RU'),'Подсказки: 0',''];for(const a of g.answers){lines.push(a.task.title,`Баллы: ${a.result.score}; точность ${a.result.parts.accuracy}/40; технология ${a.result.parts.technology}/25; порядок ${a.result.parts.order}/15; экономичность ${a.result.parts.economy}/20.`,`Коррекция: ${a.plan.offset}. Обороты: ${a.plan.rpm}. Диагноз: ${a.plan.diagnosis}.`,...a.plan.operations.map(o=>`${o.id}: Ø${o.diameter}${o.endDiameter?' → '+o.endDiameter:''}, L ${o.length}, проходы ${o.passes}, подача ${o.feed}, инструмент ${lab.tools[o.tool]}`),...a.result.errors,'');}const url=URL.createObjectURL(new Blob(['\ufeff'+lines.join('\n')],{type:'text/plain;charset=utf-8'})),a=document.createElement('a');a.href=url;a.download='cnc-route-exam.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+  function init(callback,onReview){notify=callback;review=onReview;const box=document.querySelector('.lab-actions');const submitButton=node('button','Сдать маршрут','button primary');submitButton.id='route-submit';submitButton.type='button';submitButton.hidden=true;submitButton.addEventListener('click',submit);const nextButton=node('button','Следующая деталь','button primary');nextButton.id='route-next';nextButton.type='button';nextButton.hidden=true;nextButton.addEventListener('click',next);document.querySelector('.lab-plan .lab-actions').append(submitButton,nextButton);renderHistory();}
+  function hide(){opened=null;$('route-exam-results').hidden=true;$('route-submit').hidden=true;$('route-next').hidden=true;}
+  window.CNCRouteExamUI={init,start,render,hide,save,renderHistory,active:()=>!!active,invalidate:()=>{opened=null;},readState:()=>active?{level:active.level,index:active.index,submitted:active.answers.length,plan:active.draft}:null};
 })();
 </script><script>(function () {
   'use strict';
@@ -333,6 +457,8 @@
   const allTasks=[...model.tasks.map(t=>({...t,level:'easy'})),...window.CNCLabModel.tasks.map(t=>({...t,advanced:true}))];
   const basicViewer=new window.PartViewer($('basic-viewer'));let basicView='2d',basicShape='target';
   window.CNCLabUI.init((id,help)=>{const prev=completed[id];completed[id]={at:new Date().toISOString(),assisted:prev?.assisted===false?false:help};updateProgress();save();});
+  const routeExam=window.CNCRouteExamUI;routeExam.init((navigate=false)=>{if(navigate)mode='exam';renderMode();renderHistory();save();},id=>{trainingTask=id;changeMode('learn');});
+  $('readouts').insertAdjacentHTML('afterend','<div id="basic-gauge" class="basic-gauge"><label>Поверхность<select id="basic-gauge-surface"><option value="worked">Обработанный участок</option><option value="stock">Необработанный хвостовик</option></select></label><label>Прибор<select id="basic-gauge-tool"><option value="caliper">Штангенциркуль · 0,1 мм</option><option value="micrometer">Микрометр · 0,01 мм</option></select></label><button id="basic-measure" type="button" class="button secondary" disabled>Измерить деталь</button><output id="basic-gauge-value" aria-live="polite">Завершите проход для замера.</output></div>');
   const fields = ['x','offset','feed','rpm','tool'], storageKey = 'cnc-practice-v2';
   let task = model.tasks[0], mode = 'learn', hintLevel = 0, assisted = false;
   let completed = {}, history = [], exam = null, examDraft = null, report = null, trainingTask = 'diameter';
@@ -359,12 +485,12 @@
       return {values:s.draft,assisted:s.assisted===true,hintLevel:Number.isInteger(s.hintLevel)?Math.max(0,Math.min(3,s.hintLevel)):0};
     } catch { return null; }
   }
-  function cancel() { if(animation!==null)cancelAnimationFrame(animation);animation=null;playing=false;pass=null;part=0; }
+  function cancel() { window.CNCLabUI.pause(); if(animation!==null)cancelAnimationFrame(animation);animation=null;playing=false;pass=null;part=0; }
   function lock() {
     const locked=!!pass||(mode==='exam'&&!!exam?.awaitingNext);
-    fields.forEach(k=>$(k).disabled=locked);$('check').disabled=!!pass;
+  fields.forEach(k=>$(k).disabled=locked);$('check').disabled=!!pass;
     $('run').textContent=playing?'Ⅱ Пауза':pass?'▶ Продолжить':'▶ Пробный проход';
-    $('step').disabled=playing;$('submit-answer').disabled=!!exam?.awaitingNext;
+    $('basic-measure').disabled=part!==1||!!pass;$('step').disabled=playing;$('submit-answer').disabled=!!exam?.awaitingNext;
   }
   function updateProgress() {
     $('learning-progress').textContent=`Освоено: ${Object.keys(completed).length} из ${allTasks.length}`;
@@ -404,7 +530,7 @@
   function clearFeedback() { $('check-result').className='check-result';$('check-result').textContent=mode==='exam'?'Ответ будет проверен после завершения экзамена.':'Настройки ещё не проверены'; }
   function settingsChanged(persist=true) {
     if(task.advanced)return;
-    const p=values(),r=model.evaluate(p,task);lastResult=r;part=0;
+    const p=values(),r=model.evaluate(p,task);lastResult=r;part=0;basicViewer.measurement=null;$('basic-gauge-value').textContent='Завершите проход для замера.';
     $('actual').innerHTML=fmt(r.finalDiameter)+' <small>мм</small>';$('depth').innerHTML=fmt(r.depth)+' <small>мм</small>';
     program(p);geometry(mode==='exam'?model.evaluate({...task.defaults,x:task.stock,offset:0},task):r);clearFeedback();
     $('machine-status').textContent=mode==='exam'?'Экзамен':'Ожидание';$('machine-status').className='machine-status';
@@ -468,6 +594,7 @@
   function ask(q) { if(mode!=='learn')return;assisted=true;$('mentor-answer').textContent=model.mentor(values(),q,false,task);save(); }
   function renderMode() {
     const isExam=mode==='exam',active=isExam&&!!exam;
+    $('exam-level-bar').hidden=!isExam;$('exam-level').disabled=!!exam||routeExam.active();
     $('mode-learn').setAttribute('aria-pressed',String(!isExam));$('mode-exam').setAttribute('aria-pressed',String(isExam));
     document.querySelector('.lessons').hidden=isExam;$('exam-banner').hidden=!isExam;
     $('difficulty-bar').hidden=isExam;$('lab-workspace').hidden=isExam||!task.advanced;
@@ -480,18 +607,20 @@
     $('trajectory').style.visibility=isExam?'hidden':'visible';
     document.querySelector('.bottom-grid').classList.toggle('exam-code',isExam);
     $('machine-title').textContent=isExam?'Схема задания':'Пробный проход';
-    $('basic-view-switch').hidden=isExam;renderBasicView();lock();
+    $('basic-gauge').hidden=isExam;$('basic-view-switch').hidden=isExam;renderBasicView();lock();
+    if(isExam&&$('exam-level').value!=='easy')routeExam.render();else routeExam.hide();
   }
   function showAccepted() {
     $('check-result').className='check-result';$('check-result').textContent='Ответ сохранён. Разбор будет доступен после третьего задания.';lock();
   }
   function changeMode(next) {
-    if(next===mode)return;if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
+    if(next===mode)return;routeExam.invalidate();if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
     if(mode==='learn')loadTask(allTasks.find(t=>t.id===trainingTask),false);
     else if(exam){loadTask(model.examTask(exam),false);if(examDraft&&model.evaluate(examDraft,task).valid){setValues(examDraft);settingsChanged(false);}if(exam.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}}
     renderMode();save();
   }
   function startExam() {
+    if($('exam-level').value!=='easy'){cancel();routeExam.start();return;}
     cancel();exam=model.createExam(history.length%3);examDraft=null;report=null;loadTask(model.examTask(exam),false);renderMode();renderHistory();save();
   }
   function submit() {
@@ -514,11 +643,11 @@
       review.append(row);});
   }
   function renderHistory() {
-    const list=$('history-list');list.replaceChildren();
+    routeExam.renderHistory(!!exam);const list=$('history-list');list.replaceChildren();
     if(!history.length){list.append(el('p','Здесь появятся завершённые экзамены.'));return;}
     history.forEach(h=>{const grade=model.gradeExam(h),row=el('div','','history-row');
       row.append(el('span',new Date(h.startedAt).toLocaleString('ru-RU')),el('strong',`${grade.correct} / 3 · ${grade.percent}%`));
-      const b=el('button','Разбор','button secondary');b.type='button';b.disabled=!!exam;b.addEventListener('click',()=>{cancel();mode='exam';report=h;renderReport();renderMode();save();$('exam-results').scrollIntoView({behavior:'auto',block:'start'});});row.append(b);list.append(row);});
+      const b=el('button','Разбор','button secondary');b.type='button';b.disabled=!!exam||routeExam.active();b.addEventListener('click',()=>{cancel();mode='exam';$('exam-level').value='easy';report=h;renderReport();renderMode();save();$('exam-results').scrollIntoView({behavior:'auto',block:'start'});});row.append(b);list.append(row);});
   }
   function exportReport() {
     if(!report)return;const g=model.gradeExam(report),lines=['ЧПУ Практика — результат самопроверки',new Date(report.startedAt).toLocaleString('ru-RU'),`Верно: ${g.correct} из 3 (${g.percent}%)`,''];
@@ -529,6 +658,7 @@
   document.querySelectorAll('[data-level]').forEach(b=>b.addEventListener('click',()=>{const level=b.dataset.level;document.querySelectorAll('[data-level]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));document.querySelectorAll('[data-task]').forEach(n=>n.hidden=level!=='all'&&n.dataset.difficulty!==level);}));
   for(const v of ['2d','3d'])$('basic-'+v).addEventListener('click',()=>{basicView=v;renderBasicView();});
   for(const v of ['target','result'])$('basic-'+v).addEventListener('click',()=>{basicShape=v;$('basic-target').setAttribute('aria-pressed',String(v==='target'));$('basic-result').setAttribute('aria-pressed',String(v==='result'));updateBasicViewer();});
+    $('basic-measure').addEventListener('click',()=>{if(mode!=='learn'||part!==1||pass)return;const stock=$('basic-gauge-surface').value==='stock',actual=stock?task.stock:lastResult.finalDiameter,resolution=$('basic-gauge-tool').value==='micrometer'?.01:.1;basicView='3d';basicShape='result';$('basic-target').setAttribute('aria-pressed','false');$('basic-result').setAttribute('aria-pressed','true');renderBasicView();basicViewer.measurement={x:stock?7.5:15+task.length/2,actual};basicViewer.draw();$('basic-gauge-value').textContent=fmt(Math.round(actual/resolution)*resolution,2)+' мм · '+(stock?'хвостовик':'обработанный участок');});
   fields.forEach(k=>$(k).addEventListener('input',()=>{if(!pass)settingsChanged();}));
   $('settings').addEventListener('submit',e=>{e.preventDefault();if(mode==='learn'&&!pass)check();});
   $('run').addEventListener('click',run);$('step').addEventListener('click',step);$('reset').addEventListener('click',()=>loadTask(task));
@@ -537,13 +667,14 @@
   $('mentor-form').addEventListener('submit',e=>{e.preventDefault();const q=$('question').value.trim();if(q){ask(q);$('question').value='';}});
   $('mode-learn').addEventListener('click',()=>changeMode('learn'));$('mode-exam').addEventListener('click',()=>changeMode('exam'));
   $('exam-start').addEventListener('click',startExam);$('submit-answer').addEventListener('click',submit);$('next-question').addEventListener('click',nextQuestion);$('export-report').addEventListener('click',exportReport);
-  const draft=restore();report=history[0]||null;
+  const draft=restore();report=history[0]||null;if(exam)$('exam-level').value='easy';
+  $('exam-level').addEventListener('change',()=>{if(exam||routeExam.active())return;cancel();routeExam.invalidate();routeExam.save();renderMode();});
   loadTask(mode==='exam'&&exam?model.examTask(exam):allTasks.find(t=>t.id===trainingTask),false);
   if(!task.advanced&&draft?.values&&model.evaluate(draft.values,task).valid){setValues(draft.values);settingsChanged(false);}
   if(!task.advanced&&mode==='learn'&&draft){assisted=draft.assisted;hintLevel=draft.hintLevel;$('hint-count').textContent=hintLevel+' / 3';$('hint').disabled=hintLevel===3;if(hintLevel)$('mentor-answer').textContent=task.hints[hintLevel-1];}
   if(mode==='exam'&&exam?.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}
   renderHistory();renderReport();renderMode();
-  function readState(){return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
+  function readState(){if(mode==='exam'&&$('exam-level').value!=='easy')return {mode,exam:routeExam.readState(),result:null};return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
   window.CNCDemo={readState};
   const context=document.modelContext;
   if(context?.registerTool){const lifecycle=new AbortController();const empty=input=>{if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected empty object');};

@@ -4,6 +4,8 @@
   const allTasks=[...model.tasks.map(t=>({...t,level:'easy'})),...window.CNCLabModel.tasks.map(t=>({...t,advanced:true}))];
   const basicViewer=new window.PartViewer($('basic-viewer'));let basicView='2d',basicShape='target';
   window.CNCLabUI.init((id,help)=>{const prev=completed[id];completed[id]={at:new Date().toISOString(),assisted:prev?.assisted===false?false:help};updateProgress();save();});
+  const routeExam=window.CNCRouteExamUI;routeExam.init((navigate=false)=>{if(navigate)mode='exam';renderMode();renderHistory();save();},id=>{trainingTask=id;changeMode('learn');});
+  $('readouts').insertAdjacentHTML('afterend','<div id="basic-gauge" class="basic-gauge"><label>Поверхность<select id="basic-gauge-surface"><option value="worked">Обработанный участок</option><option value="stock">Необработанный хвостовик</option></select></label><label>Прибор<select id="basic-gauge-tool"><option value="caliper">Штангенциркуль · 0,1 мм</option><option value="micrometer">Микрометр · 0,01 мм</option></select></label><button id="basic-measure" type="button" class="button secondary" disabled>Измерить деталь</button><output id="basic-gauge-value" aria-live="polite">Завершите проход для замера.</output></div>');
   const fields = ['x','offset','feed','rpm','tool'], storageKey = 'cnc-practice-v2';
   let task = model.tasks[0], mode = 'learn', hintLevel = 0, assisted = false;
   let completed = {}, history = [], exam = null, examDraft = null, report = null, trainingTask = 'diameter';
@@ -30,12 +32,12 @@
       return {values:s.draft,assisted:s.assisted===true,hintLevel:Number.isInteger(s.hintLevel)?Math.max(0,Math.min(3,s.hintLevel)):0};
     } catch { return null; }
   }
-  function cancel() { if(animation!==null)cancelAnimationFrame(animation);animation=null;playing=false;pass=null;part=0; }
+  function cancel() { window.CNCLabUI.pause(); if(animation!==null)cancelAnimationFrame(animation);animation=null;playing=false;pass=null;part=0; }
   function lock() {
     const locked=!!pass||(mode==='exam'&&!!exam?.awaitingNext);
-    fields.forEach(k=>$(k).disabled=locked);$('check').disabled=!!pass;
+  fields.forEach(k=>$(k).disabled=locked);$('check').disabled=!!pass;
     $('run').textContent=playing?'Ⅱ Пауза':pass?'▶ Продолжить':'▶ Пробный проход';
-    $('step').disabled=playing;$('submit-answer').disabled=!!exam?.awaitingNext;
+    $('basic-measure').disabled=part!==1||!!pass;$('step').disabled=playing;$('submit-answer').disabled=!!exam?.awaitingNext;
   }
   function updateProgress() {
     $('learning-progress').textContent=`Освоено: ${Object.keys(completed).length} из ${allTasks.length}`;
@@ -75,7 +77,7 @@
   function clearFeedback() { $('check-result').className='check-result';$('check-result').textContent=mode==='exam'?'Ответ будет проверен после завершения экзамена.':'Настройки ещё не проверены'; }
   function settingsChanged(persist=true) {
     if(task.advanced)return;
-    const p=values(),r=model.evaluate(p,task);lastResult=r;part=0;
+    const p=values(),r=model.evaluate(p,task);lastResult=r;part=0;basicViewer.measurement=null;$('basic-gauge-value').textContent='Завершите проход для замера.';
     $('actual').innerHTML=fmt(r.finalDiameter)+' <small>мм</small>';$('depth').innerHTML=fmt(r.depth)+' <small>мм</small>';
     program(p);geometry(mode==='exam'?model.evaluate({...task.defaults,x:task.stock,offset:0},task):r);clearFeedback();
     $('machine-status').textContent=mode==='exam'?'Экзамен':'Ожидание';$('machine-status').className='machine-status';
@@ -139,6 +141,7 @@
   function ask(q) { if(mode!=='learn')return;assisted=true;$('mentor-answer').textContent=model.mentor(values(),q,false,task);save(); }
   function renderMode() {
     const isExam=mode==='exam',active=isExam&&!!exam;
+    $('exam-level-bar').hidden=!isExam;$('exam-level').disabled=!!exam||routeExam.active();
     $('mode-learn').setAttribute('aria-pressed',String(!isExam));$('mode-exam').setAttribute('aria-pressed',String(isExam));
     document.querySelector('.lessons').hidden=isExam;$('exam-banner').hidden=!isExam;
     $('difficulty-bar').hidden=isExam;$('lab-workspace').hidden=isExam||!task.advanced;
@@ -151,18 +154,20 @@
     $('trajectory').style.visibility=isExam?'hidden':'visible';
     document.querySelector('.bottom-grid').classList.toggle('exam-code',isExam);
     $('machine-title').textContent=isExam?'Схема задания':'Пробный проход';
-    $('basic-view-switch').hidden=isExam;renderBasicView();lock();
+    $('basic-gauge').hidden=isExam;$('basic-view-switch').hidden=isExam;renderBasicView();lock();
+    if(isExam&&$('exam-level').value!=='easy')routeExam.render();else routeExam.hide();
   }
   function showAccepted() {
     $('check-result').className='check-result';$('check-result').textContent='Ответ сохранён. Разбор будет доступен после третьего задания.';lock();
   }
   function changeMode(next) {
-    if(next===mode)return;if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
+    if(next===mode)return;routeExam.invalidate();if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
     if(mode==='learn')loadTask(allTasks.find(t=>t.id===trainingTask),false);
     else if(exam){loadTask(model.examTask(exam),false);if(examDraft&&model.evaluate(examDraft,task).valid){setValues(examDraft);settingsChanged(false);}if(exam.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}}
     renderMode();save();
   }
   function startExam() {
+    if($('exam-level').value!=='easy'){cancel();routeExam.start();return;}
     cancel();exam=model.createExam(history.length%3);examDraft=null;report=null;loadTask(model.examTask(exam),false);renderMode();renderHistory();save();
   }
   function submit() {
@@ -185,11 +190,11 @@
       review.append(row);});
   }
   function renderHistory() {
-    const list=$('history-list');list.replaceChildren();
+    routeExam.renderHistory(!!exam);const list=$('history-list');list.replaceChildren();
     if(!history.length){list.append(el('p','Здесь появятся завершённые экзамены.'));return;}
     history.forEach(h=>{const grade=model.gradeExam(h),row=el('div','','history-row');
       row.append(el('span',new Date(h.startedAt).toLocaleString('ru-RU')),el('strong',`${grade.correct} / 3 · ${grade.percent}%`));
-      const b=el('button','Разбор','button secondary');b.type='button';b.disabled=!!exam;b.addEventListener('click',()=>{cancel();mode='exam';report=h;renderReport();renderMode();save();$('exam-results').scrollIntoView({behavior:'auto',block:'start'});});row.append(b);list.append(row);});
+      const b=el('button','Разбор','button secondary');b.type='button';b.disabled=!!exam||routeExam.active();b.addEventListener('click',()=>{cancel();mode='exam';$('exam-level').value='easy';report=h;renderReport();renderMode();save();$('exam-results').scrollIntoView({behavior:'auto',block:'start'});});row.append(b);list.append(row);});
   }
   function exportReport() {
     if(!report)return;const g=model.gradeExam(report),lines=['ЧПУ Практика — результат самопроверки',new Date(report.startedAt).toLocaleString('ru-RU'),`Верно: ${g.correct} из 3 (${g.percent}%)`,''];
@@ -200,6 +205,7 @@
   document.querySelectorAll('[data-level]').forEach(b=>b.addEventListener('click',()=>{const level=b.dataset.level;document.querySelectorAll('[data-level]').forEach(n=>n.setAttribute('aria-pressed',String(n===b)));document.querySelectorAll('[data-task]').forEach(n=>n.hidden=level!=='all'&&n.dataset.difficulty!==level);}));
   for(const v of ['2d','3d'])$('basic-'+v).addEventListener('click',()=>{basicView=v;renderBasicView();});
   for(const v of ['target','result'])$('basic-'+v).addEventListener('click',()=>{basicShape=v;$('basic-target').setAttribute('aria-pressed',String(v==='target'));$('basic-result').setAttribute('aria-pressed',String(v==='result'));updateBasicViewer();});
+    $('basic-measure').addEventListener('click',()=>{if(mode!=='learn'||part!==1||pass)return;const stock=$('basic-gauge-surface').value==='stock',actual=stock?task.stock:lastResult.finalDiameter,resolution=$('basic-gauge-tool').value==='micrometer'?.01:.1;basicView='3d';basicShape='result';$('basic-target').setAttribute('aria-pressed','false');$('basic-result').setAttribute('aria-pressed','true');renderBasicView();basicViewer.measurement={x:stock?7.5:15+task.length/2,actual};basicViewer.draw();$('basic-gauge-value').textContent=fmt(Math.round(actual/resolution)*resolution,2)+' мм · '+(stock?'хвостовик':'обработанный участок');});
   fields.forEach(k=>$(k).addEventListener('input',()=>{if(!pass)settingsChanged();}));
   $('settings').addEventListener('submit',e=>{e.preventDefault();if(mode==='learn'&&!pass)check();});
   $('run').addEventListener('click',run);$('step').addEventListener('click',step);$('reset').addEventListener('click',()=>loadTask(task));
@@ -208,13 +214,14 @@
   $('mentor-form').addEventListener('submit',e=>{e.preventDefault();const q=$('question').value.trim();if(q){ask(q);$('question').value='';}});
   $('mode-learn').addEventListener('click',()=>changeMode('learn'));$('mode-exam').addEventListener('click',()=>changeMode('exam'));
   $('exam-start').addEventListener('click',startExam);$('submit-answer').addEventListener('click',submit);$('next-question').addEventListener('click',nextQuestion);$('export-report').addEventListener('click',exportReport);
-  const draft=restore();report=history[0]||null;
+  const draft=restore();report=history[0]||null;if(exam)$('exam-level').value='easy';
+  $('exam-level').addEventListener('change',()=>{if(exam||routeExam.active())return;cancel();routeExam.invalidate();routeExam.save();renderMode();});
   loadTask(mode==='exam'&&exam?model.examTask(exam):allTasks.find(t=>t.id===trainingTask),false);
   if(!task.advanced&&draft?.values&&model.evaluate(draft.values,task).valid){setValues(draft.values);settingsChanged(false);}
   if(!task.advanced&&mode==='learn'&&draft){assisted=draft.assisted;hintLevel=draft.hintLevel;$('hint-count').textContent=hintLevel+' / 3';$('hint').disabled=hintLevel===3;if(hintLevel)$('mentor-answer').textContent=task.hints[hintLevel-1];}
   if(mode==='exam'&&exam?.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}
   renderHistory();renderReport();renderMode();
-  function readState(){return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
+  function readState(){if(mode==='exam'&&$('exam-level').value!=='easy')return {mode,exam:routeExam.readState(),result:null};return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
   window.CNCDemo={readState};
   const context=document.modelContext;
   if(context?.registerTool){const lifecycle=new AbortController();const empty=input=>{if(!input||typeof input!=='object'||Array.isArray(input)||Object.keys(input).length)throw new Error('Expected empty object');};

@@ -1,11 +1,11 @@
 {
   "name": "cnc-practice-demo",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "description": "Учебный тренажёр наладки токарного станка с ЧПУ",
   "scripts": {
     "start": "node scripts/serve.cjs",
-    "test": "node tests/model.test.cjs && node tests/exam.test.cjs && node tests/lab.test.cjs",
+    "test": "node tests/model.test.cjs && node tests/exam.test.cjs && node tests/lab.test.cjs && node tests/process.test.cjs",
     "build:demo": "node scripts/build-demo.cjs"
   },
   "engines": {

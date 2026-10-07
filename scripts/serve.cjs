@@ -10,6 +10,10 @@ const files = {
   '/lab-model.js': ['lab-model.js', 'text/javascript; charset=utf-8'],
   '/lab-ui.js': ['lab-ui.js', 'text/javascript; charset=utf-8'],
   '/viewer3d.js': ['viewer3d.js', 'text/javascript; charset=utf-8'],
+  '/process-model.js': ['process-model.js', 'text/javascript; charset=utf-8'],
+  '/route-exam-model.js': ['route-exam-model.js', 'text/javascript; charset=utf-8'],
+  '/lab-session.js': ['lab-session.js', 'text/javascript; charset=utf-8'],
+  '/route-exam-ui.js': ['route-exam-ui.js', 'text/javascript; charset=utf-8'],
   '/style.css': ['style.css', 'text/css; charset=utf-8'],
   '/demo/cnc-demo.html': ['demo/cnc-demo.html', 'text/html; charset=utf-8'],
   '/docs/preview.jpg': ['docs/preview.jpg', 'image/jpeg']
