@@ -18,8 +18,8 @@ async function create(options={}){
   const cfg={...config(options.env),...options.config},db=options.db||database.open(path.join(cfg.dataDir,'beta.sqlite')),clock=options.clock||Date.now,auth=authLib.create(db,{clock,secure:cfg.secure});
   if(!db.prepare('SELECT id FROM users LIMIT 1').get()){if(!options.db)db.close();throw Error('No beta accounts. Run npm run beta:init first.');}
   const dummy=await authLib.passwordHash(crypto.randomBytes(32).toString('hex')),validator=validation.create();let hashing=0,reading=0;
-  const index=fs.readFileSync(path.join(ROOT,'index.html'),'utf8'),modules=[...index.matchAll(/<script src="([\w-]+\.js)"><\/script>/g)].map(m=>m[1]);
-  const course=index.replace('<body>','<body class="cloud-loading">').replace(/<script src="[\w-]+\.js"><\/script>/g,'').replace(/href="([\w-]+\.css)"/g,'href="/$1"').replace('</body>',`<script src="/account-client.js" data-modules="${modules.join(' ')}"></script></body>`).replace('<link rel="stylesheet" href="/typography.css">','').replace('</head>','<link rel="stylesheet" href="/account.css"><link rel="stylesheet" href="/typography.css"></head>');
+  const index=fs.readFileSync(path.join(ROOT,'index.html'),'utf8'),modules=[...index.matchAll(/<script src="([\w-]+\.js)"><\/script>/g)].map(m=>m[1]),client=require('./client-assets.cjs').create();
+  const course=index.replace('<body>','<body class="cloud-loading">').replace(/<script src="[\w-]+\.js"><\/script>/g,'').replace(/href="([\w-]+\.css)"/g,'href="/$1"').replace('</body>',`<script src="/account-client.js" data-bundles="${client.groups.map(g=>g.url).join(' ')}"></script></body>`).replace('<link rel="stylesheet" href="/typography.css">','').replace('</head>','<link rel="stylesheet" href="/account.css"><link rel="stylesheet" href="/typography.css"></head>');
   const assets=new Map([...modules.map(n=>['/'+n,[n,'text/javascript']]),['/style.css',['style.css','text/css']],['/workshop-theme.css',['workshop-theme.css','text/css']],['/account.css',['server/public/account.css','text/css']],['/account-client.js',['server/public/account-client.js','text/javascript']],['/account-storage.js',['server/public/account-storage.js','text/javascript']],['/admin-client.js',['server/public/admin-client.js','text/javascript']],['/login.js',['server/public/login.js','text/javascript']]]);
   assets.set('/app.css',['app.css','text/css']);
   assets.set('/light-theme.css',['light-theme.css','text/css']);
@@ -28,13 +28,14 @@ async function create(options={}){
   assets.set('/assets/lathe-hero.png',['assets/lathe-hero.png','image/png']);
   assets.set('/typography.css',['typography.css','text/css']);
   assets.set('/assets/fonts/golos-text-variable.ttf',['assets/fonts/golos-text-variable.ttf','font/ttf']);
+  for(const group of client.groups)assets.set(group.url,[null,'text/javascript',group.bytes]);
   const publicAssets=new Set(['/account.css','/login.js','/typography.css','/assets/fonts/golos-text-variable.ttf']);
   // Release assets are immutable during a process lifetime. Authentication still runs
   // before revalidation, and unversioned URLs must revalidate on every use.
   const assetCache=new Map();
   function staticAsset(req,res,route,asset,method){
     let cached=assetCache.get(route);
-    if(!cached){const bytes=fs.readFileSync(path.join(ROOT,asset[0]));cached={bytes,etag:'"'+crypto.createHash('sha256').update(bytes).digest('hex')+'"'};assetCache.set(route,cached);}
+    if(!cached){const bytes=asset[2]||fs.readFileSync(path.join(ROOT,asset[0]));cached={bytes,etag:'"'+crypto.createHash('sha256').update(bytes).digest('hex')+'"'};assetCache.set(route,cached);}
     res.setHeader('Cache-Control','private, max-age=0, must-revalidate');res.setHeader('ETag',cached.etag);res.setHeader('Vary','Cookie');
     const matches=String(req.headers['if-none-match']||'').split(',').some(tag=>tag.trim()==='*'||tag.trim().replace(/^W\//,'')===cached.etag);
     if(matches){res.writeHead(304);return res.end();}

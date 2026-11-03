@@ -1,9 +1,9 @@
 (async function(){
   'use strict';
-  const names=document.currentScript.dataset.modules.split(' '),native=window.localStorage,metaKey='cnc-cloud-meta-v1',pilotKey='cnc-pilot-v1',installKey='cnc-cloud-install-v1';
+  const bundles=(document.currentScript.dataset.bundles||'').split(' '),native=window.localStorage,metaKey='cnc-cloud-meta-v1',pilotKey='cnc-pilot-v1',installKey='cnc-cloud-install-v1';
   const node=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;};
   const button=(text,run)=>{const b=node('button',text);b.type='button';b.onclick=()=>Promise.resolve().then(run).catch(error=>setStatus(error.message,true));return b;};
-  const load=name=>new Promise((resolve,reject)=>{const s=node('script');s.src='/'+name;s.async=false;const timer=setTimeout(()=>reject(Error('Загрузка курса заняла слишком много времени. Проверьте соединение и повторите загрузку.')),20000);s.onload=()=>{clearTimeout(timer);resolve();};s.onerror=()=>{clearTimeout(timer);reject(Error('Не удалось загрузить модуль курса. Повторите загрузку.'));};document.body.append(s);});
+  const load=name=>new Promise((resolve,reject)=>{const s=node('script');s.src=name;s.async=false;const timer=setTimeout(()=>reject(Error('Загрузка курса заняла слишком много времени. Проверьте соединение и повторите загрузку.')),20000);s.onload=()=>{clearTimeout(timer);resolve();};s.onerror=()=>{clearTimeout(timer);reject(Error('Не удалось загрузить модуль курса. Повторите загрузку.'));};document.body.append(s);});
   let user,csrf,scoped,prefix,meta,suppress=false,ready=false,pending=null,sending=false,conflicted=false,conflictPanel,bar,status,loginLink,storageFatal=false,changeSequence=0,reloadRequired=false;
   const boot=node('section',undefined,'account-boot'),bootTitle=node('h1','Готовим вашу мастерскую'),bootDetail=node('p','Подключаем аккаунт и сохранения…'),indicator=node('span',undefined,'boot-indicator');indicator.setAttribute('aria-hidden','true');boot.setAttribute('role','status');boot.append(indicator,bootTitle,bootDetail);document.body.append(boot);
   function setStatus(text,error=false){if(status){status.textContent=text;status.className=error?'cloud-error':'';}else bootDetail.textContent=text;}
@@ -40,14 +40,15 @@
   async function backups(){const list=await api('/api/backups'),panel=node('section',undefined,'cloud-panel');panel.append(node('h2','Мои отдельные копии'),node('p','Копии созданы при конфликте устройств. Для объединения скачайте учебный JSON и используйте перенос в результатах курса. Наблюдения восстанавливаются отдельно в журнале.'));if(!list.length)panel.append(node('p','Отдельных копий пока нет.'));for(const item of list){const row=node('div');row.append(node('span',new Date(item.at).toLocaleString('ru-RU')),button('Скачать обучение',async()=>download('cnc-backup-progress.json',(await api('/api/backups/'+item.id)).archive)),button('Скачать наблюдения',async()=>download('cnc-backup-observations.json',(await api('/api/backups/'+item.id)).pilot||window.CNCPilot.empty())));panel.append(row);}panel.append(button('Закрыть список',()=>panel.remove()));bar.after(panel);}
   async function logout(){const exit=async()=>{await api('/api/logout',{method:'POST',body:'{}'});location.assign('/login');};if(await push())return exit();const panel=node('section',undefined,'cloud-panel');panel.append(node('h2','Есть изменения без подтверждения сервера'),node('p','Скачайте учебную копию и наблюдения перед выходом. Доступная локальная работа останется привязана к этому аккаунту в этом браузере. После нового входа синхронизация продолжится.'),button('Скачать учебную копию',()=>download('cnc-before-logout.json',value().archive)),button('Скачать наблюдения',()=>download('cnc-observations-before-logout.json',value().pilot)),button('Выйти без подтверждения сохранения',exit),button('Остаться',()=>panel.remove()));bar.after(panel);}
   try{
+    if(bundles.length!==3||!bundles.every((name,i)=>new RegExp('^/assets/js/'+['bootstrap','models','interface'][i]+'\\.[a-f0-9]{16}\\.js$').test(name)))throw Error('Состав курса изменился. Повторите загрузку страницы.');
     const me=await api('/api/me');user=me.user;csrf=me.csrf;
-    await load('progress-config.js');await load('progress-store.js');await load('account-storage.js');
+    await load(bundles[0]);
     const made=window.CNCAccountStorage.create(native,user.id,before);scoped=made.storage;prefix=made.prefix;
     // All legacy controllers keep their storage contract, with a separate namespace per account.
     Object.defineProperty(window,'localStorage',{configurable:true,get:()=>scoped});
     suppress=true;window.CNCProgressStore.create(scoped,{keys:[...window.CNCProgressConfig.keys,pilotKey,metaKey],journalKey:installKey}).recover();suppress=false;
-    meta=readMeta();const pure=names.filter(n=>n==='training-math.js'||n==='course-discovery.js'||n==='task-guides.js'||n==='model.js'||n.endsWith('-model.js'));
-    bootDetail.textContent='Загружаем учебные модели…';await Promise.all(pure.map(load));
+    meta=readMeta();
+    bootDetail.textContent='Загружаем учебные модели…';await load(bundles[1]);
     const remote=await api('/api/progress');
     const localArchive=window.CNCProgress.fromRaw(raw()),localPilot=scoped.getItem(pilotKey)===null?null:window.CNCPilot.parse(scoped.getItem(pilotKey)),same=remote.archive&&await signature({archive:localArchive,pilot:localPilot})===await signature(remote);
     let startupConflict=false;
@@ -58,7 +59,7 @@
     window.CNCAccount={user,save:push};
     // Translate cross-tab storage events back to the scoped contract used by recovery guards.
     window.addEventListener('storage',e=>{if(e.storageArea!==native||!e.key?.startsWith(prefix))return;const key=e.key.slice(prefix.length);if(key===metaKey){if(ready&&JSON.parse(e.newValue||'null')?.revision!==meta.revision)conflict();return;}const translated=new Event('storage');Object.defineProperties(translated,{storageArea:{value:scoped},key:{value:key},newValue:{value:e.newValue},oldValue:{value:e.oldValue}});window.dispatchEvent(translated);});
-    bootDetail.textContent='Открываем курс и восстанавливаем ваш прогресс…';await Promise.all(names.filter(name=>!pure.includes(name)&&!['progress-config.js','progress-store.js'].includes(name)).map(load));
+    bootDetail.textContent='Открываем курс и восстанавливаем ваш прогресс…';await load(bundles[2]);
     boot.remove();bar=node('section',undefined,'account-bar');status=node('span');status.setAttribute('role','status');bar.append(status);
     const menu=node('details',undefined,'account-menu'),summary=node('summary'),avatar=node('span',user.username.slice(0,2).toUpperCase(),'sidebar-avatar'),identity=node('span',undefined,'sidebar-identity');
     avatar.setAttribute('aria-hidden','true');identity.append(node('strong',user.username),node('small',user.role==='admin'?'Администратор':'Участник бета-теста'));summary.append(avatar,identity);menu.append(summary);
