@@ -1,0 +1,1626 @@
+{
+  "specVersion": "1.5.0",
+  "notes": "Трассы текущей реализации, не отдельный протокол испытаний.",
+  "examples": [
+    {
+      "id": "blocked-start",
+      "title": "Запуск без подготовки",
+      "initial": {
+        "phase": "unprepared",
+        "machine": {
+          "clamped": false,
+          "zeroed": false,
+          "doorClosed": false,
+          "spindle": false
+        },
+        "diameter": 32,
+        "blank": 1,
+        "passes": 0,
+        "measurementPass": null,
+        "inspectionPass": null,
+        "events": 0,
+        "passed": false,
+        "independent": false
+      },
+      "steps": [
+        {
+          "number": 1,
+          "action": {
+            "type": "spindle",
+            "value": true
+          },
+          "before": {
+            "phase": "unprepared",
+            "machine": {
+              "clamped": false,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 0,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "unprepared",
+            "machine": {
+              "clamped": false,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "ok": false,
+          "message": "Запуск заблокирован: нужны закрепление, ноль детали и закрытая дверь.",
+          "invariantErrors": []
+        }
+      ],
+      "final": {
+        "phase": "unprepared",
+        "machine": {
+          "clamped": false,
+          "zeroed": false,
+          "doorClosed": false,
+          "spindle": false
+        },
+        "diameter": 32,
+        "blank": 1,
+        "passes": 0,
+        "measurementPass": null,
+        "inspectionPass": null,
+        "events": 1,
+        "passed": false,
+        "independent": false
+      },
+      "snapshot": {
+        "version": 1,
+        "kind": "cycle",
+        "variant": 0,
+        "actions": [
+          {
+            "type": "spindle",
+            "value": true
+          }
+        ]
+      }
+    },
+    {
+      "id": "cycle",
+      "title": "Полный цикл на разобранном условии Ø32 → Ø28",
+      "initial": {
+        "phase": "unprepared",
+        "machine": {
+          "clamped": false,
+          "zeroed": false,
+          "doorClosed": false,
+          "spindle": false
+        },
+        "diameter": 32,
+        "blank": 1,
+        "passes": 0,
+        "measurementPass": null,
+        "inspectionPass": null,
+        "events": 0,
+        "passed": false,
+        "independent": false
+      },
+      "steps": [
+        {
+          "number": 1,
+          "action": {
+            "type": "clamp",
+            "value": true
+          },
+          "before": {
+            "phase": "unprepared",
+            "machine": {
+              "clamped": false,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 0,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "clamped",
+            "machine": {
+              "clamped": true,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Заготовка закреплена. Установите ноль детали.",
+          "invariantErrors": []
+        },
+        {
+          "number": 2,
+          "action": {
+            "type": "zero",
+            "value": true
+          },
+          "before": {
+            "phase": "clamped",
+            "machine": {
+              "clamped": true,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "located",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 2,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Ноль детали установлен на торце.",
+          "invariantErrors": []
+        },
+        {
+          "number": 3,
+          "action": {
+            "type": "door",
+            "value": true
+          },
+          "before": {
+            "phase": "located",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 2,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 3,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Дверь закрыта. Проверьте готовность перед запуском.",
+          "invariantErrors": []
+        },
+        {
+          "number": 4,
+          "action": {
+            "type": "spindle",
+            "value": true
+          },
+          "before": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 3,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 4,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель включён. Задайте проход и предскажите размер.",
+          "invariantErrors": []
+        },
+        {
+          "number": 5,
+          "action": {
+            "type": "cut",
+            "stage": "rough",
+            "tool": "turning",
+            "x": 28.4,
+            "offset": 0,
+            "feed": 0.2,
+            "rpm": 800,
+            "prediction": 28.4
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 4,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 5,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Проход выполнен. Прогноз совпал с результатом. Остановите шпиндель, чтобы измерить текущую деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 6,
+          "action": {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 28,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 28
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 5,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 6,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Проход выполнен. Прогноз совпал с результатом. Остановите шпиндель, чтобы измерить текущую деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 7,
+          "action": {
+            "type": "spindle",
+            "value": false
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 6,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 7,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель полностью остановлен. Можно измерять деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 8,
+          "action": {
+            "type": "measure",
+            "instrument": "micrometer"
+          },
+          "before": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 7,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "measured",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 2,
+            "inspectionPass": null,
+            "events": 8,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Замер 28.00 мм записан. Сопоставьте показание и интервал округления с допуском.",
+          "invariantErrors": []
+        },
+        {
+          "number": 9,
+          "action": {
+            "type": "inspect",
+            "verdict": "ok",
+            "diagnosis": "none"
+          },
+          "before": {
+            "phase": "measured",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 2,
+            "inspectionPass": null,
+            "events": 8,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "passed",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 2,
+            "inspectionPass": 2,
+            "events": 9,
+            "passed": true,
+            "independent": true
+          },
+          "ok": true,
+          "message": "Задание выполнено самостоятельно: маршрут, прогнозы и контроль подтверждены.",
+          "invariantErrors": []
+        }
+      ],
+      "final": {
+        "phase": "passed",
+        "machine": {
+          "clamped": true,
+          "zeroed": true,
+          "doorClosed": true,
+          "spindle": false
+        },
+        "diameter": 28,
+        "blank": 1,
+        "passes": 2,
+        "measurementPass": 2,
+        "inspectionPass": 2,
+        "events": 9,
+        "passed": true,
+        "independent": true
+      },
+      "snapshot": {
+        "version": 1,
+        "kind": "cycle",
+        "variant": 0,
+        "actions": [
+          {
+            "type": "clamp",
+            "value": true
+          },
+          {
+            "type": "zero",
+            "value": true
+          },
+          {
+            "type": "door",
+            "value": true
+          },
+          {
+            "type": "spindle",
+            "value": true
+          },
+          {
+            "type": "cut",
+            "stage": "rough",
+            "tool": "turning",
+            "x": 28.4,
+            "offset": 0,
+            "feed": 0.2,
+            "rpm": 800,
+            "prediction": 28.4
+          },
+          {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 28,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 28
+          },
+          {
+            "type": "spindle",
+            "value": false
+          },
+          {
+            "type": "measure",
+            "instrument": "micrometer"
+          },
+          {
+            "type": "inspect",
+            "verdict": "ok",
+            "diagnosis": "none"
+          }
+        ]
+      }
+    },
+    {
+      "id": "stale",
+      "title": "Прежний замер после нового прохода",
+      "initial": {
+        "phase": "unprepared",
+        "machine": {
+          "clamped": false,
+          "zeroed": false,
+          "doorClosed": false,
+          "spindle": false
+        },
+        "diameter": 32,
+        "blank": 1,
+        "passes": 0,
+        "measurementPass": null,
+        "inspectionPass": null,
+        "events": 0,
+        "passed": false,
+        "independent": false
+      },
+      "steps": [
+        {
+          "number": 1,
+          "action": {
+            "type": "clamp",
+            "value": true
+          },
+          "before": {
+            "phase": "unprepared",
+            "machine": {
+              "clamped": false,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 0,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "clamped",
+            "machine": {
+              "clamped": true,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Заготовка закреплена. Установите ноль детали.",
+          "invariantErrors": []
+        },
+        {
+          "number": 2,
+          "action": {
+            "type": "zero",
+            "value": true
+          },
+          "before": {
+            "phase": "clamped",
+            "machine": {
+              "clamped": true,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "located",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 2,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Ноль детали установлен на торце.",
+          "invariantErrors": []
+        },
+        {
+          "number": 3,
+          "action": {
+            "type": "door",
+            "value": true
+          },
+          "before": {
+            "phase": "located",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 2,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 3,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Дверь закрыта. Проверьте готовность перед запуском.",
+          "invariantErrors": []
+        },
+        {
+          "number": 4,
+          "action": {
+            "type": "spindle",
+            "value": true
+          },
+          "before": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 3,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 4,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель включён. Задайте проход и предскажите размер.",
+          "invariantErrors": []
+        },
+        {
+          "number": 5,
+          "action": {
+            "type": "cut",
+            "stage": "rough",
+            "tool": "turning",
+            "x": 28.4,
+            "offset": 0,
+            "feed": 0.2,
+            "rpm": 800,
+            "prediction": 28.4
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 4,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 5,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Проход выполнен. Прогноз совпал с результатом. Остановите шпиндель, чтобы измерить текущую деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 6,
+          "action": {
+            "type": "spindle",
+            "value": false
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 5,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 6,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель полностью остановлен. Можно измерять деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 7,
+          "action": {
+            "type": "measure",
+            "instrument": "micrometer"
+          },
+          "before": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 6,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "measured",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 7,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Замер 28.40 мм записан. Сопоставьте показание и интервал округления с допуском.",
+          "invariantErrors": []
+        },
+        {
+          "number": 8,
+          "action": {
+            "type": "spindle",
+            "value": true
+          },
+          "before": {
+            "phase": "measured",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 7,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 8,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель включён. Задайте проход и предскажите размер.",
+          "invariantErrors": []
+        },
+        {
+          "number": 9,
+          "action": {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 28,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 28
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 8,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 9,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Проход выполнен. Прогноз совпал с результатом. Остановите шпиндель, чтобы измерить текущую деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 10,
+          "action": {
+            "type": "spindle",
+            "value": false
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 9,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 10,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель полностью остановлен. Можно измерять деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 11,
+          "action": {
+            "type": "inspect",
+            "verdict": "ok",
+            "diagnosis": "none"
+          },
+          "before": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 10,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 28,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": 1,
+            "inspectionPass": null,
+            "events": 11,
+            "passed": false,
+            "independent": false
+          },
+          "ok": false,
+          "message": "Сначала остановите шпиндель и сделайте новый замер после последнего прохода.",
+          "invariantErrors": []
+        }
+      ],
+      "final": {
+        "phase": "ready",
+        "machine": {
+          "clamped": true,
+          "zeroed": true,
+          "doorClosed": true,
+          "spindle": false
+        },
+        "diameter": 28,
+        "blank": 1,
+        "passes": 2,
+        "measurementPass": 1,
+        "inspectionPass": null,
+        "events": 11,
+        "passed": false,
+        "independent": false
+      },
+      "snapshot": {
+        "version": 1,
+        "kind": "cycle",
+        "variant": 0,
+        "actions": [
+          {
+            "type": "clamp",
+            "value": true
+          },
+          {
+            "type": "zero",
+            "value": true
+          },
+          {
+            "type": "door",
+            "value": true
+          },
+          {
+            "type": "spindle",
+            "value": true
+          },
+          {
+            "type": "cut",
+            "stage": "rough",
+            "tool": "turning",
+            "x": 28.4,
+            "offset": 0,
+            "feed": 0.2,
+            "rpm": 800,
+            "prediction": 28.4
+          },
+          {
+            "type": "spindle",
+            "value": false
+          },
+          {
+            "type": "measure",
+            "instrument": "micrometer"
+          },
+          {
+            "type": "spindle",
+            "value": true
+          },
+          {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 28,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 28
+          },
+          {
+            "type": "spindle",
+            "value": false
+          },
+          {
+            "type": "inspect",
+            "verdict": "ok",
+            "diagnosis": "none"
+          }
+        ]
+      }
+    },
+    {
+      "id": "scrap",
+      "title": "Пересъём и попытка вернуть диаметр",
+      "initial": {
+        "phase": "unprepared",
+        "machine": {
+          "clamped": false,
+          "zeroed": false,
+          "doorClosed": false,
+          "spindle": false
+        },
+        "diameter": 32,
+        "blank": 1,
+        "passes": 0,
+        "measurementPass": null,
+        "inspectionPass": null,
+        "events": 0,
+        "passed": false,
+        "independent": false
+      },
+      "steps": [
+        {
+          "number": 1,
+          "action": {
+            "type": "clamp",
+            "value": true
+          },
+          "before": {
+            "phase": "unprepared",
+            "machine": {
+              "clamped": false,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 0,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "clamped",
+            "machine": {
+              "clamped": true,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Заготовка закреплена. Установите ноль детали.",
+          "invariantErrors": []
+        },
+        {
+          "number": 2,
+          "action": {
+            "type": "zero",
+            "value": true
+          },
+          "before": {
+            "phase": "clamped",
+            "machine": {
+              "clamped": true,
+              "zeroed": false,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 1,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "located",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 2,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Ноль детали установлен на торце.",
+          "invariantErrors": []
+        },
+        {
+          "number": 3,
+          "action": {
+            "type": "door",
+            "value": true
+          },
+          "before": {
+            "phase": "located",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": false,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 2,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 3,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Дверь закрыта. Проверьте готовность перед запуском.",
+          "invariantErrors": []
+        },
+        {
+          "number": 4,
+          "action": {
+            "type": "spindle",
+            "value": true
+          },
+          "before": {
+            "phase": "ready",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": false
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 3,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 4,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Шпиндель включён. Задайте проход и предскажите размер.",
+          "invariantErrors": []
+        },
+        {
+          "number": 5,
+          "action": {
+            "type": "cut",
+            "stage": "rough",
+            "tool": "turning",
+            "x": 28.4,
+            "offset": 0,
+            "feed": 0.2,
+            "rpm": 800,
+            "prediction": 28.4
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 32,
+            "blank": 1,
+            "passes": 0,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 4,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 5,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Проход выполнен. Прогноз совпал с результатом. Остановите шпиндель, чтобы измерить текущую деталь.",
+          "invariantErrors": []
+        },
+        {
+          "number": 6,
+          "action": {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 27.8,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 27.8
+          },
+          "before": {
+            "phase": "running",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 28.4,
+            "blank": 1,
+            "passes": 1,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 5,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "scrap",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 27.8,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 6,
+            "passed": false,
+            "independent": false
+          },
+          "ok": true,
+          "message": "Проход выполнен. Прогноз совпал с результатом. Размер ниже допуска: деталь забракована, требуется новая заготовка.",
+          "invariantErrors": []
+        },
+        {
+          "number": 7,
+          "action": {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 28,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 28
+          },
+          "before": {
+            "phase": "scrap",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 27.8,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 6,
+            "passed": false,
+            "independent": false
+          },
+          "after": {
+            "phase": "scrap",
+            "machine": {
+              "clamped": true,
+              "zeroed": true,
+              "doorClosed": true,
+              "spindle": true
+            },
+            "diameter": 27.8,
+            "blank": 1,
+            "passes": 2,
+            "measurementPass": null,
+            "inspectionPass": null,
+            "events": 7,
+            "passed": false,
+            "independent": false
+          },
+          "ok": false,
+          "message": "Размер уже меньше нижнего допуска. Материал вернуть нельзя: возьмите новую заготовку.",
+          "invariantErrors": []
+        }
+      ],
+      "final": {
+        "phase": "scrap",
+        "machine": {
+          "clamped": true,
+          "zeroed": true,
+          "doorClosed": true,
+          "spindle": true
+        },
+        "diameter": 27.8,
+        "blank": 1,
+        "passes": 2,
+        "measurementPass": null,
+        "inspectionPass": null,
+        "events": 7,
+        "passed": false,
+        "independent": false
+      },
+      "snapshot": {
+        "version": 1,
+        "kind": "cycle",
+        "variant": 0,
+        "actions": [
+          {
+            "type": "clamp",
+            "value": true
+          },
+          {
+            "type": "zero",
+            "value": true
+          },
+          {
+            "type": "door",
+            "value": true
+          },
+          {
+            "type": "spindle",
+            "value": true
+          },
+          {
+            "type": "cut",
+            "stage": "rough",
+            "tool": "turning",
+            "x": 28.4,
+            "offset": 0,
+            "feed": 0.2,
+            "rpm": 800,
+            "prediction": 28.4
+          },
+          {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 27.8,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 27.8
+          },
+          {
+            "type": "cut",
+            "stage": "finish",
+            "tool": "turning",
+            "x": 28,
+            "offset": 0,
+            "feed": 0.12,
+            "rpm": 800,
+            "prediction": 28
+          }
+        ]
+      }
+    }
+  ]
+}

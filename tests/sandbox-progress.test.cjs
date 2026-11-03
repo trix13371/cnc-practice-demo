@@ -1,0 +1,24 @@
+'use strict';
+const assert=require('node:assert/strict'),sandbox=require('../sandbox-model.js'),progress=require('../progress-model.js'),config=require('../progress-config.js'),fixtures=require('./progress-fixtures.cjs');
+const apply=(book,event)=>{const w=book.works.find(w=>w.id===book.selected),{id,...saved}=w,r=sandbox.execute(saved,event);assert(r.ok,r.message);return {...book,works:book.works.map(item=>item.id===w.id?{id:w.id,...r.work}:item)};};
+let book=sandbox.createBook();book=apply(book,{type:'spindle',value:true});book=apply(book,{type:'cut',start:0,end:-20,x:28,feed:.15,rpm:800});book=apply(book,{type:'spindle',value:false});book=apply(book,{type:'measure',z:-10,instrument:'micrometer'});book.drafts['work-1']={operation:'measure',z:'-10'};
+const empty=progress.empty(),before=progress.summary(empty).progress;
+const archive=progress.empty();archive.sections.sandbox.current=book;
+assert.deepEqual(progress.summary(archive).progress,before,'Free work never grants educational credit');
+assert.deepEqual(progress.validate(archive).sections.sandbox.current,book);
+const raw=progress.toRaw(archive,{});assert(raw[config.sections.sandbox]);assert.deepEqual(progress.fromRaw(raw).sections.sandbox.current,book,'Works persist in their own section');
+const older=structuredClone(archive);delete older.sections.sandbox;const migrated=progress.validate(older);assert.deepEqual(migrated.sections.sandbox.current,sandbox.createMachineBook(),'11-section beta archives migrate without fabricated work');
+const all=fixtures.full(),legacyAll=structuredClone(all);delete legacyAll.sections.sandbox;assert.equal(progress.summary(progress.validate(legacyAll)).progress.done,22,'Migration preserves completed course');
+for(const id of progress.ids.filter(id=>id!=='sandbox')){const missing=structuredClone(archive);delete missing.sections[id];assert.throws(()=>progress.validate(missing),'Core sections remain required');}
+const current=progress.merge(archive,progress.validate(older));assert.deepEqual(current.sections.sandbox.current,book,'Old imports cannot erase active workshop');
+const other=structuredClone(archive);other.sections.sandbox.current.works[0].name='Другая работа';const merged=progress.merge(archive,other);assert.equal(merged.sections.sandbox.current.works[0].name,'Моя деталь');assert(merged.sections.sandbox.history.some(h=>h.works[0].name==='Другая работа'),'Different imported book stays recoverable in history');
+for(const mutate of [b=>b.works[0].profile={segments:[]},b=>b.works[0].passed=true,b=>b.works[0].events[1].x=NaN,b=>b.drafts['work-1'].operation='execute-code',b=>b.works[0].cursor=999,b=>b.selected='work-9']){const bad=structuredClone(archive);mutate(bad.sections.sandbox.current);assert.throws(()=>progress.validate(bad));}
+assert.equal(sandbox.stateOf(book).readings.at(-1).reading,28);
+const specification=require('../model-spec-model.js').manifest();assert.deepEqual(specification.sandbox.limits,JSON.parse(JSON.stringify(sandbox.limits)));assert.equal(specification.sandbox.maxWorks,sandbox.MAX_WORKS);
+const real=require('../real-machine-model.js');let machine=sandbox.createMachineBook();assert.equal(sandbox.isActive(machine),false,'A fresh machine work is not an achievement');machine=sandbox.addWork(machine,'Прежняя практика',{diameter:32,length:60});machine.selected='work-1';let record={...machine.works[0]};delete record.id;
+for(const event of [{type:'reference'},{type:'clamp',value:true},{type:'tool',tool:1},{type:'preset'},{type:'workOffset',z:100},{type:'door',value:true},{type:'mode',value:'MDI'},{type:'mdi',source:'G97 S800 M03'},{type:'mdi',source:'G0X28Z2'},{type:'mdi',source:'G1Z-20F.15'}])record=real.execute(record,event).work;
+machine.works[0]={id:'work-1',...record};machine.drafts['work-1']={panel:'auto',program:'G21\nG18\tG99\nM30',mdi:'G00 X40 Z5'};
+assert(sandbox.restoreBook(machine));assert.deepEqual(sandbox.parseBook(sandbox.exportBook(machine)),machine,'Mixed work versions and multiline editor drafts roundtrip');const nearMachine=sandbox.stateOf(machine);assert.equal(sandbox.sample(nearMachine.profile,50),28);
+const realArchive=progress.empty();realArchive.sections.sandbox.current=machine;assert.deepEqual(progress.fromRaw(progress.toRaw(realArchive,{})).sections.sandbox.current,machine);assert.equal(progress.summary(realArchive).progress.done,0);assert.deepEqual(sandbox.importBook(sandbox.createBook(),machine).works.map(w=>w.version),[1,2,1]);
+const invalidMachine=structuredClone(realArchive);invalidMachine.sections.sandbox.current.works[0].axes={x:1,z:1};assert.throws(()=>progress.validate(invalidMachine));assert.deepEqual(specification.realMachine.limits,JSON.parse(JSON.stringify(real.limits)));
+console.log('Sandbox progress: course isolation, cloud roundtrip, 11-section migration, branch preservation, strict replay and specification passed.');

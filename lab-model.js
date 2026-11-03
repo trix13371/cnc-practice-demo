@@ -35,7 +35,7 @@
     for(const spec of t.operations){const o=byId[spec.id],actual=o.diameter+shift,end=spec.endDiameter?o.endDiameter+shift:actual;
       const start=spec.kind==='bore'?t.bore:spec.parent?byId[spec.parent].diameter+shift:t.stock;
       const removal=spec.kind==='bore'?(actual-start)/2:(start-Math.min(actual,end))/2;
-      const perPass=removal/o.passes,issues=[];
+      const perPass=removal/o.passes,issues=[];const surfaceStart=t.operations.filter(s=>!['bore','groove'].includes(s.kind)).slice(0,t.operations.filter(s=>!['bore','groove'].includes(s.kind)).findIndex(s=>s.id===spec.id)).reduce((n,s)=>n+s.length,0);if(spec.kind==='groove'){if(spec.position+o.length>byId[spec.parent].length+1e-8)issues.push('канавка выходит за длину пояска');}else if(spec.kind==='bore'?o.length>t.length+1e-8:surfaceStart+o.length>t.length+1e-8)issues.push('участок выходит за длину заготовки');
       if(o.tool!==spec.tool)issues.push(`нужен ${tools[spec.tool].toLowerCase()}`);
       if(!near(actual,spec.diameter)||(spec.endDiameter&&!near(end,spec.endDiameter)))issues.push('итоговые диаметры вне допуска ±0,1 мм');
       if(t.diagnosis&&!near(o.diameter,spec.diameter))issues.push('не подменяйте коррекцию изменением программного размера');

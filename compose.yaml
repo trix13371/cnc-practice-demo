@@ -1,0 +1,95 @@
+name: cnc-beta
+x-bounded-logs: &bounded-logs
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "3"
+services:
+  app:
+    build: .
+    image: cnc-practice-beta:0.21
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PUBLIC_ORIGIN: https://${DOMAIN:?Set DOMAIN in .env}
+      TRUST_PROXY: "1"
+      TRUST_PROXY_PEERS: "172.30.81.2"
+    volumes:
+      - beta_data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid,nodev
+    logging: *bounded-logs
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+    stop_grace_period: 15s
+    networks:
+      beta_private:
+        ipv4_address: 172.30.81.3
+  backup:
+    image: cnc-practice-beta:0.21
+    restart: unless-stopped
+    command: [node, server/backup-loop.cjs]
+    volumes:
+      - beta_data:/data:ro
+      - beta_backups:/backups
+    read_only: true
+    logging: *bounded-logs
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    depends_on:
+      app:
+        condition: service_healthy
+    networks:
+      beta_private:
+        ipv4_address: 172.30.81.4
+    healthcheck:
+      test: [CMD, node, -e, "const s=JSON.parse(require('node:fs').readFileSync('/backups/status.json'));process.exit(Date.now()-Date.parse(s.lastSuccess)<129600000?0:1)"]
+      interval: 1m
+      timeout: 5s
+      start_period: 1m
+  caddy:
+    build:
+      context: .
+      dockerfile: Dockerfile.proxy
+    image: cnc-practice-proxy:20261026
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+    security_opt: [no-new-privileges:true]
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid,nodev
+    cap_drop: [ALL]
+    cap_add: [NET_BIND_SERVICE]
+    logging: *bounded-logs
+    mem_limit: 128m
+    networks:
+      default: {}
+      beta_private:
+        ipv4_address: 172.30.81.2
+networks:
+  beta_private:
+    internal: true
+    ipam:
+      config:
+        - subnet: 172.30.81.0/24
+volumes:
+  beta_data:
+  beta_backups:
+  caddy_data:
+  caddy_config:

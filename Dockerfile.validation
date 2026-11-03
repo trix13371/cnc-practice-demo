@@ -1,0 +1,4 @@
+ARG APP_IMAGE=cnc-practice-validation-app:ci
+FROM ${APP_IMAGE}
+COPY --chown=node:node tests/ /app/tests/
+CMD ["node", "tests/validation-course.test.cjs"]

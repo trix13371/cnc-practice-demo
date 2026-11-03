@@ -1,0 +1,7 @@
+const m=require('../program-setup-model.js');
+function setupStage(){let s=m.create();const r=a=>s=m.transition(s,a),next=()=>r({type:'next',source:s.source});for(const value of Object.keys(m.words))r({type:'inspect',value});next();for(const value of ['modes','limit','spindle','rapid','rapid','cut','rapid','rapid','stop','end']){r({type:'forecast',value});r({type:'frame'});}next();r({type:'diagnose',value:'rapid'});r({type:'preview',source:m.guide});next();return s;}
+function ready(){let s=setupStage();for(const a of [{type:'reference'},{type:'clamp'},{type:'tool',value:1},{type:'preset'},{type:'zero',value:'100'},{type:'door',value:true}])s=m.transition(s,a);s=m.transition(s,{type:'next',source:s.source});return s;}
+function running(source=m.program(30,25,36)){let s=ready();s=m.transition(s,{type:'preview',source});s=m.transition(s,{type:'next',source});s=m.transition(s,{type:'start',source});return s;}
+function machined(source){let s=running(source),guard=0;while(s.machine.program.status==='running'){if(++guard>80)throw Error('Program stalled');s=m.transition(s,{type:'step'});}s=m.transition(s,{type:'next',source:s.source});return s;}
+function complete(source){let s=machined(source);for(const a of [{type:'door',value:false},{type:'measure',z:'-12'},{type:'record',value:'30'},{type:'measure',z:'-40'},{type:'verdict'},{type:'next',source:s.source}])s=m.transition(s,a);return s;}
+module.exports={setupStage,ready,running,machined,complete};

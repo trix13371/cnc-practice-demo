@@ -1,0 +1,56 @@
+name: cnc-local
+services:
+  app:
+    build: .
+    image: cnc-practice-local:0.21
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      HOST: 0.0.0.0
+      PORT: "8080"
+      PUBLIC_ORIGIN: http://127.0.0.1:4180
+      TRUST_PROXY: "0"
+    ports:
+      - "127.0.0.1:4180:8080"
+    volumes:
+      - local_data:/data
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,noexec,nosuid,nodev
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    pids_limit: 64
+    mem_limit: 512m
+    cpus: 1.0
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+  backup:
+    image: cnc-practice-local:0.21
+    restart: unless-stopped
+    command: [node, server/backup-loop.cjs]
+    volumes:
+      - local_data:/data:ro
+      - local_backups:/backups
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    depends_on:
+      app:
+        condition: service_healthy
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: [CMD, node, -e, "const s=JSON.parse(require('node:fs').readFileSync('/backups/status.json'));process.exit(Date.now()-Date.parse(s.lastSuccess)<129600000?0:1)"]
+      interval: 1m
+      timeout: 5s
+      start_period: 1m
+volumes:
+  local_data:
+  local_backups:

@@ -1,0 +1,37 @@
+:root {
+  color-scheme: light;
+  --ink: #142b44;
+  --muted: #526478;
+  --line: #e0e5eb;
+  --paper: #f5f3ef;
+  --green: #255beb;
+  --green-pale: #edf3ff;
+  --amber: #9a610d;
+  --amber-pale: #fff4e1;
+  --red: #b03c39;
+  --surface: #fff;
+  --surface-raised: #f0f4f9;
+  --accent: #255beb;
+  --sidebar-width: 218px;
+  --account-bg: #f5f3ef;
+  --account-panel: #fff;
+  --account-ink: #142b44;
+  --account-muted: #526478;
+  --account-accent: #255beb;
+  --account-border: #e0e6ee;
+  --font-ui: "Golos Text", "Segoe UI", Arial, sans-serif;
+  --text-xs: 13px;
+  --text-sm: 14px;
+  --text-ui: 15px;
+  --text-body: 16px;
+}
+@media (min-width: 1700px) {
+  :root {
+    --sidebar-width: 244px;
+  }
+}
+@media (max-width: 1180px) {
+  :root {
+    --sidebar-width: 190px;
+  }
+}

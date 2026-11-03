@@ -5,3 +5,11 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+data/
+backups/
+secrets/
+*.sqlite
+*.sqlite-wal
+*.sqlite-shm
+*.private.*
+server.lock

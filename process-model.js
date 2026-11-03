@@ -1,6 +1,7 @@
 (function(root){
   'use strict';
   const lab=root.CNCLabModel||(typeof require==='function'?require('./lab-model.js'):null);
+  const metrology=root.CNCTrainingMath||(typeof require==='function'?require('./training-math.js'):null);
   const lerp=(a,b,t)=>a+(b-a)*t;
   function surfaces(task){let z=0;const list=[];for(const o of task.operations.filter(o=>!['bore','groove'].includes(o.kind))){list.push({...o,start:z});z+=o.length;}for(const o of task.operations.filter(o=>['bore','groove'].includes(o.kind)))list.push({...o,start:o.kind==='bore'?0:(list.find(s=>s.id===o.parent)?.start||0)+o.position});return list;}
   function stock(t){return {segments:[{length:t.length,diameter:t.stock,endDiameter:t.stock,bore:t.bore}],bore:t.bore};}
@@ -29,7 +30,36 @@
     const x=s.start+s.length*Math.max(.001,Math.min(.999,fraction));let z=0,seg=state.segments.at(-1),local=1;for(const a of state.segments){if(x<z+a.length+1e-8){seg=a;local=(x-z)/a.length;break;}z+=a.length;}
     const groove=surfaces(t).find(g=>g.kind==='groove'&&g.parent===s.id&&x>=g.start&&x<=g.start+g.length);
     const actual=s.kind==='bore'?(seg.bore??state.bore):lerp(seg.diameter,seg.endDiameter||seg.diameter,local),target=groove?groove.diameter:lerp(s.diameter,s.endDiameter||s.diameter,Math.max(.001,Math.min(.999,fraction))),resolution=instrument==='micrometer'?.01:.1,reading=Math.round(actual/resolution)*resolution;
-    return {id,title:groove?groove.title:s.title,x,actual,reading:+reading.toFixed(2),target:+target.toFixed(3),instrument,resolution,kind:s.kind==='bore'?'inside':'outside',verdict:actual<target-.10000001?'small':actual>target+.10000001?'large':'ok'};
+    const rounded=+reading.toFixed(2);
+    return {id:groove?groove.id:id,title:groove?groove.title:s.title,x,actual,reading:rounded,target:+target.toFixed(3),instrument,resolution,kind:s.kind==='bore'?'inside':'outside',verdict:metrology.classify(rounded,resolution,target,.1)};
   }
-  const api={surfaces,stock,timeline,cut,stateAt,measure};root.CNCProcess=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  function control(t,p,logs){
+    const result=lab.evaluate(t,p);if(!result.success)return {passed:false,missing:['Исправить размеры, режимы и маршрут']};
+    const stage=timeline(t,p).length,missing=[];
+    for(const s of surfaces(t)){
+      const fresh=logs.filter(m=>m.id===s.id&&m.stage===stage&&m.correct&&m.verdict==='ok');
+      if(s.endDiameter&&s.endDiameter!==s.diameter){
+        if(!fresh.some(m=>m.x<=s.start+s.length*.1+1e-8))missing.push(s.title+': замер у начала (0–10%)');
+        if(!fresh.some(m=>m.x>=s.start+s.length*.9-1e-8))missing.push(s.title+': замер у конца (90–100%)');
+      }else if(!fresh.length)missing.push(s.title+': свежий замер и верный вывод');
+    }
+    return {passed:!missing.length,missing};
+  }
+  function restoreSession(t,p,value){
+    const result={cursor:0,reached:0,logs:[]};if(!value||value.version!==undefined&&value.version!==2)return result;
+    let total;try{total=timeline(t,p).length;}catch{return result;}
+    const reached=value.reached??value.cursor;
+    if(!Number.isInteger(reached)||reached<0||reached>total||!Number.isInteger(value.cursor)||value.cursor<0||value.cursor>reached)return result;
+    result.cursor=value.cursor;result.reached=reached;
+    for(const saved of Array.isArray(value.logs)?value.logs.slice(0,12):[]){
+      if(!saved||!Number.isInteger(saved.stage)||saved.stage<0||saved.stage>reached||!['ok','large','small','uncertain'].includes(saved.answer))continue;
+      const s=surfaces(t).find(s=>s.id===saved.id);if(!s||!Number.isFinite(saved.x))continue;
+      const fraction=(saved.x-s.start)/s.length;if(fraction<0||fraction>1)continue;
+      try{const expected=measure(t,stateAt(t,p,saved.stage),s.id,fraction,saved.instrument);
+        if(Math.abs(expected.x-saved.x)>1e-6||!Number.isFinite(saved.reading)||Math.abs(expected.reading-saved.reading)>1e-8||expected.resolution!==saved.resolution)continue;
+        result.logs.push({...expected,stage:saved.stage,answer:saved.answer,correct:saved.answer===expected.verdict});
+      }catch{}
+    }return result;
+  }
+  const api={surfaces,stock,timeline,cut,stateAt,measure,control,restoreSession};root.CNCProcess=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

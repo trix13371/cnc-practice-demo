@@ -1,0 +1,16 @@
+'use strict';
+const assert = require('node:assert/strict');
+const views = require('../course-view-model.js');
+assert.deepEqual(views.create(), { kind: 'lesson', step: null });
+const routeStep = require('../learning-path-model.js').get('diagnostic-diag-rapid');
+const route = views.create('route', routeStep);
+routeStep.target === 'diagnosticCourse' && assert.equal(route.step.target, 'diagnosticCourse');
+assert.deepEqual(views.create('millingCourse'), { kind: 'millingCourse', step: null });
+assert.equal(views.lessonFor('firstSession'), 'machine');
+assert.equal(views.lessonFor('programSetup'), 'setup');
+assert.equal(views.restore({ selected: 'verification', activePractice: 'millingCourse' }).kind, 'millingCourse');
+assert.equal(views.restore({ selected: 'machine', activePractice: 'millingCourse' }).kind, 'lesson');
+assert.equal(views.create('lesson', routeStep).step, null, 'Leaving route clears its selection');
+assert.throws(() => views.create('constructor'));
+assert.throws(() => views.create('route', { kind: 'lesson', target: 'machine' }));
+console.log('Course view: exclusive practice modes, route isolation and matching-lesson restoration passed.');

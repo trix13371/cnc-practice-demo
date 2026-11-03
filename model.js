@@ -8,12 +8,12 @@
       defaults: { ...defaults, x: 30 },
       hints: ['Сравните целевой размер с конечным X. Здесь X задаётся по диаметру.', 'Чтобы из Ø32 получить Ø28, снимите 2 мм на радиус. Коррекция в этом задании нулевая.', 'Установите X = 28 мм, коррекцию = 0 мм и запустите проход.'] },
     { ...base, id: 'offset', title: 'Коррекция инструмента', goal: 'Исправьте коррекцию X',
-      description: 'В программе указан Ø28 мм. В таблице коррекций есть ошибка: восстановите нулевую коррекцию после калибровки.',
-      defaults: { ...defaults, offset: -4 },
+      description: 'Программный X = 28 мм. По карте наладки калибровка завершена, коррекция должна быть 0 мм. Введено −0,4 мм: найдите и исправьте ошибку ввода, не меняя программный размер. Это проверка известной настройки, а не диагностика по замерам.',
+      defaults: { ...defaults, offset: -.4 },
       hints: ['Сравните X в программе и диаметр траектории: что изменяет размер?', 'В модели диаметр траектории = X + коррекция. Отрицательная коррекция уменьшает размер.', 'Верните коррекцию X к 0 мм. Оставьте X = 28 мм.'] },
     { ...base, id: 'feed', title: 'Режим обработки', goal: 'Подберите учебный режим',
       description: 'Размер задан правильно. Установите подачу и обороты по условиям упражнения.',
-      defaults: { ...defaults, feed: .45 },
+      defaults: { ...defaults, feed: .45, rpm: 400 },
       hints: ['Откройте условия упражнения и сравните допустимую подачу с текущей.', 'Подача измеряется в мм/об. Для этого задания допустимо 0,10–0,25 мм/об.', 'Попробуйте подачу 0,20 мм/об при 800 об/мин.'] }
   ];
   function evaluate(p, task = tasks[0]) {
@@ -32,7 +32,7 @@
     if (p.tool !== 'turning') add('tool', 'Не подходит инструмент', 'Для наружного продольного точения нужен проходной резец.');
     if (actual <= 0) add('collision', 'Траектория пересекает ось', 'Проверьте сумму X и коррекции. Такая траектория блокирует учебную анимацию.');
     else if (actual < task.target - task.tolerance - 1e-9)
-      add('diameter', 'Снято слишком много материала', `Диаметр траектории ${actual} мм меньше целевого Ø${task.target} ±${task.tolerance}. Увеличьте сумму X и коррекции.`);
+      add('diameter', 'Траектория ниже допуска', `Диаметр траектории ${actual} мм меньше целевого Ø${task.target} ±${task.tolerance}. Исправьте настройки до запуска. Уже снятый материал не восстановить; повторный запуск вводного упражнения использует новую заготовку.`);
     else if (actual > task.target + task.tolerance + 1e-9)
       add('diameter', actual >= task.stock ? 'Материал не снимается' : 'Остался припуск', `Нужен Ø${task.target} ±${task.tolerance} мм. При траектории вне заготовки её диаметр остаётся Ø${task.stock} мм.`);
     if (depth > task.maxDepth + 1e-9) add('depth', 'Превышена глубина прохода', `Разрешён съём до ${task.maxDepth} мм на радиус. Сейчас: ${depth} мм.`);
@@ -54,6 +54,15 @@
     if (/что|ошиб|помо|подсказ|почему|провер/.test(q) || !q.trim())
       return r.success ? 'Настройки соответствуют заданию. Выполните проход целиком или по шагам, чтобы закрепить результат.' : `${checked ? 'Обнаружено' : 'Проверьте'}: ${r.errors[0].title.toLowerCase()}. ${r.errors[0].detail}`;
     return 'Могу объяснить диаметр, коррекцию, подачу, обороты, инструмент и этапы программы. Для последовательной помощи нажмите «Подсказка по шагам».';
+  }
+  function inspect(p,task,measurement){
+    const r=evaluate(p,task),math=root.CNCTrainingMath||(typeof require==='function'?require('./training-math.js'):null);
+    if(!r.success)return {passed:false,reason:'Настройки обработки не соответствуют заданию.'};
+    if(measurement?.surface!=='worked')return {passed:false,reason:'Измерьте обработанный участок, а не хвостовик.'};
+    const resolution=measurement.resolution;
+    if(![.1,.01].includes(resolution)||!Number.isFinite(measurement.reading)||Math.abs(measurement.reading-Math.round(r.finalDiameter/resolution)*resolution)>1e-8)return {passed:false,reason:'Сделайте новый замер текущей детали.'};
+    const expected=math.classify(measurement.reading,resolution,task.target,task.tolerance);
+    return {passed:expected==='ok'&&measurement.verdict===expected,expected,reason:measurement.verdict!==expected?'Вывод не соответствует интервалу показания.':expected!=='ok'?'Показание не подтверждает годность: уточните измерение.':'Размер подтверждён измерением и верным выводом.'};
   }
   const phases = [
     { end: .15, title: 'Подход', detail: 'Резец подходит к началу обработки снаружи заготовки.', code: 4 },
@@ -99,6 +108,6 @@
     if (value.answers.some((a,i)=>!a || a.index!==i || !evaluate(a.settings,examTask(value,i)).valid)) return null;
     return { version:1, variant:value.variant, startedAt:value.startedAt, answers:value.answers.map(a=>({index:a.index,settings:{...a.settings}})),index:value.index,awaitingNext:value.awaitingNext };
   }
-  root.CNCModel = { tasks, evaluate, mentor, phases, phaseAt, createExam, examTask, submitExam, advanceExam, gradeExam, restoreExam };
+  root.CNCModel = { tasks, evaluate, inspect, mentor, phases, phaseAt, createExam, examTask, submitExam, advanceExam, gradeExam, restoreExam };
   if (typeof module !== 'undefined' && module.exports) module.exports = root.CNCModel;
 })(typeof window !== 'undefined' ? window : globalThis);

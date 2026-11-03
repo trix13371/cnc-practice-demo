@@ -1,0 +1,1097 @@
+{
+  "schema": "cnc-source-foundations-v1",
+  "checkedOn": "2026-10-29",
+  "notice": "Ручной реестр. Автоматический мониторинг не включён. Сверка карточки не означает одобрение нормативного правила.",
+  "sources": [
+    {
+      "id": "SAFE-LATHE",
+      "designation": "ГОСТ Р 59209-2020",
+      "title": "Безопасность токарных станков",
+      "url": "https://protect.gost.ru/gost/details/10044a8a-0529-4bcd-b93f-5cf97176b9db",
+      "effectiveOn": "2021-09-01",
+      "note": "Требования к токарным станкам разных групп. Применимые пункты зависят от оборудования; это не стандарт сертификации браузерного курса.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "AXES",
+      "designation": "ГОСТ 23597-79",
+      "title": "Оси координат и направления движений",
+      "url": "https://protect.gost.ru/gost?month=0&page=858&search=&year=0",
+      "note": "Обозначение и статус найдены в официальном каталоге. Полный текст и постоянная карточка ещё не получены; страница каталога может измениться.",
+      "reviewLabel": "Найдена запись каталога; постатейная сверка не выполнена",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "catalog"
+    },
+    {
+      "id": "CODE",
+      "designation": "ГОСТ 20999-83",
+      "title": "Кодирование управляющих программ",
+      "url": "https://protect.gost.ru/gost?month=0&page=752&search=&year=0",
+      "note": "Стандарт не заменяет руководство конкретной стойки. Таблица команд и различия учебного профиля ещё требуют постатейной сверки.",
+      "reviewLabel": "Найдена запись каталога; постатейная сверка не выполнена",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "catalog"
+    },
+    {
+      "id": "DRAW-LINES",
+      "designation": "ГОСТ 2.303-68",
+      "title": "Линии на чертежах",
+      "url": "https://protect.gost.ru/gost/details/09645eb7-ee23-467a-a319-25b3112a7227",
+      "note": "В карточке указана замена на ГОСТ Р 2.303-2026. Дату и порядок перехода требуется отдельно подтвердить по приказу.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "DRAW-VIEWS",
+      "designation": "ГОСТ 2.305-2008",
+      "title": "Виды, разрезы и сечения",
+      "url": "https://protect.gost.ru/gost/details/cbeccb9a-67df-45fa-9c67-c391a43bbbc9",
+      "note": "Применение выбранной редакции к учебным чертежам требует проверки.",
+      "transition": {
+        "effectiveOn": "2027-10-01",
+        "title": "ГОСТ Р 2.305-2026",
+        "url": "https://protect.gost.ru/gost/details/1922e193-7fd8-4e15-8e2b-93912a456452",
+        "note": "Предусмотрено право досрочного применения."
+      },
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "DRAW-SIZES",
+      "designation": "ГОСТ 2.307-2011",
+      "title": "Размеры и предельные отклонения на чертежах",
+      "url": "https://protect.gost.ru/gost/details/62de9da6-e1a7-4023-955e-7dd9777eaab6",
+      "note": "Схема объясняет понятие; оформление каждого учебного чертежа проверяется отдельно.",
+      "transition": {
+        "effectiveOn": "2027-10-01",
+        "title": "ГОСТ Р 2.307-2026",
+        "url": "https://protect.gost.ru/gost/details/eddb3107-58be-4811-b237-5ab1d0d4c4d5",
+        "note": "Предусмотрено право досрочного применения."
+      },
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "LIMITS",
+      "designation": "ГОСТ 25346-2013",
+      "title": "Система допусков на линейные размеры",
+      "url": "https://protect.gost.ru/gost/details/ec4c69c8-6451-4b9e-91cb-f6c6787e1f34",
+      "note": "При дальнейшей проверке учесть поправку ИУС 12-2021. Номинал не обязательно лежит посередине допустимого интервала.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "FITS",
+      "designation": "ГОСТ 25347-2013",
+      "title": "Предельные отклонения отверстий и валов",
+      "url": "https://protect.gost.ru/gost/details/e7108332-b720-423a-b99b-e580aa386c7a",
+      "note": "Для таблиц учитывать поправки 2021, 2022 и 2025 годов. Эти таблицы пока не перенесены в задания.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "CALIPER",
+      "designation": "ГОСТ 166-89",
+      "title": "Штангенциркули",
+      "url": "https://protect.gost.ru/gost/details/a431f5aa-4a92-4638-90f3-f0c4b5acb9f7",
+      "note": "Тип, диапазон, отсчёт и метрологические характеристики конкретного прибора проверяют по его документации.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "MICROMETER",
+      "designation": "ГОСТ 6507-90",
+      "title": "Микрометры",
+      "url": "https://protect.gost.ru/gost/details/c8e52c27-b75e-4861-a75c-f8bd5d03de6c",
+      "note": "Виртуальный прибор имеет описанную учебную модель; его свойства нельзя переносить на все реальные микрометры.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "MEASURE-ERROR",
+      "designation": "ГОСТ 8.051-81",
+      "title": "Допускаемые погрешности измерения линейных размеров",
+      "url": "https://protect.gost.ru/gost/details/f5ce57f4-59ef-4c26-861f-30f0f13809a5",
+      "note": "Область документа ограничена. Интервал округления в задании не является полным нормативным расчётом погрешности или приёмочных границ.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "ROUGHNESS",
+      "designation": "ГОСТ 2.309-73",
+      "title": "Обозначения шероховатости",
+      "url": "https://protect.gost.ru/gost/details/757ee9f1-6974-4c87-b285-45b3719ca5e7",
+      "note": "Шероховатость в геометрической модели не рассчитывается.",
+      "transition": {
+        "effectiveOn": "2027-10-01",
+        "title": "ГОСТ Р 2.309-2026",
+        "url": "https://protect.gost.ru/gost/changesdetails/4713d771-a547-4e98-895f-8df985d59974",
+        "note": "Дата перехода проверена по карточке изменения."
+      },
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "GEOMETRIC-TOL",
+      "designation": "ГОСТ Р 2.308-2023",
+      "title": "Допуски формы и расположения",
+      "url": "https://protect.gost.ru/gost/details/41ac4e79-c383-42de-bae3-88f76054b981",
+      "effectiveOn": "2024-03-01",
+      "note": "Есть поправка 2025 года. Геометрическая картинка и одиночный замер диаметра не подтверждают форму и биение реального изделия.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "ROUTE-DOC",
+      "designation": "ГОСТ 3.1118-82",
+      "title": "Маршрутные карты",
+      "url": "https://protect.gost.ru/gost/details/11e71aab-c940-4221-97e1-498eb2563f31",
+      "note": "Упрощённую таблицу задания нельзя считать проверенной производственной маршрутной картой.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "CUTTING-DOC",
+      "designation": "ГОСТ 3.1404-86",
+      "title": "Документы операций обработки резанием",
+      "url": "https://protect.gost.ru/gost/details/0310a3e0-4646-4393-ab1a-981441404a9b",
+      "note": "Состав и оформление технологических документов требуют отдельной проверки.",
+      "checkedOn": "2026-10-29",
+      "type": "standard",
+      "verification": "metadata",
+      "reviewLabel": "Сверена карточка; полный текст и применимые пункты требуют проверки"
+    },
+    {
+      "id": "WORK-SAFETY",
+      "designation": "Приказ Минтруда № 887н от 11.12.2020",
+      "title": "Охрана труда при обработке металлов",
+      "url": "https://mintrud.gov.ru/docs/mintrud/orders/1811",
+      "reviewLabel": "Актуальная редакция требует подтверждения",
+      "note": "Страница содержит первоначальную редакцию. Официальную публикацию изменения от 29.04.2025 № 287н не удалось прочитать; исходную страницу нельзя выдавать за актуальную редакцию на 2026 год.",
+      "amendmentUrl": "https://publication.pravo.gov.ru/document/0001202505300025",
+      "checkedOn": "2026-10-29",
+      "type": "regulation",
+      "verification": "pending"
+    },
+    {
+      "id": "HAAS-PROGRAM",
+      "designation": "Руководство Haas",
+      "title": "Программирование токарной обработки",
+      "url": "https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html",
+      "reviewLabel": "Документация изготовителя; учебное подмножество описано отдельно",
+      "note": "Источник соглашений конкретного управления. Приложение не воспроизводит все функции Haas или FANUC и не является их официальным эмулятором.",
+      "checkedOn": "2026-10-29",
+      "type": "manufacturer",
+      "verification": "manufacturer"
+    },
+    {
+      "id": "EAEU-MACHINE",
+      "designation": "ТР ТС 010/2011",
+      "title": "О безопасности машин и оборудования",
+      "url": "https://eec.eaeunion.org/comission/department/deptexreg/tr/bezopMashines.php",
+      "reviewLabel": "Проверена официальная страница и перечень изменений; применимость пунктов требует проверки",
+      "note": "Нормативный контекст для оборудования. Браузерный тренажёр не является физическим станком.",
+      "checkedOn": "2026-10-29",
+      "type": "regulation",
+      "verification": "metadata"
+    }
+  ],
+  "profiles": [
+    {
+      "id": "editor",
+      "title": "Учебный редактор G-кода",
+      "description": "Короткие задания на чтение программы и прогноз траектории. Наладка стойки не моделируется.",
+      "gCodes": [
+        0,
+        1,
+        18,
+        21,
+        97,
+        98,
+        99
+      ],
+      "mCodes": [
+        3,
+        5,
+        30
+      ],
+      "conventions": [
+        "Две оси X/Z; миллиметры; X задаётся по диаметру; координаты абсолютные.",
+        "G98: F в мм/мин; G99: F в мм/об. Эти значения относятся к выбранному учебному диалекту.",
+        "В числах G-кода используется точка; обычный числовой ввод курса допускает запятую."
+      ],
+      "limits": [
+        "G96, выбор T, коррекции и привязка инструмента в этом редакторе не поддерживаются.",
+        "Остановка вращения представлена логическим состоянием, без физического выбега.",
+        "Неизвестные команды отклоняются; код предназначен для тренажёра."
+      ]
+    },
+    {
+      "id": "machine",
+      "title": "Стойка свободной мастерской",
+      "description": "Учебная двухосевая токарная установка с отдельными настройками инструмента и G54; Fanuc-подобное подмножество, без привязки к сертифицированной модели оборудования.",
+      "gCodes": [
+        0,
+        1,
+        18,
+        21,
+        40,
+        50,
+        54,
+        96,
+        97,
+        98,
+        99
+      ],
+      "mCodes": [
+        0,
+        3,
+        5,
+        8,
+        9,
+        30
+      ],
+      "conventions": [
+        "X по диаметру; рабочие абсолютные X/Z; отдельно координаты станка и фактическая вершина резца.",
+        "G96 требует явно установленного предела оборотов G50 S. G97 задаёт постоянные обороты.",
+        "T0101, T0202, T0303 и T0404 — инструменты данной учебной установки.",
+        "HOLD останавливает исполнение на границе кадра, сохраняя шпиндель и охлаждение. RESET не возвращает снятый металл."
+      ],
+      "limits": [
+        "Предел 2500 об/мин, глубины проходов, зазоры и стенка 1 мм — ограничения модели, не универсальные требования ГОСТ.",
+        "Силы резания, поломка, физический выбег, шероховатость и биение не вычисляются.",
+        "Дуги, резьба, растачивание, сверление и отрезка не поддерживаются. Радиусная компенсация G41/G42 не рассчитывается.",
+        "Знаки коррекции и последовательность наладки нужно проверять по руководству конкретного станка."
+      ]
+    }
+  ],
+  "rules": [
+    {
+      "id": "safe-access",
+      "title": "Остановка и доступ к рабочей зоне",
+      "kind": "normative",
+      "statement": "Ручной контроль выполняют после полной остановки и выполнения требований инструкции оборудования. Отвод резца или HOLD сами по себе не означают разрешение доступа.",
+      "scope": "Объяснение безопасного поведения. Конкретные операции определяются оборудованием и условиями работы.",
+      "sources": [
+        {
+          "id": "SAFE-LATHE",
+          "clause": null
+        },
+        {
+          "id": "WORK-SAFETY",
+          "clause": null
+        },
+        {
+          "id": "EAEU-MACHINE",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "В тренажёре вращение — упрощённое состояние. Команда M05 на реальном станке не доказывает мгновенное прекращение вращения."
+      ],
+      "articles": [
+        "safety",
+        "setup",
+        "first-part",
+        "trial-check",
+        "measurement"
+      ],
+      "lessons": [
+        "safety",
+        "setup",
+        "control",
+        "verification"
+      ],
+      "reviewStatus": "pending",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Постатейная сверка нормативного правила не завершена",
+      "kindLabel": "Нормативная основа"
+    },
+    {
+      "id": "axes-diameter",
+      "title": "Координаты выбранной установки",
+      "kind": "simulation",
+      "statement": "В учебных заданиях X задан по диаметру, Z направлен вдоль детали. Положение нуля и параметры наладки задаются конкретной сценой.",
+      "scope": "Учебная компоновка; не утверждение о настройках любого реального станка.",
+      "sources": [
+        {
+          "id": "AXES",
+          "clause": null
+        },
+        {
+          "id": "HAAS-PROGRAM",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Программное изменение X на 2 мм соответствует радиальному перемещению на 1 мм при принятом режиме диаметра.",
+        "В простом редакторе нет привязки инструмента; в мастерской рабочая координата и фактическая вершина могут различаться."
+      ],
+      "articles": [
+        "coordinates",
+        "zeros",
+        "incremental",
+        "z-distance",
+        "gcode",
+        "program-reading",
+        "gcode-start",
+        "program-words"
+      ],
+      "lessons": [
+        "axes",
+        "work-zero",
+        "incremental"
+      ],
+      "reviewStatus": "implementation_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Граница сверена с реализацией; не нормативный допуск",
+      "kindLabel": "Условность учебной модели"
+    },
+    {
+      "id": "code-profile",
+      "title": "Диалект и поддерживаемые команды",
+      "kind": "simulation",
+      "statement": "Учебный редактор и стойка мастерской имеют разные наборы команд. G98/G99, T и знаки коррекции объясняются в рамках выбранного профиля.",
+      "scope": "Подмножество команд приложения; паспорт обоих профилей приведён в реестре источников.",
+      "sources": [
+        {
+          "id": "CODE",
+          "clause": null
+        },
+        {
+          "id": "HAAS-PROGRAM",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Наличие ГОСТа о кодировании программ не означает, что все стойки исполняют любую команду одинаково.",
+        "Учебный код не является готовой программой для загрузки в оборудование."
+      ],
+      "articles": [
+        "gcode",
+        "program-reading",
+        "gcode-start",
+        "program-words",
+        "zeros",
+        "incremental"
+      ],
+      "lessons": [
+        "modal",
+        "verification"
+      ],
+      "reviewStatus": "implementation_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Граница сверена с реализацией; не нормативный допуск",
+      "kindLabel": "Условность учебной модели"
+    },
+    {
+      "id": "drawing-scope",
+      "title": "Учебная схема и чертёж",
+      "kind": "normative",
+      "statement": "Объясняющая схема показывает связи размеров и поверхностей. Проверка оформления производственного чертежа по ЕСКД — отдельная задача.",
+      "scope": "Размерные обозначения, линии, виды и разрезы. Полная проверка всех рисунков курса пока не выполнена.",
+      "sources": [
+        {
+          "id": "DRAW-LINES",
+          "clause": null
+        },
+        {
+          "id": "DRAW-VIEWS",
+          "clause": null
+        },
+        {
+          "id": "DRAW-SIZES",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Наличие размерных стрелок на иллюстрации само по себе не подтверждает её соответствие всем правилам ЕСКД."
+      ],
+      "articles": [
+        "blueprint",
+        "surface-map",
+        "tolerance-limits",
+        "wall-thickness"
+      ],
+      "lessons": [
+        "tolerance"
+      ],
+      "reviewStatus": "pending",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Постатейная сверка нормативного правила не завершена",
+      "kindLabel": "Нормативная основа"
+    },
+    {
+      "id": "size-limits",
+      "title": "Номинал и границы допуска",
+      "kind": "normative",
+      "statement": "Номинальный размер служит базой для отклонений. Верхняя и нижняя границы не обязательно симметричны относительно номинала.",
+      "scope": "Вводное чтение линейного размера и отклонений. Табличные поля допусков ещё требуют отдельной сверки.",
+      "sources": [
+        {
+          "id": "LIMITS",
+          "clause": null
+        },
+        {
+          "id": "FITS",
+          "clause": null
+        },
+        {
+          "id": "DRAW-SIZES",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Учебные примеры с ± не описывают все виды обозначений допуска и посадки."
+      ],
+      "articles": [
+        "blueprint",
+        "tolerance-limits",
+        "diagnostics",
+        "first-part"
+      ],
+      "lessons": [
+        "tolerance",
+        "defects"
+      ],
+      "reviewStatus": "pending",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Постатейная сверка нормативного правила не завершена",
+      "kindLabel": "Нормативная основа"
+    },
+    {
+      "id": "gauge-model",
+      "title": "Показание и погрешность прибора",
+      "kind": "simulation",
+      "statement": "В заданиях показания округляются с заданным шагом. Интервал округления помогает увидеть пограничное показание, но не описывает всю погрешность реального измерения.",
+      "scope": "Учебная модель метрологии; диапазон и характеристики реального прибора проверяются отдельно.",
+      "sources": [
+        {
+          "id": "CALIPER",
+          "clause": null
+        },
+        {
+          "id": "MICROMETER",
+          "clause": null
+        },
+        {
+          "id": "MEASURE-ERROR",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Дискретность цифрового дисплея, цена деления шкалы и допускаемая погрешность — разные характеристики.",
+        "Годность на границе нельзя подтверждать одним числом без учёта возможностей контроля."
+      ],
+      "articles": [
+        "measurement",
+        "caliper-reading",
+        "measurement-log",
+        "multi-measure",
+        "first-part",
+        "trial-check"
+      ],
+      "lessons": [
+        "gauge",
+        "control",
+        "reading-log"
+      ],
+      "reviewStatus": "implementation_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Граница сверена с реализацией; не нормативный допуск",
+      "kindLabel": "Условность учебной модели"
+    },
+    {
+      "id": "cutting-limits",
+      "title": "Режимы и пределы учебной модели",
+      "kind": "simulation",
+      "statement": "Примеры подачи, оборотов, глубины и припуска показывают расчёт внутри заданных условий. Они не назначают режим реальной обработки.",
+      "scope": "Конкретная модель и карта задания; источник реального режима — технология и документация оборудования / инструмента.",
+      "sources": [
+        {
+          "id": "HAAS-PROGRAM",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Материал, инструмент, закрепление, состояние заготовки и оборудование влияют на пригодность режима.",
+        "Успешный виртуальный проход не подтверждает допустимость такого режима на реальном станке."
+      ],
+      "articles": [
+        "passes",
+        "cutting-speed",
+        "feed-time",
+        "materials",
+        "tools",
+        "setup",
+        "offsets",
+        "diagnostics",
+        "operation-basics"
+      ],
+      "lessons": [
+        "tool",
+        "setup",
+        "rough-finish",
+        "pass-count",
+        "feed",
+        "cutting-speed",
+        "time",
+        "materials",
+        "offset-diagnosis"
+      ],
+      "reviewStatus": "implementation_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Граница сверена с реализацией; не нормативный допуск",
+      "kindLabel": "Условность учебной модели"
+    },
+    {
+      "id": "surface-result",
+      "title": "Что подтверждает результат модели",
+      "kind": "simulation",
+      "statement": "Модель рассчитывает профиль и отдельные размеры. Правильный диаметр не подтверждает автоматически шероховатость, форму, биение и все требования реального изделия.",
+      "scope": "Границы геометрической модели; обозначения требований изучаются отдельно.",
+      "sources": [
+        {
+          "id": "ROUGHNESS",
+          "clause": null
+        },
+        {
+          "id": "GEOMETRIC-TOL",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Внешняя гладкость 3D-изображения не является измерением Ra.",
+        "Нерассчитываемые свойства не входят в практический зачёт."
+      ],
+      "articles": [
+        "surface-quality",
+        "multi-measure",
+        "first-part"
+      ],
+      "lessons": [
+        "surface-quality",
+        "verification"
+      ],
+      "reviewStatus": "implementation_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Граница сверена с реализацией; не нормативный допуск",
+      "kindLabel": "Условность учебной модели"
+    },
+    {
+      "id": "technology-doc",
+      "title": "Учебный маршрут и технологическая документация",
+      "kind": "normative",
+      "statement": "Таблица последовательности действий помогает учиться. Полноценные маршрутные и операционные карты имеют собственные правила оформления.",
+      "scope": "Различие учебного конспекта и проверенной технологической документации.",
+      "sources": [
+        {
+          "id": "ROUTE-DOC",
+          "clause": null
+        },
+        {
+          "id": "CUTTING-DOC",
+          "clause": null
+        }
+      ],
+      "limitations": [
+        "Учебная карточка не выдаётся за утверждённую производственную технологию."
+      ],
+      "articles": [
+        "route",
+        "measurement-log",
+        "first-part"
+      ],
+      "lessons": [
+        "route",
+        "reading-log"
+      ],
+      "reviewStatus": "pending",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Постатейная сверка нормативного правила не завершена",
+      "kindLabel": "Нормативная основа"
+    },
+    {
+      "id": "math-basics",
+      "title": "Числа и геометрические соотношения",
+      "kind": "math",
+      "statement": "Диаметр D = 2r; радиальный съём при наружном точении = (D до − D после) / 2. Единицы и исходные условия задаются явно.",
+      "scope": "Математическое объяснение. Это не отдельное требование ГОСТа и не назначение режима резания.",
+      "sources": [],
+      "limitations": [
+        "Пройденное расстояние, приращение координаты и конечная координата — разные величины."
+      ],
+      "articles": [
+        "number-basics",
+        "diameter-basics",
+        "wall-thickness",
+        "z-distance",
+        "feed-time"
+      ],
+      "lessons": [
+        "diameter",
+        "pass-count",
+        "feed",
+        "time"
+      ],
+      "reviewStatus": "method_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Математическая зависимость; не нормативное требование",
+      "kindLabel": "Расчёт"
+    },
+    {
+      "id": "course-evidence",
+      "title": "Обучение и подтверждение умения",
+      "kind": "method",
+      "statement": "Чтение и правильный ответ после разбора помогают учиться. Самостоятельное умение проверяют действием на новом условии.",
+      "scope": "Методика курса, а не нормативная квалификация оператора.",
+      "sources": [],
+      "limitations": [
+        "Прохождение сайта не заменяет обучение и допуск к реальной работе на конкретном оборудовании."
+      ],
+      "articles": [
+        "start",
+        "reading-route",
+        "lathe-parts",
+        "operation-basics"
+      ],
+      "lessons": [
+        "machine"
+      ],
+      "reviewStatus": "method_checked",
+      "checkedOn": "2026-10-29",
+      "reviewLabel": "Методическое решение проекта",
+      "kindLabel": "Методика обучения"
+    }
+  ],
+  "coverage": {
+    "articles": [
+      {
+        "id": "start",
+        "rules": [
+          "course-evidence"
+        ]
+      },
+      {
+        "id": "safety",
+        "rules": [
+          "safe-access"
+        ]
+      },
+      {
+        "id": "blueprint",
+        "rules": [
+          "drawing-scope",
+          "size-limits"
+        ]
+      },
+      {
+        "id": "coordinates",
+        "rules": [
+          "axes-diameter"
+        ]
+      },
+      {
+        "id": "setup",
+        "rules": [
+          "safe-access",
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "tools",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "passes",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "cutting-speed",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "feed-time",
+        "rules": [
+          "cutting-limits",
+          "math-basics"
+        ]
+      },
+      {
+        "id": "measurement",
+        "rules": [
+          "safe-access",
+          "gauge-model"
+        ]
+      },
+      {
+        "id": "offsets",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "gcode",
+        "rules": [
+          "axes-diameter",
+          "code-profile"
+        ]
+      },
+      {
+        "id": "route",
+        "rules": [
+          "technology-doc"
+        ]
+      },
+      {
+        "id": "materials",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "diagnostics",
+        "rules": [
+          "size-limits",
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "measurement-log",
+        "rules": [
+          "gauge-model",
+          "technology-doc"
+        ]
+      },
+      {
+        "id": "first-part",
+        "rules": [
+          "safe-access",
+          "size-limits",
+          "gauge-model",
+          "surface-result",
+          "technology-doc"
+        ]
+      },
+      {
+        "id": "reading-route",
+        "rules": [
+          "course-evidence"
+        ]
+      },
+      {
+        "id": "zeros",
+        "rules": [
+          "axes-diameter",
+          "code-profile"
+        ]
+      },
+      {
+        "id": "incremental",
+        "rules": [
+          "axes-diameter",
+          "code-profile"
+        ]
+      },
+      {
+        "id": "program-reading",
+        "rules": [
+          "axes-diameter",
+          "code-profile"
+        ]
+      },
+      {
+        "id": "trial-check",
+        "rules": [
+          "safe-access",
+          "gauge-model"
+        ]
+      },
+      {
+        "id": "surface-quality",
+        "rules": [
+          "surface-result"
+        ]
+      },
+      {
+        "id": "multi-measure",
+        "rules": [
+          "gauge-model",
+          "surface-result"
+        ]
+      },
+      {
+        "id": "gcode-start",
+        "rules": [
+          "axes-diameter",
+          "code-profile"
+        ]
+      },
+      {
+        "id": "number-basics",
+        "rules": [
+          "math-basics"
+        ]
+      },
+      {
+        "id": "lathe-parts",
+        "rules": [
+          "course-evidence"
+        ]
+      },
+      {
+        "id": "surface-map",
+        "rules": [
+          "drawing-scope"
+        ]
+      },
+      {
+        "id": "diameter-basics",
+        "rules": [
+          "math-basics"
+        ]
+      },
+      {
+        "id": "z-distance",
+        "rules": [
+          "axes-diameter",
+          "math-basics"
+        ]
+      },
+      {
+        "id": "caliper-reading",
+        "rules": [
+          "gauge-model"
+        ]
+      },
+      {
+        "id": "wall-thickness",
+        "rules": [
+          "drawing-scope",
+          "math-basics"
+        ]
+      },
+      {
+        "id": "tolerance-limits",
+        "rules": [
+          "drawing-scope",
+          "size-limits"
+        ]
+      },
+      {
+        "id": "operation-basics",
+        "rules": [
+          "cutting-limits",
+          "course-evidence"
+        ]
+      },
+      {
+        "id": "program-words",
+        "rules": [
+          "axes-diameter",
+          "code-profile"
+        ]
+      }
+    ],
+    "lessons": [
+      {
+        "id": "machine",
+        "rules": [
+          "course-evidence"
+        ]
+      },
+      {
+        "id": "safety",
+        "rules": [
+          "safe-access"
+        ]
+      },
+      {
+        "id": "tool",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "control",
+        "rules": [
+          "safe-access",
+          "gauge-model"
+        ]
+      },
+      {
+        "id": "diameter",
+        "rules": [
+          "math-basics"
+        ]
+      },
+      {
+        "id": "tolerance",
+        "rules": [
+          "drawing-scope",
+          "size-limits"
+        ]
+      },
+      {
+        "id": "axes",
+        "rules": [
+          "axes-diameter"
+        ]
+      },
+      {
+        "id": "setup",
+        "rules": [
+          "safe-access",
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "rough-finish",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "pass-count",
+        "rules": [
+          "cutting-limits",
+          "math-basics"
+        ]
+      },
+      {
+        "id": "feed",
+        "rules": [
+          "cutting-limits",
+          "math-basics"
+        ]
+      },
+      {
+        "id": "cutting-speed",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "time",
+        "rules": [
+          "cutting-limits",
+          "math-basics"
+        ]
+      },
+      {
+        "id": "offset-diagnosis",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "gauge",
+        "rules": [
+          "gauge-model"
+        ]
+      },
+      {
+        "id": "modal",
+        "rules": [
+          "code-profile"
+        ]
+      },
+      {
+        "id": "route",
+        "rules": [
+          "technology-doc"
+        ]
+      },
+      {
+        "id": "materials",
+        "rules": [
+          "cutting-limits"
+        ]
+      },
+      {
+        "id": "defects",
+        "rules": [
+          "size-limits"
+        ]
+      },
+      {
+        "id": "reading-log",
+        "rules": [
+          "gauge-model",
+          "technology-doc"
+        ]
+      },
+      {
+        "id": "work-zero",
+        "rules": [
+          "axes-diameter"
+        ]
+      },
+      {
+        "id": "incremental",
+        "rules": [
+          "axes-diameter"
+        ]
+      },
+      {
+        "id": "verification",
+        "rules": [
+          "safe-access",
+          "code-profile",
+          "surface-result"
+        ]
+      },
+      {
+        "id": "surface-quality",
+        "rules": [
+          "surface-result"
+        ]
+      }
+    ]
+  },
+  "openIssues": [
+    {
+      "id": "SAFE-01",
+      "status": "open",
+      "reason": "Официальная публикация изменения 29.04.2025 № 287н не прочитана; действующая редакция охраны труда не отмечена подтверждённой."
+    },
+    {
+      "id": "CLAUSE-REVIEW",
+      "status": "open",
+      "reason": "Полные тексты стандартов и применимые пункты требуют постатейной проверки. Нормативные правила имеют reviewStatus=pending."
+    }
+  ]
+}

@@ -1,0 +1,28 @@
+name: Check learning models and standalone builds
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+      - run: npm test
+      - run: npm run test:server
+      - run: npm run build:demo
+      - run: npm run build:handbook
+      - run: npm run build:model-spec
+      - run: node scripts/check-build.cjs
+      - name: Build application and constrained validation fixture
+        run: |
+          docker build -t cnc-practice-validation-app:ci .
+          docker build -f Dockerfile.validation -t cnc-practice-validation:ci .
+      - name: Accept a complete course with histories on beta server resources
+        run: docker run --rm --cpus=1 --memory=512m --read-only --cap-drop=ALL --security-opt=no-new-privileges:true cnc-practice-validation:ci

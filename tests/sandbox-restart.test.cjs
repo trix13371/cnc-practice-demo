@@ -1,0 +1,11 @@
+'use strict';
+const assert=require('node:assert/strict'),s=require('../sandbox-model.js'),m=require('../real-machine-model.js');
+let book=s.createMachineBook();const loaded=m.execute(m.newWork('Исходная'),{type:'load',source:'G21\nM30'}).work;
+book.works[0]={id:'work-1',...loaded};book.drafts['work-1']={panel:'auto',offsetX:'8'};
+const before=JSON.stringify(book),next=s.restartWork(book),state=s.stateOf(next);
+assert.equal(JSON.stringify(book),before);assert.deepEqual(next.works[0],book.works[0]);assert.equal(next.works.length,2);assert.notEqual(next.selected,book.selected);
+assert.deepEqual(next.works[1].stock,book.works[0].stock);assert.equal(next.works[1].events.length,0);assert.equal(state.referenced,false);assert.equal(state.spindle,false);assert.equal(state.tool,0);assert.equal(state.program.source,'');assert.deepEqual(next.drafts[next.selected],{panel:'setup',program:'G21\nM30'});assert(s.restoreBook(next));
+const draftBook=structuredClone(book);draftBook.drafts['work-1'].program='G18\nM30';assert.equal(s.restartWork(draftBook).drafts['work-2'].program,'G18\nM30');
+let basic=s.createBook();for(const event of [{type:'spindle',value:true},{type:'cut',start:0,end:-20,x:28,feed:.15,rpm:800}]){const {id,...work}=basic.works[0];basic.works[0]={id,...s.execute(work,event).work};}const clean=s.restartWork(basic);assert.equal(s.sample(s.stateOf(basic).profile,50),28);assert.equal(s.sample(s.stateOf(clean).profile,50),32);assert.equal(s.stateOf(clean).cuts.length,0);assert.equal(s.stateOf(clean).readings.length,0);assert.deepEqual(clean.works[0],basic.works[0]);
+let full=next;while(full.works.length<5)full=s.restartWork(full);const unchanged=JSON.stringify(full);assert.throws(()=>s.restartWork(full),/пяти/);assert.equal(JSON.stringify(full),unchanged);
+console.log('Sandbox restart: original work retained, clean material/setup, program draft fallback, both modes, capacity and no mutation passed.');

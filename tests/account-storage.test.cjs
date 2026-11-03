@@ -1,0 +1,6 @@
+'use strict';
+const assert=require('node:assert/strict'),{create}=require('../server/public/account-storage.js'),config=require('../progress-config.js'),store=require('../progress-store.js');
+const map=new Map([['cnc-practice-v2','OLD-LOCAL-KEEP']]),native={get length(){return map.size;},key:i=>[...map.keys()][i]??null,getItem:k=>map.get(k)??null,setItem:(k,v)=>map.set(k,String(v)),removeItem:k=>map.delete(k)};
+let edits=0;const a=create(native,'11111111-1111-4111-a111-111111111111',()=>edits++).storage,b=create(native,'22222222-2222-4222-a222-222222222222').storage;a.setItem('cnc-practice-v2','USER-A');b.setItem('cnc-practice-v2','USER-B');assert.equal(a.getItem('cnc-practice-v2'),'USER-A');assert.equal(b.getItem('cnc-practice-v2'),'USER-B');assert.equal(native.getItem('cnc-practice-v2'),'OLD-LOCAL-KEEP');assert.equal(edits,1);
+const transaction=store.create(a,config),raw=transaction.read();raw[config.revisionKey]='one';transaction.commit(raw);assert.equal(b.getItem(config.revisionKey),null);a.clear();assert.equal(a.length,0);assert.equal(b.getItem('cnc-practice-v2'),'USER-B');assert.equal(native.getItem('cnc-practice-v2'),'OLD-LOCAL-KEEP');assert.throws(()=>create(native,'../bad'));
+console.log('Account storage: UUID namespaces, offline data isolation, original local saves and transactional recovery compatibility passed.');

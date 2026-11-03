@@ -1,8 +1,10 @@
+require('./build-styles.cjs').build();
 const fs=require('node:fs'),path=require('node:path');
 const root=path.resolve(__dirname,'..'),read=file=>fs.readFileSync(path.join(root,file),'utf8');
 let html=read('index.html');
-html=html.replace('<link rel="stylesheet" href="style.css">','<style>'+read('style.css')+'</style>');
+html=html.replace(/<link rel="preload"[^>]+>/g,'');
+html=html.replace(/<link rel="stylesheet" href="([\w-]+\.css)">/g,(_,file)=>'<style>'+read(file).replace(/url\("(\/?assets\/fonts\/[\w-]+\.ttf)"\)/g,(_,asset)=>'url("data:font/ttf;base64,'+fs.readFileSync(path.join(root,asset.replace(/^\//,''))).toString('base64')+'")').replace(/url\("(assets\/[\w-]+\.png)"\)/g,(_,asset)=>'url("data:image/png;base64,'+fs.readFileSync(path.join(root,asset)).toString('base64')+'")')+'</style>');
 html=html.replace(/<script src="([\w-]+\.js)"><\/script>/g,(_,file)=>'<script>'+read(file)+'</script>');
 fs.mkdirSync(path.join(root,'demo'),{recursive:true});
-fs.writeFileSync(path.join(root,'demo/cnc-demo.html'),html);
+fs.writeFileSync(path.join(root,'demo/cnc-demo.html'),html.replace(/^[ \t]+$/gm,''));
 console.log('Built demo/cnc-demo.html');

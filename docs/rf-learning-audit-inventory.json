@@ -1,0 +1,2565 @@
+{
+  "schema": "cnc-rf-learning-audit-inventory-v1",
+  "date": "2026-10-29",
+  "scope": "Основной курс, справочник и семейства практик; динамические экраны и варианты требуют отдельной проверки.",
+  "notice": "Кандидаты источников не означают соответствие, обязательность применения или выполненную постатейную сверку. Все статусы материалов открыты.",
+  "counts": {
+    "lesson": 24,
+    "article": 35,
+    "discovery-action": 24,
+    "route-step": 22,
+    "gcode-task": 11,
+    "machine-task": 7,
+    "basic-task": 3,
+    "skill-family": 12,
+    "training-family": 3,
+    "subsystem": 7
+  },
+  "sources": [
+    {
+      "id": "SAFE-LATHE",
+      "source": "[ГОСТ Р 59209-2020](https://protect.gost.ru/gost/details/10044a8a-0529-4bcd-b93f-5cf97176b9db), безопасность токарных станков",
+      "application": "Опасности, ограждения, режимы и доступ к рабочей зоне",
+      "verification": "Действует, введён 01.09.2021; охватывает токарные станки с ЧПУ. Проверить применимые пункты по группе станка, не переносить все требования конструкции на браузерную программу."
+    },
+    {
+      "id": "AXES",
+      "source": "[ГОСТ 23597-79, официальный каталог](https://protect.gost.ru/gost?month=0&page=858&search=&year=0)",
+      "application": "Оси и направления движений",
+      "verification": "Обозначение и действующий статус найдены в каталоге; получить полный текст и привязку к принятой компоновке станка. Номер страницы каталога может меняться."
+    },
+    {
+      "id": "CODE",
+      "source": "[ГОСТ 20999-83, официальный каталог](https://protect.gost.ru/gost?month=0&page=752&search=&year=0)",
+      "application": "Структура и кодирование управляющих программ",
+      "verification": "Обозначение и действующий статус найдены в каталоге; таблицы команд сверить по полному тексту и руководству выбранной стойки."
+    },
+    {
+      "id": "DRAW-LINES",
+      "source": "[ГОСТ 2.303-68](https://protect.gost.ru/gost/details/09645eb7-ee23-467a-a319-25b3112a7227)",
+      "application": "Контуры, осевые, размерные и другие линии",
+      "verification": "Действует; карточка указывает ГОСТ Р 2.303-2026. Перед выпуском уточнить переход по приказу, не переключать редакцию по одному полю карточки."
+    },
+    {
+      "id": "DRAW-VIEWS",
+      "source": "[ГОСТ 2.305-2008](https://protect.gost.ru/gost/details/cbeccb9a-67df-45fa-9c67-c391a43bbbc9)",
+      "application": "Виды, разрезы, сечения",
+      "verification": "Текущая база; переход на [ГОСТ Р 2.305-2026](https://protect.gost.ru/gost/details/1922e193-7fd8-4e15-8e2b-93912a456452) с 01.10.2027, с правом досрочного применения."
+    },
+    {
+      "id": "DRAW-SIZES",
+      "source": "[ГОСТ 2.307-2011](https://protect.gost.ru/gost/details/62de9da6-e1a7-4023-955e-7dd9777eaab6)",
+      "application": "Диаметры, длины, предельные отклонения на чертеже",
+      "verification": "Текущая база; переход на [ГОСТ Р 2.307-2026](https://protect.gost.ru/gost/details/eddb3107-58be-4811-b237-5ab1d0d4c4d5) с 01.10.2027, с правом досрочного применения."
+    },
+    {
+      "id": "LIMITS",
+      "source": "[ГОСТ 25346-2013](https://protect.gost.ru/gost/details/ec4c69c8-6451-4b9e-91cb-f6c6787e1f34)",
+      "application": "Термины допуска, отклонения и посадки",
+      "verification": "Действует; учесть поправку ИУС 12-2021. Не приравнивать допуск к симметричному ± для всех случаев."
+    },
+    {
+      "id": "FITS",
+      "source": "[ГОСТ 25347-2013](https://protect.gost.ru/gost/details/e7108332-b720-423a-b99b-e580aa386c7a)",
+      "application": "Позднее: таблицы полей допусков отверстий и валов",
+      "verification": "Действует; карточка перечисляет поправки 2021, 2022 и 2025 годов. Числовые таблицы ещё не сверены; H7/h6 не включать в первые упражнения."
+    },
+    {
+      "id": "CALIPER",
+      "source": "[ГОСТ 166-89](https://protect.gost.ru/gost/details/a431f5aa-4a92-4638-90f3-f0c4b5acb9f7)",
+      "application": "Типы, характеристики и применимость штангенциркулей",
+      "verification": "Действует; паспорт конкретного выбранного прибора нужен дополнительно. Не задаёт единственную универсальную дискретность / точность для всех приборов."
+    },
+    {
+      "id": "MICROMETER",
+      "source": "[ГОСТ 6507-90](https://protect.gost.ru/gost/details/c8e52c27-b75e-4861-a75c-f8bd5d03de6c)",
+      "application": "Типы и характеристики микрометров",
+      "verification": "Действует; моделировать конкретный тип, диапазон, шкалу и свойства."
+    },
+    {
+      "id": "MEASURE-ERROR",
+      "source": "[ГОСТ 8.051-81](https://protect.gost.ru/gost/details/f5ce57f4-59ef-4c26-861f-30f0f13809a5)",
+      "application": "Приёмочный контроль линейных размеров и допускаемые погрешности",
+      "verification": "Действует; применимость ограничена областью документа. Нынешний интервал округления — учебная модель, не полный нормативный расчёт погрешности и приёмочных границ."
+    },
+    {
+      "id": "ROUGHNESS",
+      "source": "[ГОСТ 2.309-73](https://protect.gost.ru/gost/details/757ee9f1-6974-4c87-b285-45b3719ca5e7)",
+      "application": "Чтение обозначений шероховатости",
+      "verification": "Текущая база; [карточка изменения](https://protect.gost.ru/gost/changesdetails/4713d771-a547-4e98-895f-8df985d59974) фиксирует переход на ГОСТ Р 2.309-2026 с 01.10.2027. Расчёта Ra в тренажёре нет; не засчитывать его по гладкости 3D-картинки."
+    },
+    {
+      "id": "GEOMETRIC-TOL",
+      "source": "[ГОСТ Р 2.308-2023](https://protect.gost.ru/gost/details/41ac4e79-c383-42de-bae3-88f76054b981)",
+      "application": "Позднее: чтение допусков формы и расположения",
+      "verification": "Действует с 01.03.2024, есть поправка 2025 года. Не брать ГОСТ 2.308-2011 как текущую российскую основу."
+    },
+    {
+      "id": "ROUTE-DOC",
+      "source": "[ГОСТ 3.1118-82](https://protect.gost.ru/gost/details/11e71aab-c940-4221-97e1-498eb2563f31)",
+      "application": "Позднее: чтение маршрутной карты",
+      "verification": "Действует по карточке; учебную карточку пока называть учебной, до проверки формы и заполнения."
+    },
+    {
+      "id": "CUTTING-DOC",
+      "source": "[ГОСТ 3.1404-86](https://protect.gost.ru/gost/details/0310a3e0-4646-4393-ab1a-981441404a9b)",
+      "application": "Документы операций обработки резанием",
+      "verification": "Действует; сверить состав и оформление карт, когда добавляется обучение документации."
+    },
+    {
+      "id": "WORK-SAFETY",
+      "source": "Приказ Минтруда 11.12.2020 № 887н; изменение 29.04.2025 № 287н",
+      "verification": "Актуальная редакция по официальному изменению не прочитана; блокер SAFE-01."
+    },
+    {
+      "id": "MACHINE-PROFILE",
+      "source": "Руководство выбранного станка / стойки / инструмента и спецификация модели",
+      "verification": "Выбор семейства и версия руководства требуют фиксации. Лимиты модели не выдавать за ГОСТ."
+    },
+    {
+      "id": "MATH",
+      "source": "Независимые математические эталоны и методика обучения",
+      "verification": "Не нормативное требование; отдельно проверяются числа, единицы и педагогическая доступность."
+    }
+  ],
+  "materials": [
+    {
+      "key": "lesson:machine",
+      "kind": "lesson",
+      "id": "machine",
+      "title": "Что делает токарный станок",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Отличать заготовку от инструмента"
+    },
+    {
+      "key": "lesson:safety",
+      "kind": "lesson",
+      "id": "safety",
+      "title": "Сначала безопасное действие",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Выбирать безопасную последовательность"
+    },
+    {
+      "key": "lesson:tool",
+      "kind": "lesson",
+      "id": "tool",
+      "title": "Какой инструмент для какой поверхности",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Выбирать инструмент для наружного точения"
+    },
+    {
+      "key": "lesson:control",
+      "kind": "lesson",
+      "id": "control",
+      "title": "От прохода к измерению",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Планировать контроль результата"
+    },
+    {
+      "key": "lesson:diameter",
+      "kind": "lesson",
+      "id": "diameter",
+      "title": "Диаметр и съём на радиус",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Рассчитывать снимаемый слой"
+    },
+    {
+      "key": "lesson:tolerance",
+      "kind": "lesson",
+      "id": "tolerance",
+      "title": "Чертёж и допуск",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Определять годный размер"
+    },
+    {
+      "key": "lesson:axes",
+      "kind": "lesson",
+      "id": "axes",
+      "title": "Координаты X и Z",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Связывать координату с размером"
+    },
+    {
+      "key": "lesson:setup",
+      "kind": "lesson",
+      "id": "setup",
+      "title": "Наладка до запуска",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверять готовность учебного станка"
+    },
+    {
+      "key": "lesson:rough-finish",
+      "kind": "lesson",
+      "id": "rough-finish",
+      "title": "Зачем оставлять чистовой припуск",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Разделять основной съём и окончательный проход"
+    },
+    {
+      "key": "lesson:pass-count",
+      "kind": "lesson",
+      "id": "pass-count",
+      "title": "Распределение нескольких проходов",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Рассчитывать число черновых переходов"
+    },
+    {
+      "key": "lesson:feed",
+      "kind": "lesson",
+      "id": "feed",
+      "title": "Подача, обороты и время",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Различать мм/об и об/мин"
+    },
+    {
+      "key": "lesson:cutting-speed",
+      "kind": "lesson",
+      "id": "cutting-speed",
+      "title": "Скорость поверхности и обороты",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Предсказывать влияние диаметра на скорость резания"
+    },
+    {
+      "key": "lesson:time",
+      "kind": "lesson",
+      "id": "time",
+      "title": "Время резания и полный цикл",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Переводить расчёт прохода в секунды"
+    },
+    {
+      "key": "lesson:offset-diagnosis",
+      "kind": "lesson",
+      "id": "offset-diagnosis",
+      "title": "Постоянное отклонение по нескольким размерам",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Определять коррекцию в учебной модели"
+    },
+    {
+      "key": "lesson:gauge",
+      "kind": "lesson",
+      "id": "gauge",
+      "title": "Когда показание нужно уточнить",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Учитывать округление при сравнении с допуском"
+    },
+    {
+      "key": "lesson:modal",
+      "kind": "lesson",
+      "id": "modal",
+      "title": "Режим сохраняется между строками",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Понимать модальность команд"
+    },
+    {
+      "key": "lesson:route",
+      "kind": "lesson",
+      "id": "route",
+      "title": "Зависимости технологического маршрута",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "ROUTE-DOC",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Считать припуск от нужной исходной поверхности"
+    },
+    {
+      "key": "lesson:materials",
+      "kind": "lesson",
+      "id": "materials",
+      "title": "Материал и исходные данные",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Отличать расчёт от назначения реального режима"
+    },
+    {
+      "key": "lesson:defects",
+      "kind": "lesson",
+      "id": "defects",
+      "title": "Пересъём и остаточный припуск",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Отличать исправимое снятием материала отклонение от брака"
+    },
+    {
+      "key": "lesson:reading-log",
+      "kind": "lesson",
+      "id": "reading-log",
+      "title": "Измерение как проверяемая запись",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "MEASURE-ERROR",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Связывать показание с состоянием детали"
+    },
+    {
+      "key": "lesson:work-zero",
+      "kind": "lesson",
+      "id": "work-zero",
+      "title": "Ноль станка и ноль детали",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Различать систему станка и базу чертежа"
+    },
+    {
+      "key": "lesson:incremental",
+      "kind": "lesson",
+      "id": "incremental",
+      "title": "Координата и приращение",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Различать конечную точку и перемещение"
+    },
+    {
+      "key": "lesson:verification",
+      "kind": "lesson",
+      "id": "verification",
+      "title": "Проверка первого изделия",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "MACHINE-PROFILE",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Связывать проверку программы с контролем детали"
+    },
+    {
+      "key": "lesson:surface-quality",
+      "kind": "lesson",
+      "id": "surface-quality",
+      "title": "Размер, форма и поверхность",
+      "file": "course-model.js",
+      "sourceCandidates": [
+        "ROUGHNESS",
+        "GEOMETRIC-TOL"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Не подменять все требования одним диаметром"
+    },
+    {
+      "key": "article:start",
+      "kind": "article",
+      "id": "start",
+      "title": "Что делает оператор ЧПУ и как учиться с нуля",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:safety",
+      "kind": "article",
+      "id": "safety",
+      "title": "Остановка, ограждения и безопасная последовательность",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:blueprint",
+      "kind": "article",
+      "id": "blueprint",
+      "title": "Как читать простое задание и допуск",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "DRAW-LINES",
+        "DRAW-VIEWS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:coordinates",
+      "kind": "article",
+      "id": "coordinates",
+      "title": "X, Z и ноль детали без путаницы",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:setup",
+      "kind": "article",
+      "id": "setup",
+      "title": "Что нужно подготовить до первого прохода",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:tools",
+      "kind": "article",
+      "id": "tools",
+      "title": "Проходной, расточной и канавочный резец",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:passes",
+      "kind": "article",
+      "id": "passes",
+      "title": "Припуск, черновые и чистовой проходы",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:cutting-speed",
+      "kind": "article",
+      "id": "cutting-speed",
+      "title": "Обороты и скорость резания — разные величины",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:feed-time",
+      "kind": "article",
+      "id": "feed-time",
+      "title": "Подача и оценка времени прохода",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:measurement",
+      "kind": "article",
+      "id": "measurement",
+      "title": "Штангенциркуль, микрометр и пограничный размер",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:offsets",
+      "kind": "article",
+      "id": "offsets",
+      "title": "Как отличить общее смещение от ошибки одного размера",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:gcode",
+      "kind": "article",
+      "id": "gcode",
+      "title": "Как читать строку программы и помнить её режим",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:route",
+      "kind": "article",
+      "id": "route",
+      "title": "Как составить маршрут обработки детали",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "ROUTE-DOC",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:materials",
+      "kind": "article",
+      "id": "materials",
+      "title": "Зачем знать материал заготовки",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:diagnostics",
+      "kind": "article",
+      "id": "diagnostics",
+      "title": "Как разбирать ошибку без случайного перебора настроек",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:measurement-log",
+      "kind": "article",
+      "id": "measurement-log",
+      "title": "Как вести журнал измерений и передать результат",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MEASURE-ERROR",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:first-part",
+      "kind": "article",
+      "id": "first-part",
+      "title": "Первая деталь: осмысленный маршрут целиком",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:reading-route",
+      "kind": "article",
+      "id": "reading-route",
+      "title": "Что читать дальше: маршрут самостоятельной подготовки",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:zeros",
+      "kind": "article",
+      "id": "zeros",
+      "title": "Ноль станка, ноль детали и коррекция",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE",
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:incremental",
+      "kind": "article",
+      "id": "incremental",
+      "title": "Абсолютная точка и относительное перемещение",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:program-reading",
+      "kind": "article",
+      "id": "program-reading",
+      "title": "Разберите программу как таблицу состояний",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "MACHINE-PROFILE",
+        "AXES"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:trial-check",
+      "kind": "article",
+      "id": "trial-check",
+      "title": "Первое изделие: прогноз, проверка, измерение",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "MACHINE-PROFILE",
+        "MEASURE-ERROR",
+        "CALIPER",
+        "MICROMETER"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:surface-quality",
+      "kind": "article",
+      "id": "surface-quality",
+      "title": "Почему одного размера недостаточно",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "ROUGHNESS",
+        "GEOMETRIC-TOL",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:multi-measure",
+      "kind": "article",
+      "id": "multi-measure",
+      "title": "Контроль в нескольких сечениях",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "ROUGHNESS",
+        "GEOMETRIC-TOL",
+        "MEASURE-ERROR",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:gcode-start",
+      "kind": "article",
+      "id": "gcode-start",
+      "title": "Первые программы: от слова к траектории",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE",
+        "CODE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:number-basics",
+      "kind": "article",
+      "id": "number-basics",
+      "title": "Миллиметры, десятые и сотые: как читать числа",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "DRAW-SIZES",
+        "LIMITS",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:lathe-parts",
+      "kind": "article",
+      "id": "lathe-parts",
+      "title": "Устройство токарного станка: кто что делает",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:surface-map",
+      "kind": "article",
+      "id": "surface-map",
+      "title": "Как увидеть поверхность на рисунке и в разрезе",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE",
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR",
+        "DRAW-LINES",
+        "DRAW-VIEWS",
+        "DRAW-SIZES"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:diameter-basics",
+      "kind": "article",
+      "id": "diameter-basics",
+      "title": "Диаметр, радиус и снимаемый слой на одном круге",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:z-distance",
+      "kind": "article",
+      "id": "z-distance",
+      "title": "Отрицательная координата и пройденное расстояние",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE",
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:caliper-reading",
+      "kind": "article",
+      "id": "caliper-reading",
+      "title": "Что означает число на измерительном приборе",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:wall-thickness",
+      "kind": "article",
+      "id": "wall-thickness",
+      "title": "Втулка: наружный размер, отверстие и толщина стенки",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE",
+        "ROUTE-DOC",
+        "CUTTING-DOC",
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:tolerance-limits",
+      "kind": "article",
+      "id": "tolerance-limits",
+      "title": "Номинал и границы: когда допуск не симметричен",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:operation-basics",
+      "kind": "article",
+      "id": "operation-basics",
+      "title": "Шесть токарных операций простыми словами",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "MACHINE-PROFILE",
+        "ROUTE-DOC",
+        "CUTTING-DOC"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "article:program-words",
+      "kind": "article",
+      "id": "program-words",
+      "title": "Буквы X, Z, F, S, G и M: первое чтение строки",
+      "file": "library-model.js + library-content-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "MACHINE-PROFILE",
+        "AXES",
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить текст, схему, таблицы и связанные вопросы, а не только заголовок."
+    },
+    {
+      "key": "discovery-action:machine-1",
+      "kind": "discovery-action",
+      "id": "machine-1",
+      "title": "Найдите заготовку",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:machine-2",
+      "kind": "discovery-action",
+      "id": "machine-2",
+      "title": "Найдите патрон",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:machine-3",
+      "kind": "discovery-action",
+      "id": "machine-3",
+      "title": "Найдите резец",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:control-1",
+      "kind": "discovery-action",
+      "id": "control-1",
+      "title": "Покажите поверхность после прохода",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:control-2",
+      "kind": "discovery-action",
+      "id": "control-2",
+      "title": "Найдите необработанный хвостовик",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:control-3",
+      "kind": "discovery-action",
+      "id": "control-3",
+      "title": "Выберите место замера",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:axes-1",
+      "kind": "discovery-action",
+      "id": "axes-1",
+      "title": "Движение вдоль детали к патрону",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:axes-2",
+      "kind": "discovery-action",
+      "id": "axes-2",
+      "title": "Ближе к оси заготовки",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:axes-3",
+      "kind": "discovery-action",
+      "id": "axes-3",
+      "title": "Отойти от оси заготовки",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:safety-1",
+      "kind": "discovery-action",
+      "id": "safety-1",
+      "title": "Проход закончился — вращение осталось",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:safety-2",
+      "kind": "discovery-action",
+      "id": "safety-2",
+      "title": "Команда остановки уже дана",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:safety-3",
+      "kind": "discovery-action",
+      "id": "safety-3",
+      "title": "Вращение прекратилось. Что проверить дальше?",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:tool-1",
+      "kind": "discovery-action",
+      "id": "tool-1",
+      "title": "Где работает проходной резец?",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:tool-2",
+      "kind": "discovery-action",
+      "id": "tool-2",
+      "title": "Где работает расточной резец?",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:tool-3",
+      "kind": "discovery-action",
+      "id": "tool-3",
+      "title": "Найдите поверхность для канавочного резца",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:diameter-1",
+      "kind": "discovery-action",
+      "id": "diameter-1",
+      "title": "Покажите диаметр",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:diameter-2",
+      "kind": "discovery-action",
+      "id": "diameter-2",
+      "title": "Сколько останется после снятия слоя?",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:diameter-3",
+      "kind": "discovery-action",
+      "id": "diameter-3",
+      "title": "Теперь найдите толщину слоя",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:tolerance-1",
+      "kind": "discovery-action",
+      "id": "tolerance-1",
+      "title": "Отметьте середину разрешённого промежутка",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:tolerance-2",
+      "kind": "discovery-action",
+      "id": "tolerance-2",
+      "title": "Граница тоже разрешена",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:tolerance-3",
+      "kind": "discovery-action",
+      "id": "tolerance-3",
+      "title": "Перейдём к десятым долям миллиметра",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:feed-1",
+      "kind": "discovery-action",
+      "id": "feed-1",
+      "title": "Два оборота — два одинаковых шага",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:feed-2",
+      "kind": "discovery-action",
+      "id": "feed-2",
+      "title": "Посчитайте путь за три оборота",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "discovery-action:feed-3",
+      "kind": "discovery-action",
+      "id": "feed-3",
+      "title": "Маленький шаг, больше оборотов",
+      "file": "discovery-practice-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Включая условие, обратную связь, подсказку и рисунок."
+    },
+    {
+      "key": "route-step:machine",
+      "kind": "route-step",
+      "id": "machine",
+      "title": "Что делает станок",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:safety",
+      "kind": "route-step",
+      "id": "safety",
+      "title": "Когда можно измерять",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:tool",
+      "kind": "route-step",
+      "id": "tool",
+      "title": "Выбираем резец",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:diameter",
+      "kind": "route-step",
+      "id": "diameter",
+      "title": "Что означает диаметр",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:axes",
+      "kind": "route-step",
+      "id": "axes",
+      "title": "Как задать X и Z",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:first-cut",
+      "kind": "route-step",
+      "id": "first-cut",
+      "title": "Выполняем первый проход",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:control",
+      "kind": "route-step",
+      "id": "control",
+      "title": "Зачем нужен замер",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:tolerance",
+      "kind": "route-step",
+      "id": "tolerance",
+      "title": "Сравниваем с допуском",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:first-control",
+      "kind": "route-step",
+      "id": "first-control",
+      "title": "Измеряем и подтверждаем",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MATH"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:setup",
+      "kind": "route-step",
+      "id": "setup",
+      "title": "Подготовка станка",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:rough-finish",
+      "kind": "route-step",
+      "id": "rough-finish",
+      "title": "Черновой и чистовой проходы",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:feed",
+      "kind": "route-step",
+      "id": "feed",
+      "title": "Подача и обороты",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:pass-count",
+      "kind": "route-step",
+      "id": "pass-count",
+      "title": "Распределяем припуск",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:full-cycle",
+      "kind": "route-step",
+      "id": "full-cycle",
+      "title": "Полный цикл с разбором",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:self-cycle",
+      "kind": "route-step",
+      "id": "self-cycle",
+      "title": "Другой чертёж без помощи",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:code-coordinates",
+      "kind": "route-step",
+      "id": "code-coordinates",
+      "title": "Координаты в строке программы",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:code-motion",
+      "kind": "route-step",
+      "id": "code-motion",
+      "title": "Подход и рабочий ход",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:code-modal",
+      "kind": "route-step",
+      "id": "code-modal",
+      "title": "Что сохраняется между строками",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:code-feed",
+      "kind": "route-step",
+      "id": "code-feed",
+      "title": "Подача в программе",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:code-spindle",
+      "kind": "route-step",
+      "id": "code-spindle",
+      "title": "Команды запуска и остановки",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:code-retract",
+      "kind": "route-step",
+      "id": "code-retract",
+      "title": "Отвод по X, затем по Z",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "route-step:self-code",
+      "kind": "route-step",
+      "id": "self-code",
+      "title": "Программа для другого чертежа",
+      "file": "learning-path-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить предварительные умения и смысл зачёта; сам шаг не является нормативным правилом."
+    },
+    {
+      "key": "gcode-task:coordinates",
+      "kind": "gcode-task",
+      "id": "coordinates",
+      "title": "Буква и число",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:motion",
+      "kind": "gcode-task",
+      "id": "motion",
+      "title": "Два разных движения",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:modal",
+      "kind": "gcode-task",
+      "id": "modal",
+      "title": "Режим запоминается",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:feed",
+      "kind": "gcode-task",
+      "id": "feed",
+      "title": "У подачи есть единицы",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:spindle",
+      "kind": "gcode-task",
+      "id": "spindle",
+      "title": "Команды вращения и завершения",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:retract",
+      "kind": "gcode-task",
+      "id": "retract",
+      "title": "Порядок отвода",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:contour",
+      "kind": "gcode-task",
+      "id": "contour",
+      "title": "Прямая и наклонный участок",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:program",
+      "kind": "gcode-task",
+      "id": "program",
+      "title": "Соберите учебный маршрут",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:transfer-a",
+      "kind": "gcode-task",
+      "id": "transfer-a",
+      "title": "Программа для детали Ø24 × 35",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:transfer-b",
+      "kind": "gcode-task",
+      "id": "transfer-b",
+      "title": "Программа для детали Ø34 × 30",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "gcode-task:transfer-c",
+      "kind": "gcode-task",
+      "id": "transfer-c",
+      "title": "Программа для детали Ø22 × 50",
+      "file": "gcode-model.js + gcode-learning-model.js",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все варианты, команды, прогнозы, эталоны и ограничения диалекта."
+    },
+    {
+      "key": "machine-task:diameter",
+      "kind": "machine-task",
+      "id": "diameter",
+      "title": "Первый проход",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "machine-task:offset",
+      "kind": "machine-task",
+      "id": "offset",
+      "title": "Коррекция инструмента",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "machine-task:feed",
+      "kind": "machine-task",
+      "id": "feed",
+      "title": "Режим обработки",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "machine-task:shoulder",
+      "kind": "machine-task",
+      "id": "shoulder",
+      "title": "Ступенчатый вал",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "machine-task:sleeve",
+      "kind": "machine-task",
+      "id": "sleeve",
+      "title": "Полая втулка",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "machine-task:taper",
+      "kind": "machine-task",
+      "id": "taper",
+      "title": "Конус и канавка",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "machine-task:calibration",
+      "kind": "machine-task",
+      "id": "calibration",
+      "title": "Вал по контрольным замерам",
+      "file": "machine-model.js",
+      "sourceCandidates": [
+        "DRAW-SIZES",
+        "LIMITS",
+        "CALIPER",
+        "MEASURE-ERROR",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить поверхности, условия, контрольные точки и все используемые профили."
+    },
+    {
+      "key": "basic-task:diameter",
+      "kind": "basic-task",
+      "id": "diameter",
+      "title": "Первый проход",
+      "file": "model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить смысл чисел и границы применимости к реальному станку."
+    },
+    {
+      "key": "basic-task:offset",
+      "kind": "basic-task",
+      "id": "offset",
+      "title": "Коррекция инструмента",
+      "file": "model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить смысл чисел и границы применимости к реальному станку."
+    },
+    {
+      "key": "basic-task:feed",
+      "kind": "basic-task",
+      "id": "feed",
+      "title": "Режим обработки",
+      "file": "model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить смысл чисел и границы применимости к реальному станку."
+    },
+    {
+      "key": "skill-family:depth",
+      "kind": "skill-family",
+      "id": "depth",
+      "title": "Съём на радиус",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:allowance",
+      "kind": "skill-family",
+      "id": "allowance",
+      "title": "Чистовой припуск",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:passes",
+      "kind": "skill-family",
+      "id": "passes",
+      "title": "Число проходов",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:feed",
+      "kind": "skill-family",
+      "id": "feed",
+      "title": "Минутная подача",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:time",
+      "kind": "skill-family",
+      "id": "time",
+      "title": "Время прохода",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:offset",
+      "kind": "skill-family",
+      "id": "offset",
+      "title": "Коррекция по замерам",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:tolerance",
+      "kind": "skill-family",
+      "id": "tolerance",
+      "title": "Границы допуска",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:rounding",
+      "kind": "skill-family",
+      "id": "rounding",
+      "title": "Неопределённый замер",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:coordinates",
+      "kind": "skill-family",
+      "id": "coordinates",
+      "title": "Координаты X и Z",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:modal",
+      "kind": "skill-family",
+      "id": "modal",
+      "title": "Чтение строк программы",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:route",
+      "kind": "skill-family",
+      "id": "route",
+      "title": "Зависимости маршрута",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "skill-family:setup",
+      "kind": "skill-family",
+      "id": "setup",
+      "title": "Готовность и контроль",
+      "file": "skills-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Семейство генерируемых вопросов: проверить все ветки генератора, а не один пример."
+    },
+    {
+      "key": "training-family:cycle",
+      "kind": "training-family",
+      "id": "cycle",
+      "title": "Первый полный цикл",
+      "file": "training-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все условия семейства и различие помощи / нового самостоятельного выполнения."
+    },
+    {
+      "key": "training-family:passes",
+      "kind": "training-family",
+      "id": "passes",
+      "title": "Распределение припуска",
+      "file": "training-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все условия семейства и различие помощи / нового самостоятельного выполнения."
+    },
+    {
+      "key": "training-family:offset",
+      "kind": "training-family",
+      "id": "offset",
+      "title": "Диагностика коррекции",
+      "file": "training-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "MACHINE-PROFILE",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Проверить все условия семейства и различие помощи / нового самостоятельного выполнения."
+    },
+    {
+      "key": "subsystem:controller",
+      "kind": "subsystem",
+      "id": "controller",
+      "title": "Стойка: состояния, команды, блокировки, диагностики",
+      "file": "real-machine-model.js + real-machine-ui.js",
+      "sourceCandidates": [
+        "SAFE-LATHE",
+        "WORK-SAFETY",
+        "AXES",
+        "CODE",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    },
+    {
+      "key": "subsystem:sandbox",
+      "kind": "subsystem",
+      "id": "sandbox",
+      "title": "Свободная мастерская и ограничения модели",
+      "file": "sandbox-model.js + sandbox-ui.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    },
+    {
+      "key": "subsystem:drawings",
+      "kind": "subsystem",
+      "id": "drawings",
+      "title": "Общие и генерируемые схемы / чертежи",
+      "file": "course-discovery.js + machine-graphics.js + real-machine-ui.js + viewer3d.js",
+      "sourceCandidates": [
+        "DRAW-LINES",
+        "DRAW-VIEWS",
+        "DRAW-SIZES"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    },
+    {
+      "key": "subsystem:metrology",
+      "kind": "subsystem",
+      "id": "metrology",
+      "title": "Все модели показаний и решений о годности",
+      "file": "training-math.js + model.js + real-machine-model.js",
+      "sourceCandidates": [
+        "CALIPER",
+        "MICROMETER",
+        "MEASURE-ERROR",
+        "LIMITS"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    },
+    {
+      "key": "subsystem:geometry",
+      "kind": "subsystem",
+      "id": "geometry",
+      "title": "Съём, заготовки, торцевание, канавки",
+      "file": "stock-shape-model.js + radial-ops-model.js + real-machine-model.js",
+      "sourceCandidates": [
+        "MATH",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    },
+    {
+      "key": "subsystem:specification",
+      "kind": "subsystem",
+      "id": "specification",
+      "title": "Паспорта учебных моделей и поддерживаемый диалект",
+      "file": "model-spec-model.js + MODEL-SPECIFICATION.md",
+      "sourceCandidates": [
+        "CODE",
+        "AXES",
+        "MACHINE-PROFILE"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    },
+    {
+      "key": "subsystem:extended-process",
+      "kind": "subsystem",
+      "id": "extended-process",
+      "title": "Расширенные детали и экзамен",
+      "file": "process-model.js + lab-model.js + route-exam-model.js",
+      "sourceCandidates": [
+        "MACHINE-PROFILE",
+        "DRAW-SIZES",
+        "LIMITS",
+        "MEASURE-ERROR"
+      ],
+      "reviewStatus": "not_reviewed",
+      "clauseReferences": [],
+      "reviewer": null,
+      "reviewedAt": null,
+      "notes": "Нужен отдельный просмотр интерфейса, динамических состояний, исходников и генерируемых вариантов."
+    }
+  ]
+}

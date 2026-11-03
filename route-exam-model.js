@@ -22,9 +22,10 @@
     if(t.minWall){technologyMax++;technology+=(by.outer.diameter-by.bore.diameter)/2>=t.minWall-1e-9?1:0;}
     const order=t.order.every(([a,b])=>p.operations.findIndex(o=>o.id===a)<p.operations.findIndex(o=>o.id===b));
     const parts={accuracy:Math.round(40*geometry/geometryMax),technology:Math.round(25*technology/technologyMax),order:order?15:0,economy:Math.max(0,20-extra*2)};
-    return {...r,parts,extra,score:Object.values(parts).reduce((a,b)=>a+b,0),hints:0};
+    const rawScore=Object.values(parts).reduce((a,b)=>a+b,0),score=r.success?rawScore:Math.min(59,rawScore);
+    return {...r,parts,extra,rawScore,score,passed:r.success&&score>=80,hints:0};
   }
-  function grade(e){if(e.answers.length!==2)throw new Error('Завершите оба задания');const answers=e.answers.map((p,i)=>({task:taskFor(e.level,e.seed,i),plan:p,result:gradeTask(taskFor(e.level,e.seed,i),p)}));return {answers,score:Math.round(answers.reduce((s,a)=>s+a.result.score,0)/2)};}
+  function grade(e){if(e.answers.length!==2)throw new Error('Завершите оба задания');const answers=e.answers.map((p,i)=>({task:taskFor(e.level,e.seed,i),plan:p,result:gradeTask(taskFor(e.level,e.seed,i),p)}));return {answers,score:Math.round(answers.reduce((s,a)=>s+a.result.score,0)/2),passed:answers.every(a=>a.result.passed)};}
   function restore(e){try{if(!e||e.version!==1||!Number.isFinite(Date.parse(e.at))||![0,1].includes(e.index)||!Array.isArray(e.answers)||e.answers.length<e.index||e.answers.length>e.index+1)return null;taskFor(e.level,e.seed,0);if(e.answers.some((p,i)=>!lab.validate(taskFor(e.level,e.seed,i),p)))return null;return {...create(e.level,e.seed,e.at),index:e.index,answers:e.answers,draft:e.answers.length===e.index&&lab.validate(taskFor(e.level,e.seed,e.index),e.draft)?e.draft:null};}catch{return null;}}
   const api={taskFor,create,submit,advance,gradeTask,grade,restore};root.CNCRouteExam=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
