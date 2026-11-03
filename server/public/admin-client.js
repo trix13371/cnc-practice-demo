@@ -64,7 +64,25 @@
   function compactEvidence(data) {
     const s = data.summary,
       overview = node("section"),
-      activity = node("ul");
+      activity = node("ul"),
+      signals = node("ul");
+    const noteChecks = (part, title) => {
+      if (!part) return;
+      const errors = Array.isArray(part.errors)
+        ? part.errors.reduce((sum, n) => sum + n, 0)
+        : part.errors || 0;
+      const helped = part.assisted || part.help?.length;
+      if (errors || helped)
+        signals.append(
+          node(
+            "li",
+            title +
+              " · проверок с ошибками: " +
+              errors +
+              (helped ? " · разбор открывался" : ""),
+          ),
+        );
+    };
     overview.className = "admin-overview";
     overview.append(
       node("h3", "Сводка обучения"),
@@ -81,6 +99,7 @@
       ["shaftProject", "Проект по чертежу"],
     ]) {
       const part = s[key];
+      noteChecks(part, title);
       if (part?.status === "in-progress")
         activity.append(
           node(
@@ -96,6 +115,7 @@
       ["diagnosticCourse", "Диагностика"],
     ]) {
       const part = s[key];
+      noteChecks(part, title);
       if (current?.[key]?.events.length && part?.done.length < part.total)
         activity.append(
           node(
@@ -106,6 +126,15 @@
     }
     if (activity.children.length)
       overview.append(node("p", "В работе:"), activity);
+    if (signals.children.length)
+      overview.append(
+        node("p", "Ошибки и помощь в текущих попытках:"),
+        signals,
+        node(
+          "p",
+          "Проверка ошибки может быть намеренной частью задания. Подробности — в разделах ниже.",
+        ),
+      );
     if (s.progress.next)
       overview.append(node("p", "По маршруту: " + s.progress.next.title));
     const previous = [...detail.children],
@@ -118,7 +147,7 @@
       sections.push(box);
       return box;
     };
-    let section = fold("Подробный маршрут · " + s.rows.length + " этапов");
+    let section = fold("Подробный маршрут · этапов: " + s.rows.length);
     for (const child of previous.slice(2)) {
       if (child.tagName.toLowerCase() === "h3")
         section = fold(child.textContent);
@@ -160,7 +189,7 @@
       table(
         ["Условие", "Результат", "Помощь и ошибки"],
         [...s.training, ...s.gcode].map((r) => [
-          r.title + " · " + r.id,
+          r.title,
           r.independent
             ? "Самостоятельно"
             : r.passed
@@ -178,8 +207,8 @@
         table(
           ["Задание", "Причина", "Разбор", "Ошибки"],
           d.done.map((r) => [
-            r.id,
-            r.cause,
+            r.title || "Задание диагностики",
+            r.causeTitle || "Причина не описана в этой версии",
             r.help ? "Открывался" : "Не открывался",
             r.errors,
           ]),
@@ -202,34 +231,28 @@
         table(
           ["Задание", "Диагностика на копии", "Ошибки", "Разбор"],
           mill.done.map((d) => [
-            d.id,
-            d.diagnostics.join(", ") || "—",
+            d.title || "Фрезерное задание",
+            d.diagnosticTitles?.join(", ") || "—",
             d.errors,
             d.help ? "Открывался" : "Не открывался",
           ]),
         ),
       );
-      detail.append(
-        node(
-          "p",
-          "События диагностики и блокировки: " +
-            mill.incidents
-              .map(
-                (e) =>
-                  e.code +
-                  (e.part ? " · " + e.part + " / " + e.obstacle : "") +
-                  (e.preview ? " (на копии)" : " (выполнение)"),
-              )
-              .join(", "),
-        ),
-      );
-      if (mill.fault)
+      if (mill.incidents.length)
         detail.append(
           node(
             "p",
-            "Текущая ошибка: " + mill.fault.code + " · " + mill.fault.title,
+            "События диагностики и блокировки: " +
+              mill.incidents
+                .map(
+                  (e) =>
+                    e.title + (e.preview ? " (на копии)" : " (выполнение)"),
+                )
+                .join(", "),
           ),
         );
+      if (mill.fault)
+        detail.append(node("p", "Текущая ошибка: " + mill.fault.title));
     }
     if (s.operationCourse) {
       detail.append(
@@ -244,7 +267,7 @@
         table(
           ["Операция", "Попытка", "Разбор", "Ошибки"],
           s.operationCourse.done.map((d) => [
-            d.id,
+            d.title || "Токарная операция",
             d.attempt,
             d.help ? "Открывался" : "Не открывался",
             d.errors,

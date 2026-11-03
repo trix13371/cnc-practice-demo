@@ -103,7 +103,7 @@ async function create(options={}){
         if(route.startsWith('/api/admin/')){
           if(session.role!=='admin')throw fail(403,'Доступ только администратору.');
           if(route==='/api/admin/users'&&method==='GET'){const result=[];for(const r of db.prepare('SELECT u.id,u.username,u.role,p.summary,p.archive,p.pilot,p.updated_at FROM users u LEFT JOIN progress p ON p.user_id=u.id ORDER BY u.username').all()){let summary=r.summary?JSON.parse(r.summary):null;if(r.archive&&summary?.routeVersion!==2)summary=(await validator.run({archive:JSON.parse(r.archive),pilot:r.pilot?JSON.parse(r.pilot):null})).summary;result.push({id:r.id,username:r.username,role:r.role,done:summary?.progress.done||0,total:require('../learning-path-model.js').steps.length,updatedAt:r.updated_at});}return json(res,200,result);}
-          const id=route.match(/^\/api\/admin\/users\/([a-f0-9-]{36})\/progress$/);if(id&&method==='GET'){const user=db.prepare('SELECT id,username,role FROM users WHERE id=?').get(id[1]);if(!user)throw fail(404,'Участник не найден.');const current=state(user.id);if(current.archive)current.summary=(await validator.run({archive:current.archive,pilot:current.pilot})).summary;return json(res,200,{user,...current});}
+          const id=route.match(/^\/api\/admin\/users\/([a-f0-9-]{36})\/progress$/);if(id&&method==='GET'){const user=db.prepare('SELECT id,username,role FROM users WHERE id=?').get(id[1]);if(!user)throw fail(404,'Участник не найден.');const current=state(user.id);if(current.archive)current.summary=(await validator.run({archive:current.archive,pilot:current.pilot})).summary;return json(res,200,{user,...current,summary:require('./admin-report.cjs').describe(current.summary)});}
         }
         throw fail(404,'API не найден.');
       }

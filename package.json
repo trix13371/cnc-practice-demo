@@ -14,7 +14,7 @@
     "beta:start": "node server/index.cjs",
     "beta:backup": "node server/cli.cjs backup",
     "beta:restore": "node server/cli.cjs restore",
-    "test:server": "node tests/client-assets.test.cjs && node tests/server.test.cjs && node tests/account-storage.test.cjs && node tests/account-client.test.cjs && node tests/security.test.cjs && node tests/validation-course.test.cjs && node tests/admin-client.test.cjs",
+    "test:server": "node tests/client-assets.test.cjs && node tests/server.test.cjs && node tests/account-storage.test.cjs && node tests/account-client.test.cjs && node tests/security.test.cjs && node tests/validation-course.test.cjs && node tests/admin-client.test.cjs && node tests/admin-report.test.cjs",
     "build:styles": "node scripts/build-styles.cjs"
   },
   "engines": {
