@@ -1136,8 +1136,18 @@ function display(state) {
 }
 
 /* ===== Предпросмотр программы (без мутаций работы и реального состояния) ===== */
+function graphicsFrame(st, block) {
+  const coordinates=display(st),move=block?.ops.find(op=>op.k==='move');
+  let command=null;
+  if(move){
+    const work={x:move.x??coordinates.work.x,z:move.z??coordinates.work.z};
+    command={motion:block.ops.find(op=>op.k==='gmotion')?.v??st.motion,work,
+      actual:{x:r3(coordinates.actual.x+work.x-coordinates.work.x),z:r3(coordinates.actual.z+work.z-coordinates.work.z)}};
+  }
+  return {row:block?.row??null,raw:block?.raw??'',before:{coordinates,tool:st.tool,workOffset:clone(st.workOffset),spindle:st.spindle,motion:st.motion},command};
+}
 function graphics(work, source) {
-  const empty = { path: [], profile: null, alarm: null, position: null, steps: 0 };
+  const empty = { path: [], profile: null, alarm: null, position: null, steps: 0, incident:null };
   const r = restoreWork(work);
   if (!r) return Object.assign({ ok: false, message: 'Работа не проходит проверку целостности журнала' }, empty);
   const st = r.state; // свежие объекты — оригинал не затрагивается
@@ -1162,12 +1172,14 @@ function graphics(work, source) {
     return Object.assign({ ok: true, message: 'Программа не содержит исполняемых кадров' },
       { path: [], profile: st.profile, alarm: null, position: clone(st.position), steps: 0 });
   st.program.status = 'running';
-  let guard = 0;
+  let guard = 0, incident=null;
   while (guard < MAX_LINES+1) {
     if (st.program.status === 'done') break;
     if (st.program.status === 'hold') st.program.status = 'running'; // только графика продолжает после M00
     if (st.program.status !== 'running') break;
+    const frame=graphicsFrame(st,st.program.blocks[st.program.index]);
     stepOnce(st);guard++;
+    if(st.alarm)incident={...frame,code:st.alarm.code};
   }
   const alarm = st.alarm;
   return {
@@ -1180,7 +1192,8 @@ function graphics(work, source) {
     alarm: alarm ? clone(alarm) : null,
     position: clone(st.position),
     tool: st.tool,
-    steps: guard
+    steps: guard,
+    incident
   };
 }
 

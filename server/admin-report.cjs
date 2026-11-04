@@ -43,6 +43,19 @@ function describe(summary) {
       causeTitle: Object.hasOwn(diagnostics.causes, row.cause)
         ? diagnostics.causes[row.cause]
         : "Причина не описана в этой версии",
+      originalIncident: (() => {
+        const t = diagnostics.tasks.find((t) => t.id === row.id);
+        const f = t && diagnostics.original(t).incident;
+        return f
+          ? {
+              row: f.row,
+              source: f.raw,
+              code: f.code,
+              part: f.part || null,
+              obstacle: f.obstacle || null,
+            }
+          : null;
+      })(),
     }));
   const faultTitle = (code) =>
     Object.hasOwn(milling.faults, code)

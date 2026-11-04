@@ -2,6 +2,7 @@
   'use strict';
 
   const GROUPS = {
+    independentProject:{id:'independentProject',name:'Самостоятельное итоговое изделие'},
     metrology:{id:'metrology',name:'Чертёж, прибор и решение'},
     turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
@@ -74,6 +75,7 @@
   STEPS.push({"id":"diagnostic-diag-body","target":"diagnosticCourse","title":"Пределы осей не заменяют проверку корпуса","group":"diagnostics","kind":"coursePractice","subtask":"diag-body"});
   STEPS.push({"id":"diagnostic-diag-travel","target":"diagnosticCourse","title":"Опечатка в конечной координате","group":"diagnostics","kind":"coursePractice","subtask":"diag-travel"});
   STEPS.push({"id":"diagnostic-diag-spindle","target":"diagnosticCourse","title":"Рабочая подача без вращения","group":"diagnostics","kind":"coursePractice","subtask":"diag-spindle"});
+  STEPS.push({id:'project-RF5-SHAFT-05',target:'shaftProject',title:'Самостоятельное изделие · без шаблона',group:'independentProject',kind:'coursePractice',subtask:'RF5-SHAFT-05'});
 
   const STEP_BY_ID = Object.fromEntries(STEPS.map(s => [s.id, s]));
 

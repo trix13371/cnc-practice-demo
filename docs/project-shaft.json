@@ -1,0 +1,681 @@
+{
+  "format": "cnc-project-assignments-v1",
+  "scope": "Учебные пакеты; не полный комплект ЕСКД и не допуск к физическому станку",
+  "projects": [
+    {
+      "format": "cnc-project-package-v1",
+      "id": "RF5-SHAFT-01",
+      "revision": 1,
+      "independent": false,
+      "drawing": {
+        "units": "мм",
+        "datum": "Z0 — исходный свободный торец; X — диаметр",
+        "stock": {
+          "diameter": 36,
+          "length": 65,
+          "grip": 15
+        },
+        "surfaces": {
+          "A": {
+            "diameter": 28,
+            "length": 20,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "B": {
+            "diameter": 32,
+            "length": 25,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "C": {
+            "diameter": 36,
+            "length": 20,
+            "preserve": true
+          }
+        },
+        "referenceReach": 45
+      },
+      "setup": {
+        "stock": {
+          "diameter": 36,
+          "length": 65,
+          "grip": 15
+        },
+        "tool": "T0101",
+        "maxRadialRemoval": 2,
+        "workZeroMachineZ": 100,
+        "required": [
+          "Референс",
+          "Заготовка закреплена",
+          "T0101 измерен виртуальным щупом",
+          "G54 по заданному машинному торцу",
+          "Ограждение закрыто"
+        ],
+        "scope": "Учебная наладка. Зажим 15 мм задан отдельно от вылета; ручное касание не проверяется."
+      },
+      "control": [
+        {
+          "id": "dA",
+          "title": "A · передний диаметр",
+          "nominal": 28,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dB",
+          "title": "B · средний диаметр",
+          "nominal": 32,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dC",
+          "title": "C · сохранённый диаметр",
+          "nominal": 36,
+          "tolerance": 0,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "lA",
+          "title": "От торца до ближнего уступа",
+          "nominal": 20,
+          "tolerance": 0.2,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "reach",
+          "title": "От торца до дальнего уступа · справочно",
+          "nominal": 45,
+          "tolerance": null,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "lB",
+          "title": "Длина B · разность двух отсчётов",
+          "nominal": 25,
+          "tolerance": 0.2,
+          "method": "calculation",
+          "unit": "мм"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "plan",
+          "required": true,
+          "title": "Выполнимый маршрут без превышения съёма"
+        },
+        {
+          "id": "setup",
+          "required": true,
+          "title": "Проверка текущей программы при текущей наладке"
+        },
+        {
+          "id": "execution",
+          "required": true,
+          "title": "Реальное исполнение на виртуальной заготовке и требуемый профиль"
+        },
+        {
+          "id": "measurements",
+          "required": true,
+          "title": "Все шесть свежих записей текущей попытки"
+        },
+        {
+          "id": "report",
+          "required": true,
+          "title": "Сопоставление с планом и подтверждённое решение по изделию"
+        }
+      ],
+      "limitations": [
+        "Нет связи с физическим станком",
+        "Не проверены форма, шероховатость, усилия и температура",
+        "Учебный чертёж не является полным комплектом ЕСКД"
+      ]
+    },
+    {
+      "format": "cnc-project-package-v1",
+      "id": "RF5-SHAFT-02",
+      "revision": 1,
+      "independent": false,
+      "drawing": {
+        "units": "мм",
+        "datum": "Z0 — исходный свободный торец; X — диаметр",
+        "stock": {
+          "diameter": 34,
+          "length": 60,
+          "grip": 15
+        },
+        "surfaces": {
+          "A": {
+            "diameter": 26,
+            "length": 15,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "B": {
+            "diameter": 30,
+            "length": 20,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "C": {
+            "diameter": 34,
+            "length": 25,
+            "preserve": true
+          }
+        },
+        "referenceReach": 35
+      },
+      "setup": {
+        "stock": {
+          "diameter": 34,
+          "length": 60,
+          "grip": 15
+        },
+        "tool": "T0101",
+        "maxRadialRemoval": 2,
+        "workZeroMachineZ": 100,
+        "required": [
+          "Референс",
+          "Заготовка закреплена",
+          "T0101 измерен виртуальным щупом",
+          "G54 по заданному машинному торцу",
+          "Ограждение закрыто"
+        ],
+        "scope": "Учебная наладка. Зажим 15 мм задан отдельно от вылета; ручное касание не проверяется."
+      },
+      "control": [
+        {
+          "id": "dA",
+          "title": "A · передний диаметр",
+          "nominal": 26,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dB",
+          "title": "B · средний диаметр",
+          "nominal": 30,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dC",
+          "title": "C · сохранённый диаметр",
+          "nominal": 34,
+          "tolerance": 0,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "lA",
+          "title": "От торца до ближнего уступа",
+          "nominal": 15,
+          "tolerance": 0.2,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "reach",
+          "title": "От торца до дальнего уступа · справочно",
+          "nominal": 35,
+          "tolerance": null,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "lB",
+          "title": "Длина B · разность двух отсчётов",
+          "nominal": 20,
+          "tolerance": 0.2,
+          "method": "calculation",
+          "unit": "мм"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "plan",
+          "required": true,
+          "title": "Выполнимый маршрут без превышения съёма"
+        },
+        {
+          "id": "setup",
+          "required": true,
+          "title": "Проверка текущей программы при текущей наладке"
+        },
+        {
+          "id": "execution",
+          "required": true,
+          "title": "Реальное исполнение на виртуальной заготовке и требуемый профиль"
+        },
+        {
+          "id": "measurements",
+          "required": true,
+          "title": "Все шесть свежих записей текущей попытки"
+        },
+        {
+          "id": "report",
+          "required": true,
+          "title": "Сопоставление с планом и подтверждённое решение по изделию"
+        }
+      ],
+      "limitations": [
+        "Нет связи с физическим станком",
+        "Не проверены форма, шероховатость, усилия и температура",
+        "Учебный чертёж не является полным комплектом ЕСКД"
+      ]
+    },
+    {
+      "format": "cnc-project-package-v1",
+      "id": "RF5-SHAFT-03",
+      "revision": 1,
+      "independent": false,
+      "drawing": {
+        "units": "мм",
+        "datum": "Z0 — исходный свободный торец; X — диаметр",
+        "stock": {
+          "diameter": 38,
+          "length": 70,
+          "grip": 15
+        },
+        "surfaces": {
+          "A": {
+            "diameter": 30,
+            "length": 25,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "B": {
+            "diameter": 34,
+            "length": 15,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "C": {
+            "diameter": 38,
+            "length": 30,
+            "preserve": true
+          }
+        },
+        "referenceReach": 40
+      },
+      "setup": {
+        "stock": {
+          "diameter": 38,
+          "length": 70,
+          "grip": 15
+        },
+        "tool": "T0101",
+        "maxRadialRemoval": 2,
+        "workZeroMachineZ": 100,
+        "required": [
+          "Референс",
+          "Заготовка закреплена",
+          "T0101 измерен виртуальным щупом",
+          "G54 по заданному машинному торцу",
+          "Ограждение закрыто"
+        ],
+        "scope": "Учебная наладка. Зажим 15 мм задан отдельно от вылета; ручное касание не проверяется."
+      },
+      "control": [
+        {
+          "id": "dA",
+          "title": "A · передний диаметр",
+          "nominal": 30,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dB",
+          "title": "B · средний диаметр",
+          "nominal": 34,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dC",
+          "title": "C · сохранённый диаметр",
+          "nominal": 38,
+          "tolerance": 0,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "lA",
+          "title": "От торца до ближнего уступа",
+          "nominal": 25,
+          "tolerance": 0.2,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "reach",
+          "title": "От торца до дальнего уступа · справочно",
+          "nominal": 40,
+          "tolerance": null,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "lB",
+          "title": "Длина B · разность двух отсчётов",
+          "nominal": 15,
+          "tolerance": 0.2,
+          "method": "calculation",
+          "unit": "мм"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "plan",
+          "required": true,
+          "title": "Выполнимый маршрут без превышения съёма"
+        },
+        {
+          "id": "setup",
+          "required": true,
+          "title": "Проверка текущей программы при текущей наладке"
+        },
+        {
+          "id": "execution",
+          "required": true,
+          "title": "Реальное исполнение на виртуальной заготовке и требуемый профиль"
+        },
+        {
+          "id": "measurements",
+          "required": true,
+          "title": "Все шесть свежих записей текущей попытки"
+        },
+        {
+          "id": "report",
+          "required": true,
+          "title": "Сопоставление с планом и подтверждённое решение по изделию"
+        }
+      ],
+      "limitations": [
+        "Нет связи с физическим станком",
+        "Не проверены форма, шероховатость, усилия и температура",
+        "Учебный чертёж не является полным комплектом ЕСКД"
+      ]
+    },
+    {
+      "format": "cnc-project-package-v1",
+      "id": "RF5-SHAFT-04",
+      "revision": 1,
+      "independent": false,
+      "drawing": {
+        "units": "мм",
+        "datum": "Z0 — исходный свободный торец; X — диаметр",
+        "stock": {
+          "diameter": 35,
+          "length": 64,
+          "grip": 15
+        },
+        "surfaces": {
+          "A": {
+            "diameter": 30,
+            "length": 18,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "B": {
+            "diameter": 32,
+            "length": 22,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "C": {
+            "diameter": 35,
+            "length": 24,
+            "preserve": true
+          }
+        },
+        "referenceReach": 40
+      },
+      "setup": {
+        "stock": {
+          "diameter": 35,
+          "length": 64,
+          "grip": 15
+        },
+        "tool": "T0101",
+        "maxRadialRemoval": 2,
+        "workZeroMachineZ": 100,
+        "required": [
+          "Референс",
+          "Заготовка закреплена",
+          "T0101 измерен виртуальным щупом",
+          "G54 по заданному машинному торцу",
+          "Ограждение закрыто"
+        ],
+        "scope": "Учебная наладка. Зажим 15 мм задан отдельно от вылета; ручное касание не проверяется."
+      },
+      "control": [
+        {
+          "id": "dA",
+          "title": "A · передний диаметр",
+          "nominal": 30,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dB",
+          "title": "B · средний диаметр",
+          "nominal": 32,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dC",
+          "title": "C · сохранённый диаметр",
+          "nominal": 35,
+          "tolerance": 0,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "lA",
+          "title": "От торца до ближнего уступа",
+          "nominal": 18,
+          "tolerance": 0.2,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "reach",
+          "title": "От торца до дальнего уступа · справочно",
+          "nominal": 40,
+          "tolerance": null,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "lB",
+          "title": "Длина B · разность двух отсчётов",
+          "nominal": 22,
+          "tolerance": 0.2,
+          "method": "calculation",
+          "unit": "мм"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "plan",
+          "required": true,
+          "title": "Выполнимый маршрут без превышения съёма"
+        },
+        {
+          "id": "setup",
+          "required": true,
+          "title": "Проверка текущей программы при текущей наладке"
+        },
+        {
+          "id": "execution",
+          "required": true,
+          "title": "Реальное исполнение на виртуальной заготовке и требуемый профиль"
+        },
+        {
+          "id": "measurements",
+          "required": true,
+          "title": "Все шесть свежих записей текущей попытки"
+        },
+        {
+          "id": "report",
+          "required": true,
+          "title": "Сопоставление с планом и подтверждённое решение по изделию"
+        }
+      ],
+      "limitations": [
+        "Нет связи с физическим станком",
+        "Не проверены форма, шероховатость, усилия и температура",
+        "Учебный чертёж не является полным комплектом ЕСКД"
+      ]
+    },
+    {
+      "format": "cnc-project-package-v1",
+      "id": "RF5-SHAFT-05",
+      "revision": 1,
+      "independent": true,
+      "drawing": {
+        "units": "мм",
+        "datum": "Z0 — исходный свободный торец; X — диаметр",
+        "stock": {
+          "diameter": 38,
+          "length": 74,
+          "grip": 15
+        },
+        "surfaces": {
+          "A": {
+            "diameter": 30,
+            "length": 22,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "B": {
+            "diameter": 33,
+            "length": 26,
+            "diameterTolerance": 0.1,
+            "lengthTolerance": 0.2
+          },
+          "C": {
+            "diameter": 38,
+            "length": 26,
+            "preserve": true
+          }
+        },
+        "referenceReach": 48
+      },
+      "setup": {
+        "stock": {
+          "diameter": 38,
+          "length": 74,
+          "grip": 15
+        },
+        "tool": "T0101",
+        "maxRadialRemoval": 2,
+        "workZeroMachineZ": 100,
+        "required": [
+          "Референс",
+          "Заготовка закреплена",
+          "T0101 измерен виртуальным щупом",
+          "G54 по заданному машинному торцу",
+          "Ограждение закрыто"
+        ],
+        "scope": "Учебная наладка. Зажим 15 мм задан отдельно от вылета; ручное касание не проверяется."
+      },
+      "control": [
+        {
+          "id": "dA",
+          "title": "A · передний диаметр",
+          "nominal": 30,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dB",
+          "title": "B · средний диаметр",
+          "nominal": 33,
+          "tolerance": 0.1,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "dC",
+          "title": "C · сохранённый диаметр",
+          "nominal": 38,
+          "tolerance": 0,
+          "method": "micrometer",
+          "unit": "мм"
+        },
+        {
+          "id": "lA",
+          "title": "От торца до ближнего уступа",
+          "nominal": 22,
+          "tolerance": 0.2,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "reach",
+          "title": "От торца до дальнего уступа · справочно",
+          "nominal": 48,
+          "tolerance": null,
+          "method": "depth",
+          "unit": "мм"
+        },
+        {
+          "id": "lB",
+          "title": "Длина B · разность двух отсчётов",
+          "nominal": 26,
+          "tolerance": 0.2,
+          "method": "calculation",
+          "unit": "мм"
+        }
+      ],
+      "acceptance": [
+        {
+          "id": "plan",
+          "required": true,
+          "title": "Выполнимый маршрут без превышения съёма"
+        },
+        {
+          "id": "setup",
+          "required": true,
+          "title": "Проверка текущей программы при текущей наладке"
+        },
+        {
+          "id": "execution",
+          "required": true,
+          "title": "Реальное исполнение на виртуальной заготовке и требуемый профиль"
+        },
+        {
+          "id": "measurements",
+          "required": true,
+          "title": "Все шесть свежих записей текущей попытки"
+        },
+        {
+          "id": "report",
+          "required": true,
+          "title": "Сопоставление с планом и подтверждённое решение по изделию"
+        }
+      ],
+      "limitations": [
+        "Нет связи с физическим станком",
+        "Не проверены форма, шероховатость, усилия и температура",
+        "Учебный чертёж не является полным комплектом ЕСКД"
+      ]
+    }
+  ]
+}

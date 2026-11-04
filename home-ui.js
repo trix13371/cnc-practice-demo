@@ -56,6 +56,12 @@
       copy: "Находим причины и проверяем исправления на копии.",
       art: "code",
     },
+    {
+      title: "Самостоятельное изделие",
+      ids: ["independentProject"],
+      copy: "Свой маршрут, программа с пустого редактора и полный контроль.",
+      art: "gauge",
+    },
   ];
   const artwork = {
     chuck:
@@ -77,6 +83,10 @@
       node("p", "ПОШАГОВОЕ ОБУЧЕНИЕ · ОТ НУЛЯ ДО ПЕРВОЙ ДЕТАЛИ", "eyebrow"),
     );
     const phase = {
+      independentProject: [
+        "Свой маршрут.<br>Собственная программа.",
+        "Изготовьте итоговый валик с дополнительным черновым проходом и подтвердите все размеры. Редактор программы — без шаблона.",
+      ],
       operations: [
         "От простого прохода —<br>к сложной обработке.",
         "Торцевание, канавки и конус: выбирайте инструмент, создавайте программу и проверяйте результат.",
@@ -260,7 +270,7 @@
     hero.append(intro, art);
     root.append(hero);
     const route = node("div", undefined, "home-route");
-    route.setAttribute("aria-label", "Восемь разделов курса");
+    route.setAttribute("aria-label", "Разделы курса");
     for (const [i, g] of groups.entries()) {
       const items = p.items.filter((item) => g.ids.includes(item.group)),
         done = items.filter((item) => item.done).length,

@@ -9271,6 +9271,32 @@ body[data-screen="course"] .course-index {
 .milling-course .shaft-drawing svg {
   width: 100%;
 }
+.diagnostic-facts {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 1fr);
+  gap: 8px 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel, #fff);
+}
+.diagnostic-facts dt {
+  font-weight: 600;
+}
+.diagnostic-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 600px) {
+  .diagnostic-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .diagnostic-facts dd {
+    margin-bottom: 10px;
+  }
+}
 @media (max-width: 650px) {
   .milling-course .shaft-measure-controls {
     grid-template-columns: 1fr;
@@ -12112,13 +12138,22 @@ body.cloud-loading {
     {id:'RF5-SHAFT-01',revision:1,title:'Ступенчатый валик · базовый',stock:{diameter:36,length:65,grip:15},front:28,middle:32,base:36,frontLength:20,middleLength:25,diameterTolerance:.1,lengthTolerance:.2,reach:45},
     {id:'RF5-SHAFT-02',revision:1,title:'Короткий валик',stock:{diameter:34,length:60,grip:15},front:26,middle:30,base:34,frontLength:15,middleLength:20,diameterTolerance:.1,lengthTolerance:.2,reach:35},
     {id:'RF5-SHAFT-03',revision:1,title:'Валик с длинной шейкой',stock:{diameter:38,length:70,grip:15},front:30,middle:34,base:38,frontLength:25,middleLength:15,diameterTolerance:.1,lengthTolerance:.2,reach:40},
-    {id:'RF5-SHAFT-04',revision:1,title:'Валик с другим припуском',stock:{diameter:35,length:64,grip:15},front:30,middle:32,base:35,frontLength:18,middleLength:22,diameterTolerance:.1,lengthTolerance:.2,reach:40}
+    {id:'RF5-SHAFT-04',revision:1,title:'Валик с другим припуском',stock:{diameter:35,length:64,grip:15},front:30,middle:32,base:35,frontLength:18,middleLength:22,diameterTolerance:.1,lengthTolerance:.2,reach:40},
+    {id:'RF5-SHAFT-05',revision:1,title:'Самостоятельное изделие · без шаблона',independent:true,stock:{diameter:38,length:74,grip:15},front:30,middle:33,base:38,frontLength:22,middleLength:26,diameterTolerance:.1,lengthTolerance:.2,reach:48}
   ]);
   const task=variants.find(t=>t.id===variant);if(!task)fail('Неизвестный чертёж проекта.');
   const steps=freeze(['Прочитайте чертёж изделия','Составьте технологический маршрут','Выполните наладку заготовки','Подготовьте и проверьте программу','Изготовьте валик','Заполните карту контроля','Сопоставьте план и результат'].map((title,id)=>({id,title})));
-  const operations=freeze({reduce:{title:'Общий участок до Ø'+task.middle+' · Z0…−'+task.reach,x:task.middle,z:-task.reach},frontRough:{title:'Передний участок до Ø'+task.middle+' · Z0…−'+task.frontLength,x:task.middle,z:-task.frontLength},frontFinish:{title:'Передний участок до Ø'+task.front+' · Z0…−'+task.frontLength,x:task.front,z:-task.frontLength}});
-  const rows=freeze([{id:'dA',title:'A · передний диаметр',nominal:task.front,tolerance:.1,method:'micrometer',unit:'мм'},{id:'dB',title:'B · средний диаметр',nominal:task.middle,tolerance:.1,method:'micrometer',unit:'мм'},{id:'dC',title:'C · сохранённый диаметр',nominal:task.base,tolerance:0,method:'micrometer',unit:'мм'},{id:'lA',title:'От торца до ближнего уступа',nominal:task.frontLength,tolerance:.2,method:'depth',unit:'мм'},{id:'reach',title:'От торца до дальнего уступа · справочно',nominal:task.reach,tolerance:null,method:'depth',unit:'мм'},{id:'lB',title:'Длина B · разность двух отсчётов',nominal:task.middleLength,tolerance:.2,method:'calculation',unit:'мм'}]);
-  const clearance=task.base+2,template=['G21 G18 G40 G54 G99','G50 S1200','G97 S800 M3','(Добавьте переходы по своему маршруту)','G0 X'+clearance+' Z5','M5','M30'].join('\n');
+  const operations=freeze({reduce:{title:'Общий участок до Ø'+task.middle+' · Z0…−'+task.reach,x:task.middle,z:-task.reach},frontRough:{title:'Передний участок до Ø'+task.middle+' · Z0…−'+task.frontLength,x:task.middle,z:-task.frontLength},frontFinish:{title:'Передний участок до Ø'+task.front+' · Z0…−'+task.frontLength,x:task.front,z:-task.frontLength},...(task.independent?{bulkRough:{title:'Черновой общий участок до Ø35 · Z0…−'+task.reach,x:35,z:-task.reach},frontPreRough:{title:'Предварительный передний участок до Ø35 · Z0…−'+task.frontLength,x:35,z:-task.frontLength}}:{})});
+  const rows=freeze([{id:'dA',title:'A · передний диаметр',nominal:task.front,tolerance:task.diameterTolerance,method:'micrometer',unit:'мм'},{id:'dB',title:'B · средний диаметр',nominal:task.middle,tolerance:task.diameterTolerance,method:'micrometer',unit:'мм'},{id:'dC',title:'C · сохранённый диаметр',nominal:task.base,tolerance:0,method:'micrometer',unit:'мм'},{id:'lA',title:'От торца до ближнего уступа',nominal:task.frontLength,tolerance:task.lengthTolerance,method:'depth',unit:'мм'},{id:'reach',title:'От торца до дальнего уступа · справочно',nominal:task.reach,tolerance:null,method:'depth',unit:'мм'},{id:'lB',title:'Длина B · разность двух отсчётов',nominal:task.middleLength,tolerance:task.lengthTolerance,method:'calculation',unit:'мм'}]);
+  const clearance=task.base+2,template=task.independent?'':['G21 G18 G40 G54 G99','G50 S1200','G97 S800 M3','(Добавьте переходы по своему маршруту)','G0 X'+clearance+' Z5','M5','M30'].join('\n');
+  function documents(){return freeze({format:'cnc-project-package-v1',id:task.id,revision:task.revision,independent:!!task.independent,
+    drawing:{units:'мм',datum:'Z0 — исходный свободный торец; X — диаметр',stock:copy(task.stock),surfaces:{
+      A:{diameter:task.front,length:task.frontLength,diameterTolerance:task.diameterTolerance,lengthTolerance:task.lengthTolerance},
+      B:{diameter:task.middle,length:task.middleLength,diameterTolerance:task.diameterTolerance,lengthTolerance:task.lengthTolerance},
+      C:{diameter:task.base,length:task.stock.length-task.reach,preserve:true}},referenceReach:task.reach},
+    setup:{stock:copy(task.stock),tool:'T0101',maxRadialRemoval:engine().tools.find(t=>t.id===1).maxDepth,workZeroMachineZ:100,required:['Референс','Заготовка закреплена','T0101 измерен виртуальным щупом','G54 по заданному машинному торцу','Ограждение закрыто'],scope:'Учебная наладка. Зажим 15 мм задан отдельно от вылета; ручное касание не проверяется.'},
+    control:copy(rows),acceptance:[{id:'plan',required:true,title:'Выполнимый маршрут без превышения съёма'},{id:'setup',required:true,title:'Проверка текущей программы при текущей наладке'},{id:'execution',required:true,title:'Реальное исполнение на виртуальной заготовке и требуемый профиль'},{id:'measurements',required:true,title:'Все шесть свежих записей текущей попытки'},{id:'report',required:true,title:'Сопоставление с планом и подтверждённое решение по изделию'}],
+    limitations:['Нет связи с физическим станком','Не проверены форма, шероховатость, усилия и температура','Учебный чертёж не является полным комплектом ЕСКД']});}
   function source(value){if(typeof value!=='string'||value.length>4000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/.test(value))fail('Программа: до 4000 символов без невидимых управляющих знаков.');return value;}
   function number(value){const n=numbers.parseNumber(value);if(n===null||Math.abs(n)>1000)fail('Введите размер в миллиметрах без выражений.');return n;}
   function exact(o,keys){if(!o||typeof o!=='object'||Array.isArray(o)||![Object.prototype,null].includes(Object.getPrototypeOf(o))||Reflect.ownKeys(o).length!==keys.length||keys.some(k=>!Object.hasOwn(o,k)))fail('Недопустимая запись проекта.');}
@@ -12127,7 +12162,7 @@ body.cloud-loading {
   function planWork(){const s=blank();for(const a of [{type:'reference'},{type:'clamp',value:true},{type:'tool',tool:1},{type:'preset'},{type:'workOffset',z:100},{type:'door',value:true}]){const r=operate(s,a);if(!r.ok)fail(r.message);}return s.work;}
   function create(){return {version:1,events:[],step:0,complete:false,...blank(),seen:[],plan:[],planPreview:null,planReady:false,source:template,preview:null,approval:null,executed:false,records:{},measurement:null,report:null,correct:false,attempt:1,assisted:false,hints:[],errors:Array(7).fill(0),feedback:''};}
   function planSource(plan){const lines=['G21 G18 G40 G54 G99','G50 S1200','G97 S800 M3'];for(const id of plan){const o=operations[id];if(!o)fail('Неизвестная операция.');lines.push('G0 X'+clearance+' Z2','X'+o.x,'G1 Z'+o.z+' F0.1','G0 X'+clearance,'Z2');}return [...lines,'G0 X'+clearance+' Z5','M5','M30'].join('\n');}
-  function shape(profile){const p=profile?.segments;if(!p||p.length!==3||Math.abs(profile.frontZ||0)>1e-8)return false;const same=(seg,d,tol)=>Math.abs(seg.diameter-d)<=tol+1e-8&&Math.abs((seg.endDiameter??seg.diameter)-seg.diameter)<1e-8;return same(p[0],task.base,0)&&same(p[1],task.middle,.1)&&same(p[2],task.front,.1)&&Math.abs(p[2].length-task.frontLength)<=.20000001&&Math.abs(p[1].length-task.middleLength)<=.20000001&&Math.abs(p.reduce((n,s)=>n+s.length,0)-task.stock.length)<1e-8;}
+  function shape(profile){const p=profile?.segments;if(!p||p.length!==3||Math.abs(profile.frontZ||0)>1e-8)return false;const same=(seg,d,tol)=>Math.abs(seg.diameter-d)<=tol+1e-8&&Math.abs((seg.endDiameter??seg.diameter)-seg.diameter)<1e-8;return same(p[0],task.base,0)&&same(p[1],task.middle,task.diameterTolerance)&&same(p[2],task.front,task.diameterTolerance)&&Math.abs(p[2].length-task.frontLength)<=task.lengthTolerance+1e-8&&Math.abs(p[1].length-task.middleLength)<=task.lengthTolerance+1e-8&&Math.abs(p.reduce((n,s)=>n+s.length,0)-task.stock.length)<1e-8;}
   function ready(s){const m=s.machine;return !!(m.referenced&&m.clamped&&m.tool===1&&m.offsets['1'].calibrated&&m.workOffset.confirmed&&m.workOffset.z===100&&m.doorClosed&&!m.alarm&&!m.estop);}
   function signature(s){const m=s.machine;return JSON.stringify([m.stock,m.referenced,m.clamped,m.tool,m.offsets,m.workOffset,m.doorClosed,m.estop,m.alarm,m.profile,s.plan]);}
   function approved(s,text){return !!s.approval&&s.approval.source===text&&s.approval.setup===signature(s);}
@@ -12169,7 +12204,7 @@ body.cloud-loading {
   function transition(s,a){const restored=restore(snapshot(s));if(!restored)fail('Повреждён журнал проекта.');return apply(restored,a);}
   function validDraft(d,s){return !!(d&&typeof d==='object'&&!Array.isArray(d)&&Object.keys(d).length===2&&Object.hasOwn(d,'step')&&Object.hasOwn(d,'values')&&s&&!s.complete&&d.step===s.step&&d.values&&typeof d.values==='object'&&!Array.isArray(d.values)&&Object.keys(d.values).every(k=>['program','zero','z','value','note','row','method','route','decision'].includes(k)&&typeof d.values[k]==='string'&&(k!=='route'||['','followed','changed'].includes(d.values[k]))&&(k!=='decision'||['','accept','reject'].includes(d.values[k]))&&(k!=='row'||rows.some(r=>r.id===d.values[k]))&&(k!=='method'||['micrometer','depth'].includes(d.values[k]))&&d.values[k].length<=(k==='program'?4000:k==='note'?500:32)&&(k==='program'||!/[\r\n\t]/.test(d.values[k]))&&!/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/.test(d.values[k])));}
   function report(s){const r=restore(snapshot(s));if(!r)fail('Повреждён проект.');const lines=['ЧПУ Практика · протокол учебного изделия',task.id+' / редакция '+task.revision,r.complete?'ЗАВЕРШЕНО':'ЧЕРНОВИК · не подтверждает завершение','Попытка '+r.attempt,'Маршрут: '+r.plan.map(id=>operations[id].title).join(' → '),'Сравнение с фактическими переходами: '+(routeMatches(r)?'совпадает':'отличается'),'Последний проход: '+r.machine.cuts.length,'Фактические переходы: '+trace(r.machine.path).map(p=>'X'+p[0]+' Z'+p[2]+' → X'+p[1]+' Z'+p[3]).join(' | '),'Наладка: T'+r.machine.tool+'; G54 Z'+r.machine.workOffset.z,''];for(const row of rows){const v=r.records[row.id];lines.push(row.title+': '+(v?v.value+' мм · '+({micrometer:'микрометр',depth:'глубиномер',calculation:'разность отсчётов'}[v.method]||v.method)+(typeof v.z==='number'?' · Z'+v.z:'')+' · '+(fresh(r,v)?'актуально':'устарело'):'нет записи')+'; '+(row.tolerance===null?'справочный размер':row.id==='dC'?'сохранить исходный Ø'+task.base+' мм':row.nominal+' ±'+row.tolerance+' мм'));}lines.push('','Решение: '+(r.report?.decision==='accept'?'принято в учебной модели':'не принято'),'Помощь: '+(r.assisted?'открывалась':'не открывалась'),'Ошибок: '+r.errors.reduce((a,b)=>a+b,0),'Примечание: '+(r.report?.note||''),'','Программа:',r.source,'','Учебная геометрическая модель, не допуск к физическому станку. Осевые отсчёты вычислены по границам профиля; усилие и погрешность не моделируются.');return lines.join('\n');}
-  return freeze({variants,forTask:id=>build(engine,numbers,replayCache,id),MAX_EVENTS,task,steps,operations,rows,template,create,planSource,shape,ready,approved,trace,routeMatches,shoulders,recordsReady,inTolerance,snapshot,restore,transition,validDraft,report});
+  return freeze({variants,forTask:id=>build(engine,numbers,replayCache,id),MAX_EVENTS,task,steps,operations,rows,template,documents,create,planSource,shape,ready,approved,trace,routeMatches,shoulders,recordsReady,inTolerance,snapshot,restore,transition,validDraft,report});
 });
 
 // Versioned project portfolio. Dimensions always come from the fixed registry above.
@@ -13933,13 +13968,13 @@ function draftFor(t){return {program:t.kind==='lathe'?t.bad:'',route:t.kind==='m
 function validDraft(d){try{exact(d,['program','route','zero','tool','cause','spindle']);text(d.program,4000);text(d.route,900);text(d.zero,32);if(!['1','3','4'].includes(d.tool)||typeof d.spindle!=='boolean'||typeof d.cause!=='string'||d.cause!==''&&!Object.hasOwn(causes,d.cause))return false;return true;}catch{return false;}}
 function latheWork(tool,zero){let w=lathe().newWork('Диагностика на копии',{diameter:32,length:60,grip:15});for(const a of [{type:'reference'},{type:'clamp',value:true},{type:'tool',tool},{type:'preset'},{type:'workOffset',z:zero},{type:'door',value:true}]){const r=lathe().execute(w,a);if(!r.ok)throw Error(r.message);w=r.work;}return w;}
 function route(textValue){const lines=text(textValue,900).trim().split(/\r?\n/);if(!lines.length||lines.length>6)throw Error('Маршрут: от 1 до 6 строк X Y Z G0/G1.');return lines.map(line=>{const parts=line.trim().split(/\s+/);if(parts.length!==4||!['G0','G1'].includes(parts[3])||parts.slice(0,3).some(p=>!/^[-+]?(?:\d+(?:\.\d+)?|\.\d+)$/.test(p)||!Number.isFinite(Number(p))||Math.abs(Number(p))>1000))throw Error('Строка маршрута: X Y Z G0/G1; десятичная точка.');return {x:Number(parts[0]),y:Number(parts[1]),z:Number(parts[2]),mode:parts[3]};});}
-function evaluate(t,d){if(!validDraft(d))throw Error('Проверьте поля исправления.');if(t.kind==='lathe'){if(!/^[-+]?\d+(?:[.,]\d+)?$/.test(d.zero.trim()))throw Error('Введите числовой G54.');const zero=Number(d.zero.replace(',','.'));if(!Number.isFinite(zero)||Math.abs(zero)>1000)throw Error('Неверный G54.');const g=lathe().graphics(latheWork(Number(d.tool),zero),text(d.program,4000));return {ok:g.ok,message:g.message||'',code:g.alarm?.code||'',profile:g.profile,setupOK:zero===100&&Number(d.tool)===(t.correctTool??t.tool)};}
-let s=mill().create();s.position={x:t.start[0],y:t.start[1],z:t.start[2]};s.setup={reference:true,clamped:true,tool:true,zero:true,door:true};s.spindle=d.spindle;const log=[];for(const step of route(d.route)){const r=mill().plan(s,step);log.push({from:copy(s.position),to:{x:step.x,y:step.y,z:step.z},mode:step.mode,code:r.code||'',part:r.part||'',obstacle:r.obstacle||''});if(!r.ok)return {ok:false,code:r.code,message:r.title+'. '+r.advice,log};s.position=r.to;s.grid=r.grid;}return {ok:true,message:'Все отрезки допустимы в учебном профиле.',position:s.position,grid:s.grid,log};}
+function evaluate(t,d){if(!validDraft(d))throw Error('Проверьте поля исправления.');if(t.kind==='lathe'){if(!/^[-+]?\d+(?:[.,]\d+)?$/.test(d.zero.trim()))throw Error('Введите числовой G54.');const zero=Number(d.zero.replace(',','.'));if(!Number.isFinite(zero)||Math.abs(zero)>1000)throw Error('Неверный G54.');const g=lathe().graphics(latheWork(Number(d.tool),zero),text(d.program,4000));return {ok:g.ok,message:g.message||'',code:g.alarm?.code||'',profile:g.profile,path:g.path,position:g.position,incident:g.incident||null,setupOK:zero===100&&Number(d.tool)===(t.correctTool??t.tool)};}
+let s=mill().create();s.position={x:t.start[0],y:t.start[1],z:t.start[2]};s.setup={reference:true,clamped:true,tool:true,zero:true,door:true};s.spindle=d.spindle;const log=[];for(const step of route(d.route)){const r=mill().plan(s,step);log.push({row:log.length+1,from:copy(s.position),to:{x:step.x,y:step.y,z:step.z},mode:step.mode,code:r.code||'',part:r.part||'',obstacle:r.obstacle||'',point:r.point?copy(r.point):null});if(!r.ok){const last=log[log.length-1];return {ok:false,code:r.code,message:r.title+'. '+r.advice,log,incident:{row:last.row,raw:d.route.trim().split(/\r?\n/)[last.row-1],before:{position:copy(last.from),spindle:d.spindle},command:{mode:step.mode,actual:copy(last.to)},code:r.code,part:last.part,obstacle:last.obstacle,point:last.point}};}s.position=r.to;s.grid=r.grid;}return {ok:true,message:'Все отрезки допустимы в учебном профиле.',position:s.position,grid:s.grid,log,incident:null};}
 const expectedCache=new Map(),originalCache=new Map();function expected(t){if(!expectedCache.has(t.id)){const d={...draftFor(t),program:t.kind==='lathe'?t.reference:'',route:t.kind==='mill'?t.reference:'',zero:'100',tool:String(t.correctTool??t.tool??1),spindle:true};const result=evaluate(t,d);if(!result.ok)throw Error('Ошибка эталона: '+result.message);expectedCache.set(t.id,result);}return copy(expectedCache.get(t.id));}
 function matches(t,r){if(!r.ok)return false;const e=expected(t);if(t.kind==='lathe'){const norm=p=>JSON.stringify({frontZ:p.frontZ||0,segments:p.segments.map(s=>[s.length,s.diameter,s.endDiameter??s.diameter].map(x=>Math.round(x*1e6)/1e6))});return r.setupOK&&norm(r.profile)===norm(e.profile);}return ['x','y','z'].every(k=>Math.abs(r.position[k]-e.position[k])<1e-8)&&r.grid.every((z,i)=>Math.abs(z-e.grid[i])<1e-8);}
 function original(t){if(!originalCache.has(t.id)){const r=evaluate(t,draftFor(t));if(matches(t,r))throw Error('Исходная ошибка не воспроизводится.');originalCache.set(t.id,r);}return copy(originalCache.get(t.id));}
-function create(){return {version:1,events:[],current:0,inspected:false,done:[],help:[],errors:Array(tasks.length).fill(0),feedback:'',result:null,draft:draftFor(tasks[0])};}
-function apply(state,a){if(state.events.length>=120)throw Error('Журнал диагностики заполнен.');const fields={inspect:['type'],repair:['type','draft'],hint:['type'],next:['type']};if(!a||!Object.hasOwn(fields,a.type))throw Error('Неизвестное действие.');exact(a,fields[a.type]);const s=copy(state),t=tasks[s.current],accepted=s.done.some(d=>d.id===t.id);if(accepted&&a.type!=='next')throw Error('Задание принято. Перейдите дальше.');switch(a.type){case 'inspect':s.result=original(t);s.inspected=true;s.feedback='Проверка исходного варианта на копии: '+(s.result.ok?'Исполнение возможно, но результат/наладка не соответствует условию.':s.result.message);break;case 'repair':if(!s.inspected)throw Error('Сначала проверьте исходный вариант на копии.');if(!validDraft(a.draft))throw Error('Неверные поля исправления.');s.draft=copy(a.draft);s.result=evaluate(t,s.draft);if(s.draft.cause!==t.cause){s.errors[s.current]++;s.feedback='Укажите причину, которую устраняет исправление. Сверьте наладку, сообщение и условие.';}else if(!matches(t,s.result)){s.errors[s.current]++;s.feedback=s.result.ok?'Движения допустимы, но конечный профиль, точка или наладка не соответствует заданию.':s.result.message;}else{s.done.push({id:t.id,cause:t.cause,help:s.help.includes(t.id),errors:s.errors[s.current],repair:copy(s.draft)});s.feedback='Причина и исправление подтверждены на копии. Это диагностика, а не изготовление детали.';}break;case 'hint':if(s.help.includes(t.id))throw Error('Разбор уже открыт.');s.help.push(t.id);s.feedback=t.hint;break;case 'next':if(!accepted||s.current===tasks.length-1)throw Error('Следующее задание пока недоступно.');s.current++;s.inspected=false;s.result=null;s.feedback='';s.draft=draftFor(tasks[s.current]);break;}s.events.push(copy(a));return s;}
+function create(){return {version:1,events:[],current:0,inspected:false,done:[],help:[],errors:Array(tasks.length).fill(0),feedback:'',result:null,originalResult:null,repairResult:null,draft:draftFor(tasks[0])};}
+function apply(state,a){if(state.events.length>=120)throw Error('Журнал диагностики заполнен.');const fields={inspect:['type'],repair:['type','draft'],hint:['type'],next:['type']};if(!a||!Object.hasOwn(fields,a.type))throw Error('Неизвестное действие.');exact(a,fields[a.type]);const s=copy(state),t=tasks[s.current],accepted=s.done.some(d=>d.id===t.id);if(accepted&&a.type!=='next')throw Error('Задание принято. Перейдите дальше.');switch(a.type){case 'inspect':s.result=original(t);s.originalResult=copy(s.result);s.inspected=true;s.feedback='Проверка исходного варианта на копии: '+(s.result.ok?'Исполнение возможно, но результат/наладка не соответствует условию.':s.result.message);break;case 'repair':if(!s.inspected)throw Error('Сначала проверьте исходный вариант на копии.');if(!validDraft(a.draft))throw Error('Неверные поля исправления.');s.draft=copy(a.draft);s.result=evaluate(t,s.draft);s.repairResult=copy(s.result);if(s.draft.cause!==t.cause){s.errors[s.current]++;s.feedback='Укажите причину, которую устраняет исправление. Сверьте наладку, сообщение и условие.';}else if(!matches(t,s.result)){s.errors[s.current]++;s.feedback=s.result.ok?'Движения допустимы, но конечный профиль, точка или наладка не соответствует заданию.':s.result.message;}else{s.done.push({id:t.id,cause:t.cause,help:s.help.includes(t.id),errors:s.errors[s.current],repair:copy(s.draft)});s.feedback='Причина и исправление подтверждены на копии. Это диагностика, а не изготовление детали.';}break;case 'hint':if(s.help.includes(t.id))throw Error('Разбор уже открыт.');s.help.push(t.id);s.feedback=t.hint;break;case 'next':if(!accepted||s.current===tasks.length-1)throw Error('Следующее задание пока недоступно.');s.current++;s.inspected=false;s.result=null;s.originalResult=null;s.repairResult=null;s.feedback='';s.draft=draftFor(tasks[s.current]);break;}s.events.push(copy(a));return s;}
 function snapshot(s){return {version:1,events:copy(s.events),draft:copy(s.draft)};}
 let cacheKey=null,cacheValue=null;function restore(raw){try{const key=JSON.stringify(raw);if(key===cacheKey)return copy(cacheValue);exact(raw,['version','events','draft']);if(raw.version!==1||!Array.isArray(raw.events)||raw.events.length>120||!validDraft(raw.draft))return null;let s=create();for(const a of raw.events)s=apply(s,a);s.draft=copy(raw.draft);cacheKey=key;cacheValue=copy(s);return s;}catch{return null;}}
 function transition(s,a){const r=restore(snapshot(s));if(!r)throw Error('Повреждена диагностика.');return apply(r,a);}
@@ -14478,6 +14513,7 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
   'use strict';
 
   const GROUPS = {
+    independentProject:{id:'independentProject',name:'Самостоятельное итоговое изделие'},
     metrology:{id:'metrology',name:'Чертёж, прибор и решение'},
     turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
@@ -14550,6 +14586,7 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
   STEPS.push({"id":"diagnostic-diag-body","target":"diagnosticCourse","title":"Пределы осей не заменяют проверку корпуса","group":"diagnostics","kind":"coursePractice","subtask":"diag-body"});
   STEPS.push({"id":"diagnostic-diag-travel","target":"diagnosticCourse","title":"Опечатка в конечной координате","group":"diagnostics","kind":"coursePractice","subtask":"diag-travel"});
   STEPS.push({"id":"diagnostic-diag-spindle","target":"diagnosticCourse","title":"Рабочая подача без вращения","group":"diagnostics","kind":"coursePractice","subtask":"diag-spindle"});
+  STEPS.push({id:'project-RF5-SHAFT-05',target:'shaftProject',title:'Самостоятельное изделие · без шаблона',group:'independentProject',kind:'coursePractice',subtask:'RF5-SHAFT-05'});
 
   const STEP_BY_ID = Object.fromEntries(STEPS.map(s => [s.id, s]));
 
@@ -16558,8 +16595,18 @@ function display(state) {
 }
 
 /* ===== Предпросмотр программы (без мутаций работы и реального состояния) ===== */
+function graphicsFrame(st, block) {
+  const coordinates=display(st),move=block?.ops.find(op=>op.k==='move');
+  let command=null;
+  if(move){
+    const work={x:move.x??coordinates.work.x,z:move.z??coordinates.work.z};
+    command={motion:block.ops.find(op=>op.k==='gmotion')?.v??st.motion,work,
+      actual:{x:r3(coordinates.actual.x+work.x-coordinates.work.x),z:r3(coordinates.actual.z+work.z-coordinates.work.z)}};
+  }
+  return {row:block?.row??null,raw:block?.raw??'',before:{coordinates,tool:st.tool,workOffset:clone(st.workOffset),spindle:st.spindle,motion:st.motion},command};
+}
 function graphics(work, source) {
-  const empty = { path: [], profile: null, alarm: null, position: null, steps: 0 };
+  const empty = { path: [], profile: null, alarm: null, position: null, steps: 0, incident:null };
   const r = restoreWork(work);
   if (!r) return Object.assign({ ok: false, message: 'Работа не проходит проверку целостности журнала' }, empty);
   const st = r.state; // свежие объекты — оригинал не затрагивается
@@ -16584,12 +16631,14 @@ function graphics(work, source) {
     return Object.assign({ ok: true, message: 'Программа не содержит исполняемых кадров' },
       { path: [], profile: st.profile, alarm: null, position: clone(st.position), steps: 0 });
   st.program.status = 'running';
-  let guard = 0;
+  let guard = 0, incident=null;
   while (guard < MAX_LINES+1) {
     if (st.program.status === 'done') break;
     if (st.program.status === 'hold') st.program.status = 'running'; // только графика продолжает после M00
     if (st.program.status !== 'running') break;
+    const frame=graphicsFrame(st,st.program.blocks[st.program.index]);
     stepOnce(st);guard++;
+    if(st.alarm)incident={...frame,code:st.alarm.code};
   }
   const alarm = st.alarm;
   return {
@@ -16602,7 +16651,8 @@ function graphics(work, source) {
     alarm: alarm ? clone(alarm) : null,
     position: clone(st.position),
     tool: st.tool,
-    steps: guard
+    steps: guard,
+    incident
   };
 }
 
@@ -16896,7 +16946,7 @@ return {
     const fp=course.firstProcess.restore(a.sections.coursePath.current.firstProcess),firstProcess={status:!fp?.events.length?'not-started':fp.complete?'complete':'in-progress',step:fp?.step??0,total:8,completed:!!fp?.complete,assisted:!!fp?.assisted,errors:fp?.errors.reduce((a,b)=>a+b,0)||0};
     const ps=course.programSetup.restore(a.sections.coursePath.current.programSetup),programSetup={status:!ps?.events.length?'not-started':ps.complete?'complete':'in-progress',step:ps?.step??0,total:7,completed:!!ps?.complete,assisted:!!ps?.assisted,errors:ps?.errors.reduce((a,b)=>a+b,0)||0};
     const sp=course.shaftProject.restore(a.sections.coursePath.current.shaftProject),shaftProject={evidence:sp?course.shaftProject.evidence(sp):null,taskId:sp?.taskId||'RF5-SHAFT-01',accepted:[...(sp?.completedProjects||[]),...(sp?.complete?[course.shaftProject.snapshot({...sp,completedProjects:[]})]:[])].map(raw=>({taskId:raw.taskId||'RF5-SHAFT-01',report:course.shaftProject.report(course.shaftProject.restore(raw))})),status:!sp?.events.length?'not-started':sp.complete?'complete':'in-progress',step:sp?.step??0,total:7,completed:!!sp?.complete,assisted:!!sp?.assisted,errors:sp?.errors.reduce((a,b)=>a+b,0)||0,recorded:Object.keys(sp?.records||{}).length,measurements:6,attempt:sp?.attempt||1,report:sp?.complete?course.shaftProject.report(sp):null};
-    return {routeVersion:4,progress,metrologyCourse:(()=>{const s=course.metrologyCourse.restore(a.sections.coursePath.current.metrologyCourse);return {done:s?.done||[],current:s?.current||0,total:6,errors:s?.errors||[],help:s?.help||[]};})(),diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
+    return {routeVersion:5,progress,metrologyCourse:(()=>{const s=course.metrologyCourse.restore(a.sections.coursePath.current.metrologyCourse);return {done:s?.done||[],current:s?.current||0,total:6,errors:s?.errors||[],help:s?.help||[]};})(),diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
   }
   function report(a){const s=summary(a),lines=['ЧПУ Практика — общая сводка',`Обязательный путь: ${s.progress.done} / ${s.progress.total}`,`Создано: ${a.createdAt}`,'Исторические результаты отделены от текущих черновиков. Это учебная самопроверка, не допуск к реальному станку.',`Первое знакомство: ${s.introduction.status==='complete'?'завершено':s.introduction.status==='in-progress'?'действие '+(s.introduction.step+1)+' / '+s.introduction.total:'не начато'}; подсказки ${s.introduction.assisted?'открывались':'не открывались'}; неверных проверочных действий ${s.introduction.errors}`,'Вводное занятие учитывается отдельно от прежних зачётов курса.',`Проект валика: ${s.shaftProject.status}; протокол ${s.shaftProject.recorded}/6; помощь ${s.shaftProject.assisted?'да':'нет'}; ошибок ${s.shaftProject.errors}`,`Программа и наладка: ${s.programSetup.status}; помощь ${s.programSetup.assisted?'да':'нет'}; ошибок ${s.programSetup.errors}`,`Первый процесс: ${s.firstProcess.status}; помощь ${s.firstProcess.assisted?'да':'нет'}; ошибок ${s.firstProcess.errors}`,`Деталь и измерение: ${s.drawing.status}; действие ${s.drawing.step+1} / ${s.drawing.total}; помощь ${s.drawing.assisted?'да':'нет'}; ошибок ${s.drawing.errors}`,''];for(const row of s.rows)lines.push(`${row.done?'✓':'○'} ${row.title}: ${row.detail}`);lines.push('','Дополнительные разделы',`На станке: ${s.station.filter(r=>r.passed).length} / ${s.station.length}`,`Практикум: ${s.training.filter(r=>r.passed).length} / ${s.training.length}`,`G-код: ${s.gcode.filter(r=>r.passed).length} / ${s.gcode.length}`,`Навыки, подтверждённые хотя бы в одной истории: ${s.skills.filter(r=>r.status==='mastered').length} / ${s.skills.length}`,`Прочитано: ${s.library.read} / ${s.library.total}`,`Экзаменов в истории: ${s.exams.length}`,'');for(const row of [...s.training,...s.gcode])lines.push(`${row.title}: ${row.independent?'самостоятельный результат':row.passed?'с разбором / прежний зачёт':'не подтверждено'}; помощь ${row.helped||row.hints?'есть':'не отмечена'}; ошибок в одной истории до ${row.errors}`);return lines.join('\n');}
   const api={FORMAT,VERSION,MAX_BYTES,MAX_HISTORY,ids,labels,empty,normalize,active,canonical,validate,parse,stringify,fromRaw,toRaw,merge,summary,evidence,courseEvidence,combineEvidence,report,planDraft};root.CNCProgress=api;if(node)module.exports=api;
@@ -18240,12 +18290,12 @@ return {
   root.CNCProgramSetupUI=Object.freeze({create});
 })(window);
 </script><script>(function(root){
-  'use strict';function create(options={}){const headingTag=options.headingTag==='h1'?'h1':'h3',model=root.CNCShaftProject.forTask(options.saved?.taskId||'RF5-SHAFT-01'),t=model.task,el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;},mm=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:3});
+  'use strict';function create(options={}){if(options.saved&&!root.CNCShaftProject.restore(options.saved)){const host=document.createElement('section'),title=document.createElement(options.headingTag==='h1'?'h1':'h3'),note=document.createElement('p');title.textContent='Сохранённый проект недоступен';note.textContent='Неизвестная версия или повреждённый журнал. Исходная работа не заменена новой.';host.append(title,note);return host;}const headingTag=options.headingTag==='h1'?'h1':'h3',model=root.CNCShaftProject.forTask(options.saved?.taskId||'RF5-SHAFT-01'),t=model.task,el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;},mm=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:3});
   const intros=[
     'Изготовьте ступенчатый валик по учебному чертежу. Прочитайте требования к участкам A, B и C. Размеры в миллиметрах; X задаётся по диаметру, Z0 — свободный торец. Заготовка Ø'+t.base+', вылет '+t.stock.length+' мм; зажатые 15 мм указаны отдельно.',
     'Составьте порядок наружных переходов. За один проход T0101 допускает до 2 мм на радиус. Выберите операции и проверьте выполнимость. Это проверка плана на отдельной подготовленной копии — ваша заготовка ещё не обработана.',
     'Выполните наладку своей заготовки: референс, закрепление, проходной инструмент T0101, измерение виртуальным щупом, рабочий ноль и закрытие ограждения. По условию свободный торец имеет машинный Z100. Щуп автоматический; ручное касание здесь не отрабатывается.',
-    'Запишите переходы по своему маршруту. Перед быстрым перемещением вдоль детали отводите инструмент снаружи Ø'+t.base+'. Проверьте программу и сравните обе ступени с чертежом. Начальные режимы в шаблоне — заданные условия упражнения.',
+    (t.independent?'Редактор пустой: составьте программу самостоятельно. ':'')+'Запишите переходы по своему маршруту. Перед быстрым перемещением вдоль детали отводите инструмент снаружи Ø'+t.base+'. Проверьте программу и сравните обе ступени с чертежом.'+(t.independent?' Используйте поддерживаемый X/Z-диалект и допустимые режимы.':' Начальные режимы в шаблоне — заданные условия упражнения.'),
     'Выполните проверенную программу на своей заготовке. Доступны режимы исполнения по кадрам и до ближайшей остановки. HOLD может оставить шпиндель включённым. RESET прерывает цикл и сохраняет уже снятый материал.',
     'Заполните карту контроля текущего изделия. Для трёх диаметров выбирайте сечения внутри соответствующих цилиндрических участков. Глубиномером получите расстояния от торца до двух уступов, затем вычислите длину B как дальний отсчёт минус ближний.',
     'Сравните фактические переходы с первоначальным планом, проверьте все строки протокола и сформулируйте вывод. Несколько корректных маршрутов допустимы; изменение маршрута нужно отразить в отчёте.'
@@ -18277,18 +18327,19 @@ return {
     function saveDraft(key,value){draft[key]=value;if(state.step===5){draft.row=selected;draft.method=method;}try{if(onDraft({step:state.step,values:{...draft}})===false)throw Error('Черновик не сохранён. Не закрывайте страницу.');}catch(e){host.querySelector('.start-feedback').textContent=e.message;}}
     function field(parent,label,key,initial='',max=32){const wrap=el('label',label,'field'),input=el('input');input.type='text';input.inputMode=max===32?'decimal':'text';input.autocomplete='off';input.maxLength=max;input.disabled=state.correct;input.value=draft[key]??initial;draft[key]=input.value;input.setAttribute('aria-label',label);input.addEventListener('input',()=>saveDraft(key,input.value));wrap.append(input);parent.append(wrap);return input;}
     function form(parent,text,specs,action){const f=el('form',undefined,'start-answer');for(const spec of specs)field(f,...spec);const submit=el('button',text,'button primary');submit.type='submit';submit.disabled=state.correct;f.append(submit);f.addEventListener('submit',e=>{e.preventDefault();run(action());});parent.append(f);}
-    function editor(parent){const label=el('label','Программа валика','field'),input=el('textarea');input.rows=12;input.maxLength=4000;input.spellcheck=false;input.value=currentSource();draft.program=input.value;input.setAttribute('aria-label','Программа валика');input.addEventListener('input',()=>{saveDraft('program',input.value);const launch=host.querySelector('[data-shaft-start]'),next=host.querySelector('[data-shaft-next]');if(launch)launch.disabled=!model.approved(state,input.value);if(next&&state.step===3)next.disabled=!state.correct||input.value!==state.source;host.querySelector('.start-feedback').textContent=input.value!==state.source?'Текст изменён: нужна повторная проверка.':state.feedback;});label.append(input);parent.append(label,el('p','Дробные значения в G-коде пишутся с точкой. Шаблон содержит только режимы и завершение; переходы добавьте самостоятельно.','start-note'));}
+    function editor(parent){const label=el('label','Программа валика','field'),input=el('textarea');input.rows=12;input.maxLength=4000;input.spellcheck=false;input.value=currentSource();draft.program=input.value;input.setAttribute('aria-label','Программа валика');input.addEventListener('input',()=>{saveDraft('program',input.value);const launch=host.querySelector('[data-shaft-start]'),next=host.querySelector('[data-shaft-next]');if(launch)launch.disabled=!model.approved(state,input.value);if(next&&state.step===3)next.disabled=!state.correct||input.value!==state.source;host.querySelector('.start-feedback').textContent=input.value!==state.source?'Текст изменён: нужна повторная проверка.':state.feedback;});label.append(input);parent.append(label,el('p',t.independent?'Пустой редактор. Напишите программу целиком, включая режимы, подходы, обработку, отвод и завершение. Дробные числа — с точкой.':'Дробные значения в G-коде пишутся с точкой. Шаблон содержит только режимы и завершение; переходы добавьте самостоятельно.','start-note'));}
     function code(parent){const list=el('ol',undefined,'ps-code');state.source.split('\n').forEach((text,i)=>{const item=el('li',text||' ');if(i===state.machine.program.index){item.className='is-current';item.setAttribute('aria-current','step');}list.append(item);});parent.append(list);}
     function map(parent){const wrap=el('div',undefined,'shaft-table-wrap'),table=el('table',undefined,'shaft-control-table'),head=el('tr');for(const title of ['Параметр','Требование, мм','Запись, мм'])head.append(el('th',title));const thead=el('thead');thead.append(head);table.append(thead);const body=el('tbody');for(const row of model.rows){const tr=el('tr'),r=state.records[row.id];if(row.id===selected&&state.step===5)tr.className='is-current';tr.append(el('th',row.title),el('td',row.tolerance===null?mm(t.reach)+'* · справочно':mm(row.nominal)+(row.tolerance?' ±'+mm(row.tolerance):' · сохранить')),el('td',r?mm(r.value)+' · '+(model.inTolerance(row,r.value)?'записано':'вне допуска'):'—'));body.append(tr);}table.append(body);wrap.append(table);parent.append(wrap);}
+    function documents(parent){const packet=model.documents(),details=el('details',undefined,'course-reading');details.append(el('summary','Документы задания · наладка, контроль и приёмка'),el('h3','Лист наладки'),el('p','Заготовка Ø'+t.base+'; вылет '+t.stock.length+' мм; отдельный зажим '+t.stock.grip+' мм. '+packet.setup.tool+'; до '+packet.setup.maxRadialRemoval+' мм на радиус за проход. Машинный Z свободного торца — '+packet.setup.workZeroMachineZ+' мм.'));const setup=el('ul');for(const item of packet.setup.required)setup.append(el('li',item));details.append(setup,el('h3','Карта контроля'));map(details);details.append(el('h3','Обязательные критерии приёмки'));const criteria=el('ul');for(const row of packet.acceptance)criteria.append(el('li',row.title));details.append(criteria,el('p','Все критерии обязательны. Быстрое выполнение не компенсирует отсутствие обработки или контроля.','start-note'));const save=el('button','Скачать пакет задания JSON','button secondary');save.type='button';save.addEventListener('click',()=>download('shaft-'+t.id+'-assignment.json',JSON.stringify(packet,null,2),'application/json'));details.append(save);parent.append(details);}
     function render(focus){host.replaceChildren();const i=state.step,m=state.machine,title=el(headingTag,state.complete?'Валик изготовлен · протокол принят':model.steps[i].title);title.tabIndex=-1;host.append(el('p','ПРОЕКТ · СТУПЕНЧАТЫЙ ВАЛИК · '+(state.complete?'ИТОГ':'ЭТАП '+(i+1)+' ИЗ 7'),'eyebrow'),title);
       const exportReport=()=>download('cnc-shaft-protocol.txt',model.report(state));
       host.append(el('p',t.title+' · '+t.id,'start-note'));
       if(!options.readOnly&&(!state.events.length||state.complete)){const chooser=el('div',undefined,'start-controls');for(const v of model.variants){if(v.id===t.id||state.completedProjects.some(p=>(p.taskId||'RF5-SHAFT-01')===v.id))continue;const b=el('button','Другой чертёж: '+v.title,'button secondary');b.type='button';b.addEventListener('click',()=>{try{const next=model.transition(state,{type:'selectVariant',id:v.id}),saved=model.snapshot(next);if(onChange(saved)===false)throw Error('Не удалось сохранить выбор.');host.replaceWith(create({...options,saved,savedDraft:undefined}));}catch(e){notice=e.message;render();}});chooser.append(b);}host.append(chooser);}
       if(state.completedProjects.length){const history=el('details',undefined,'course-reading');history.append(el('summary','Принятые изделия · '+state.completedProjects.length));for(const p of state.completedProjects){const id=p.taskId||'RF5-SHAFT-01',b=el('button','Скачать протокол '+id,'button secondary');b.type='button';b.addEventListener('click',()=>download('shaft-'+id+'.txt',model.report(model.restore(p))));history.append(b);}host.append(history);}
       if(state.complete){host.append(el('p','Маршрут, наладка, исполненная программа, диаметры и длины связаны с одной учебной деталью.'),el('p','Попытка '+state.attempt+' · ошибок '+state.errors.reduce((a,b)=>a+b,0)+' · помощь '+(state.assisted?'открывалась':'не открывалась'),'start-value'));map(host);const report=el('button','Скачать принятый протокол','button primary');report.type='button';report.addEventListener('click',exportReport);const done=el('button','Вернуться к курсу','button secondary');done.type='button';done.addEventListener('click',onDone);host.append(report,done,el('p','Учебный результат не подтверждает допуск к реальному станку. Проверка с преподавателем остаётся отдельным этапом.','start-note'));if(focus)title.focus();return;}
-      host.append(el('p',intros[i]));const views=el('div',undefined,'start-controls');for(const [id,label]of [['drawing','Учебный чертёж'],['actual','Текущее изделие']]){const b=el('button',label,'button secondary');b.type='button';b.setAttribute('aria-pressed',String(view===id));b.addEventListener('click',()=>{view=id;render();});views.append(b);}host.append(views);const figure=el('figure',undefined,'start-board drawing-board shaft-drawing');figure.innerHTML=drawing(state,view==='drawing'?target:m.profile,view==='actual');figure.append(el('figcaption',view==='drawing'?'*'+t.reach+' мм — справочный размер '+t.frontLength+'+'+t.middleLength+', без самостоятельного допуска. Это учебный чертёж, не полный комплект конструкторской документации.':'Фактическая геометрия текущей попытки. Подсветка показывает последнее сечение или выбранный уступ.'));host.append(figure);
+      host.append(el('p',intros[i]));const views=el('div',undefined,'start-controls');for(const [id,label]of [['drawing','Учебный чертёж'],['actual','Текущее изделие']]){const b=el('button',label,'button secondary');b.type='button';b.setAttribute('aria-pressed',String(view===id));b.addEventListener('click',()=>{view=id;render();});views.append(b);}host.append(views);const figure=el('figure',undefined,'start-board drawing-board shaft-drawing');figure.innerHTML=drawing(state,view==='drawing'?target:m.profile,view==='actual');figure.append(el('figcaption',view==='drawing'?'*'+t.reach+' мм — справочный размер '+t.frontLength+'+'+t.middleLength+', без самостоятельного допуска. Это учебный чертёж, не полный комплект конструкторской документации.':'Фактическая геометрия текущей попытки. Подсветка показывает последнее сечение или выбранный уступ.'));host.append(figure);documents(host);
       if(i===0){const row=el('div',undefined,'start-controls');for(const id of ['A','B','C'])row.append(button('Участок '+id,{type:'inspect',id}));host.append(row,el('p','Изучено поверхностей: '+state.seen.length+' из 3','start-value'));const save=el('button','Скачать учебный чертёж SVG','course-back');save.type='button';save.addEventListener('click',()=>download('shaft-'+t.id+'.svg',drawing(state,target),'image/svg+xml'));host.append(save);}
-      if(i===1){const plan=el('ol',undefined,'shaft-route');for(const id of state.plan)plan.append(el('li',model.operations[id].title));host.append(plan);const row=el('div',undefined,'start-controls');for(const [id,o]of Object.entries(model.operations)){const b=button('Добавить: '+o.title,{type:'append',id});b.disabled=state.plan.length>=6;row.append(b);}const remove=button('Убрать последнюю операцию',{type:'remove'});remove.disabled=!state.plan.length;row.append(remove);host.append(row,button('Проверить маршрут',{type:'checkPlan'}));}
+      if(i===1){const plan=el('ol',undefined,'shaft-route');for(const id of state.plan)plan.append(el('li',model.operations[id].title));host.append(plan);const row=el('div',undefined,'start-controls');if(t.independent){const label=el('label','Переход маршрута','field'),choice=el('select'),empty=el('option','Выберите переход');empty.value='';choice.setAttribute('aria-label','Переход маршрута');choice.append(empty);for(const [id,o]of Object.entries(model.operations)){const option=el('option',o.title);option.value=id;choice.append(option);}choice.value='';const add=button('Добавить переход',()=>({type:'append',id:choice.value}));add.disabled=true;choice.addEventListener('change',()=>{add.disabled=!choice.value||state.plan.length>=6;});label.append(choice);row.append(label,add);}else{for(const [id,o]of Object.entries(model.operations)){const b=button('Добавить: '+o.title,{type:'append',id});b.disabled=state.plan.length>=6;row.append(b);}}const remove=button('Убрать последнюю операцию',{type:'remove'});remove.disabled=!state.plan.length;row.append(remove);host.append(row,button('Проверить маршрут',{type:'checkPlan'}));}
       if(i===2){const list=el('ul',undefined,'ps-checklist');for(const [ok,label]of [[m.referenced,'Машинные координаты'],[m.clamped,'Закрепление'],[m.tool===1,'T0101 · проходной'],[m.tool===1&&m.offsets['1'].calibrated,'Измерение инструмента щупом'],[m.workOffset.confirmed&&m.workOffset.z===100,'G54 по машинному Z100 торца'],[m.doorClosed,'Ограждение закрыто']])list.append(el('li',(ok?'✓ ':'○ ')+label));host.append(list);if(!m.referenced)host.append(button('Выполнить учебный референс',{type:'reference'}));else if(!m.clamped)host.append(button('Закрепить заготовку',{type:'clamp'}));else if(m.tool!==1)host.append(button('Выбрать T0101 · до 2 мм на радиус',{type:'tool',value:1}),button('Выбрать T0202 · до 0,5 мм на радиус',{type:'tool',value:2}));else if(!m.offsets['1'].calibrated)host.append(button('Измерить инструмент виртуальным щупом',{type:'preset'}));else if(!m.workOffset.confirmed||m.workOffset.z!==100)form(host,'Подтвердить G54',[['Машинный Z свободного торца, мм','zero']],()=>({type:'zero',value:draft.zero||''}));else if(!m.doorClosed)host.append(button('Закрыть ограждение',{type:'door',value:true}));}
       if(i===3){editor(host);host.append(button('Проверить программу на копии',()=>({type:'preview',source:currentSource()})));if(state.preview){const box=el('div',undefined,'ps-preview');box.append(el(headingTag==='h1'?'h2':'h4','Результат графики · копия'),el('p',state.preview.message));if(state.preview.profile){const f=el('figure',undefined,'start-board drawing-board shaft-drawing');f.innerHTML=drawing(state,state.preview.profile,true);box.append(f);}host.append(box);}}
       if(i===4){const display=root.CNCRealMachine.display(m);host.append(el('p','Рабочие X'+display.work.x+' Z'+display.work.z+' · шпиндель '+(m.spindle?'включён':'выключен в модели')+' · переходов со съёмом: '+m.path.filter(p=>p.cutting).length,'start-value'));const status={empty:'не запущена',running:'выполнение',hold:'пауза',done:'завершено',ready:'готово',alarm:'авария',stopped:'прервано'};host.append(el('p','Программа: '+(status[m.program.status]||m.program.status)));code(host);if(!state.executed){const start=button('Запустить проверенную программу',()=>({type:'start',source:currentSource()}));start.dataset.shaftStart='';start.disabled=!model.approved(state,currentSource());start.className='button primary';host.append(start,button('Вернуться к программе',{type:'back'}));const change=el('details',undefined,'course-reading');change.append(el('summary','Изменить текст или G54 до запуска'));editor(change);form(change,'Изменить G54',[['Машинный Z торца, мм','zero',String(m.workOffset.z)]],()=>({type:'zero',value:draft.zero||''}));host.append(change);}else if(!state.correct){if(m.program.status==='running'){const label=el('label','Режим исполнения','field'),select=el('select');select.setAttribute('aria-label','Режим исполнения');for(const [value,text]of [['auto','До ближайшей остановки'],['step','По одному кадру']]){const o=el('option',text);o.value=value;select.append(o);}select.value=execution;select.addEventListener('change',()=>{execution=select.value;render();});label.append(select);host.append(label,button(execution==='auto'?'Выполнить до остановки':'Выполнить следующий кадр',{type:execution==='auto'?'run':'step'}),button('HOLD · пауза подачи',{type:'hold'}));}if(m.program.status==='hold')host.append(button('Продолжить цикл',()=>({type:'start',source:state.source})));host.append(button('RESET · прервать цикл',{type:'reset'}));if(!m.spindle&&!['running','hold'].includes(m.program.status))host.append(button('Новая заготовка и наладка',{type:'restart'}));}}
@@ -18919,14 +18970,613 @@ if(s.lastCheck&&!s.lastCheck.ok)host.append(el('p','Отвергнутый пу�
 const log=el('details',undefined,'course-reading');log.append(el('summary','Журнал траекторий с ошибками · '+s.incidents.length));for(const event of s.incidents)log.append(el('p',event.lesson+' · '+event.code+(event.part?' · '+event.part+' / '+event.obstacle:'')+' · '+(event.preview?'найдено на копии':'движение заблокировано')+' · X'+event.from.x+' Y'+event.from.y+' Z'+event.from.z+' → X'+event.to.x+' Y'+event.to.y+' Z'+event.to.z));host.append(log);
 const limits=el('details',undefined,'course-reading');limits.append(el('summary','Геометрия и ограничения профиля'),el('p','Плита 60×40×10 мм, фреза Ø6 с осевым врезанием. Сетка 2 мм: снимается материал в центрах ячеек, точная форма стенок и объём не вычисляются. Зона крепления консервативно расширена на радиус фрезы: это запас, а не точный контакт цилиндра в углах. Проверяется весь отрезок движения. G0 внутри исходного габарита запрещён и после снятия материала, кроме вертикального выхода вверх без изменения X/Y. G1 ниже верха допускает только горизонтальный ход или отдельное вертикальное врезание. Максимум 1 мм нового съёма на ячейку. Пределы X−20…80, Y−20…60, Z−12…40. Щуп, контроль поверхности и остановка идеализированы. '+(s.profile===1?'Прежний профиль: державка и корпус не проверяются; после четырёх заданий доступно продолжение.':'Новый профиль: державка Ø24 занимает Z вершины +8…+28. Колонна корпуса: X54…62, Y−18…−8, Z−10…35. Фреза, державка, крепление, заготовка и колонна проверяются непрерывно по отрезку, выбирается самый ранний вход. Корпус ограничен одной условной колонной, все остальные узлы станка не моделируются.')+' Стойка, G-код, усилия и точная метрология не моделируются. Это вводная ветка, не полный фрезерный симулятор и не допуск к оборудованию.'));host.append(limits);const back=el('button','Вернуться к курсу','course-back');back.onclick=onDone;host.append(back);}
 render();return host;}root.CNCMillingCourseUI=Object.freeze({create});})(window);
-</script><script>(function(root){'use strict';const m=root.CNCDiagnosticCourse,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({headingTag='h3',saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),notice='';const host=el('section',undefined,'start-session shaft-project-session diagnostic-course');function save(){if(onChange(m.snapshot(s))===false)notice='Сохранение недоступно. Не закрывайте страницу.';}function run(a){try{s=m.transition(s,a);notice='';save();}catch(e){notice=e.message;}render();}function b(text,a){const n=el('button',text,'button secondary');n.type='button';n.onclick=()=>run(typeof a==='function'?a():a);return n;}function field(parent,label,key){const wrap=el('label',label,'field'),input=el('input');input.type='text';input.maxLength=32;input.inputMode='decimal';input.value=s.draft[key];input.setAttribute('aria-label',label);input.oninput=()=>{s.draft[key]=input.value;save();};wrap.append(input);parent.append(wrap);}
-function diagram(t){if(t.kind==='mill'){const x=v=>65+(v+20)*4,y=v=>245-(v+20)*3;let svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 310" role="img" aria-label="Проверяемая траектория на копии"><rect x="145" y="65" width="240" height="120" fill="#ccdbe5"/><rect x="245" y="89" width="40" height="24" fill="#b58b67"/><rect x="361" y="209" width="32" height="30" fill="#b1a4c2"/>';for(const p of s.result?.log||[])svg+='<line x1="'+x(p.from.x)+'" y1="'+y(p.from.y)+'" x2="'+x(p.to.x)+'" y2="'+y(p.to.y)+'" stroke="'+(p.code?'#bd3545':'#26744d')+'" stroke-width="3"/>';return svg+'<text x="65" y="280" fill="#24465f">Плита · крепление · колонна; красный — отвергнутый отрезок</text></svg>';}
-const profile=s.result?.profile||m.expected(t).profile;let u=0,p='M50 130',lower=[];for(const seg of profile.segments){const a=50+u*8,bb=50+(u+seg.length)*8,y=130-seg.diameter*2.5,ey=130-(seg.endDiameter??seg.diameter)*2.5;p+='L'+a+' '+y+'L'+bb+' '+ey;lower.unshift('L'+bb+' '+(260-ey)+'L'+a+' '+(260-y));u+=seg.length;}return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 290" role="img" aria-label="Геометрический результат проверки"><path d="'+p+lower.join('')+'Z" fill="#cadce8" stroke="#416780" stroke-width="2"/><text x="40" y="245" fill="#24465f">'+(s.result?'Профиль после проверки на копии':'Требуемый профиль')+'</text><text x="40" y="273" fill="#24465f">Точные размеры заданы в условии</text></svg>';}
-function render(){const t=m.tasks[s.current],accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(el('p','ДИАГНОСТИКА · '+(t.kind==='lathe'?'ТОКАРНЫЙ':'ФРЕЗЕРНЫЙ')+' СТАНОК','eyebrow'),el(headingTag,t.title),el('p','Задание '+(s.current+1)+' из '+m.tasks.length+' · уровень '+t.level+' · принято '+s.done.length,'start-value'),el('p',t.learn),el('p',t.goal));const figure=el('figure',undefined,'shaft-drawing start-board');figure.innerHTML=diagram(t);host.append(figure);const original=el('details',undefined,'course-reading');original.append(el('summary','Исходный вариант с ошибкой'),el('pre',t.bad));if(t.kind==='lathe')original.append(el('p','Исходно: T0'+t.tool+'0'+t.tool+', G54 Z'+t.zero+'. Заготовка Ø32 × 60, зажатые 15 мм отдельно.'));host.append(original);
-if(!accepted&&!readOnly){host.append(b('Проверить исходный вариант на копии',{type:'inspect'}));const causeWrap=el('label','Причина ошибки','field'),cause=el('select');cause.setAttribute('aria-label','Причина ошибки');const placeholder=el('option','Выберите причину');placeholder.value='';cause.append(placeholder);for(const key of t.choices){const option=el('option',m.causes[key]);option.value=key;cause.append(option);}cause.value=s.draft.cause;cause.onchange=()=>{s.draft.cause=cause.value;save();};causeWrap.append(cause);host.append(causeWrap);if(t.kind==='lathe'){const tools=el('label','Инструмент для проверки','field'),select=el('select');select.setAttribute('aria-label','Инструмент для проверки');for(const [id,label]of [['1','T0101 · проходной'],['3','T0303 · торцевой'],['4','T0404 · канавочный 2 мм']]){const o=el('option',label);o.value=id;select.append(o);}select.value=s.draft.tool;select.onchange=()=>{s.draft.tool=select.value;save();};tools.append(select);host.append(tools);field(host,'G54 · машинный Z торца, мм','zero');}else{const label=el('label','Шпиндель включён на копии','field'),check=el('input');check.type='checkbox';check.checked=s.draft.spindle;check.setAttribute('aria-label','Шпиндель включён на копии');check.onchange=()=>{s.draft.spindle=check.checked;save();};label.append(check);host.append(label);host.append(el('p','Строка маршрута: X Y Z G0/G1, например -10 10 12 G0. До 6 строк; дробные числа с точкой.','start-note'));}
-const key=t.kind==='lathe'?'program':'route',label=el('label',t.kind==='lathe'?'Исправленная программа':'Исправленный маршрут','field'),input=el('textarea');input.rows=t.kind==='lathe'?12:6;input.maxLength=t.kind==='lathe'?4000:900;input.spellcheck=false;input.value=s.draft[key];input.setAttribute('aria-label',t.kind==='lathe'?'Исправленная программа':'Исправленный маршрут');input.oninput=()=>{s.draft[key]=input.value;save();};label.append(input);host.append(label,b('Проверить причину и исправление',()=>({type:'repair',draft:s.draft})));const hint=b(s.help.includes(t.id)?'Разбор открыт':'Нужен разбор',{type:'hint'});hint.disabled=s.help.includes(t.id);host.append(hint);if(s.help.includes(t.id))host.append(el('p',t.hint,'start-hint'));}else if(accepted){host.append(el('p','Причина и исправление подтверждены на копии. Ошибок: '+s.errors[s.current]+'; разбор '+(s.help.includes(t.id)?'открывался':'не открывался')+'.','start-value'));if(!readOnly&&!routeMode&&s.current<m.tasks.length-1)host.append(b('Следующая диагностическая задача',{type:'next'}));}
-const feedback=el('p',notice||s.feedback,'start-feedback');feedback.setAttribute('role','status');host.append(feedback);if(s.result?.log){const list=el('ol');for(const p of s.result.log)list.append(el('li','X'+p.from.x+' Y'+p.from.y+' Z'+p.from.z+' → X'+p.to.x+' Y'+p.to.y+' Z'+p.to.z+' · '+(p.code||'допустимо')+(p.part?' · '+p.part+' / '+p.obstacle:'')));host.append(list);}host.append(el('p','Проверки выполняются на изолированной подготовленной копии. Изготовление, наладка физического станка и метрологический контроль этим блоком не подтверждаются. Режимы заданы упражнением. Ограничения токарного и фрезерного профилей сохраняются.','start-note'));const back=el('button','К маршруту курса','course-back');back.onclick=onDone;host.append(back);}
-render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(window);
+</script><script>(function (root) {
+  "use strict";
+  const m = root.CNCDiagnosticCourse;
+  const el = (tag, text, cls) => {
+    const n = document.createElement(tag);
+    if (text !== undefined) n.textContent = text;
+    if (cls) n.className = cls;
+    return n;
+  };
+  const mm = (n) =>
+    Number(n).toLocaleString("ru-RU", { maximumFractionDigits: 3 });
+  const coords = (p) =>
+    p
+      ? Object.entries(p)
+          .map(([k, v]) => k.toUpperCase() + " " + mm(v))
+          .join(" · ")
+      : "нет движения";
+  function create({
+    headingTag = "h3",
+    saved,
+    readOnly = false,
+    routeMode = false,
+    onChange = () => true,
+    onDone = () => {},
+  } = {}) {
+    let s = saved ? m.restore(saved) : m.create(),
+      notice = "";
+    const host = el(
+      "section",
+      undefined,
+      "start-session shaft-project-session diagnostic-course",
+    );
+    const focusTargets = {};
+    if (!s) {
+      host.append(
+        el(headingTag, "Сохранённая диагностика недоступна"),
+        el(
+          "p",
+          "Неизвестная версия или повреждённый журнал. Исходная работа не заменена новой.",
+        ),
+      );
+      return host;
+    }
+    function save() {
+      if (onChange(m.snapshot(s)) === false)
+        notice = "Сохранение недоступно. Не закрывайте страницу.";
+    }
+    function run(a) {
+      let target = "status";
+      try {
+        s = m.transition(s, a);
+        notice = "";
+        save();
+        target =
+          a.type === "inspect"
+            ? "original"
+            : a.type === "repair"
+              ? "repair"
+              : a.type === "next"
+                ? "title"
+                : "status";
+      } catch (e) {
+        notice = e.message;
+      }
+      render(target);
+    }
+    function button(text, a, primary = false) {
+      const n = el(
+        "button",
+        text,
+        "button " + (primary ? "primary" : "secondary"),
+      );
+      n.type = "button";
+      n.onclick = () => run(typeof a === "function" ? a() : a);
+      return n;
+    }
+    function select(label, key, options) {
+      const wrap = el("label", label, "field"),
+        input = el("select");
+      input.setAttribute("aria-label", label);
+      for (const [value, title] of options) {
+        const o = el("option", title);
+        o.value = value;
+        o.selected = s.draft[key] === value;
+        input.append(o);
+      }
+      input.value = s.draft[key];
+      input.onchange = () => {
+        s.draft[key] = input.value;
+        save();
+      };
+      wrap.append(input);
+      return wrap;
+    }
+    function input(label, key) {
+      const wrap = el("label", label, "field"),
+        n = el("input");
+      n.type = "text";
+      n.inputMode = "decimal";
+      n.maxLength = 32;
+      n.value = s.draft[key];
+      n.setAttribute("aria-label", label);
+      n.oninput = () => {
+        s.draft[key] = n.value;
+        save();
+      };
+      wrap.append(n);
+      return wrap;
+    }
+    function sourceList(source, row) {
+      const list = el("ol", undefined, "ps-code");
+      source.split(/\r?\n/).forEach((line, i) => {
+        const item = el("li", line || " ");
+        if (i + 1 === row) {
+          item.className = "is-current";
+          item.setAttribute(
+            "aria-label",
+            "Строка " + row + " · первый отказ: " + line,
+          );
+        }
+        list.append(item);
+      });
+      return list;
+    }
+    function latheArt(result) {
+      const x = (z) => 520 + z * 7,
+        y = (v) => 180 - v * 2.2;
+      let u = 0,
+        d = "M" + x(-60) + " 180",
+        lower = [];
+      const profile = result.profile;
+      for (const seg of profile?.segments || [{ length: 60, diameter: 32 }]) {
+        const a = x(-60 + u),
+          b = x(-60 + u + seg.length);
+        d +=
+          "L" +
+          a +
+          " " +
+          y(seg.diameter) +
+          "L" +
+          b +
+          " " +
+          y(seg.endDiameter ?? seg.diameter);
+        lower.unshift(
+          "L" +
+            b +
+            " " +
+            (360 - y(seg.endDiameter ?? seg.diameter)) +
+            "L" +
+            a +
+            " " +
+            (360 - y(seg.diameter)),
+        );
+        u += seg.length;
+      }
+      let svg =
+        '<svg viewBox="0 0 640 330" role="img" aria-label="Токарная проверка: профиль и отвергнутое движение; X по диаметру, Z вдоль детали"><rect x="55" y="95" width="45" height="170" fill="#a9bdca"/><path d="' +
+        d +
+        lower.join("") +
+        'Z" fill="#d7e3ed" stroke="#365b76" stroke-width="2"/><path d="M80 180H610" stroke="#8299aa" stroke-dasharray="6 5"/>';
+      for (const p of result.path || [])
+        svg +=
+          '<path d="M' +
+          x(p.from.z) +
+          " " +
+          y(p.from.x) +
+          "L" +
+          x(p.to.z) +
+          " " +
+          y(p.to.x) +
+          '" fill="none" stroke="#2c7453" stroke-width="2"/>';
+      const f = result.incident,
+        from = f?.before.coordinates.actual,
+        to = f?.command?.actual;
+      if (from) {
+        svg +=
+          '<circle cx="' +
+          x(from.z) +
+          '" cy="' +
+          y(from.x) +
+          '" r="5" fill="#2458ee"/>';
+        if (to)
+          svg +=
+            '<path d="M' +
+            x(from.z) +
+            " " +
+            y(from.x) +
+            "L" +
+            x(to.z) +
+            " " +
+            y(to.x) +
+            '" fill="none" stroke="#b83245" stroke-width="3" stroke-dasharray="7 4"/><circle cx="' +
+            x(to.z) +
+            '" cy="' +
+            y(to.x) +
+            '" r="5" fill="#fff" stroke="#b83245" stroke-width="2"/>';
+      }
+      return (
+        svg +
+        '<text x="105" y="298">Z −60</text><text x="520" y="298" text-anchor="end">Z 0 · исходный торец</text><text x="105" y="30">X — диаметр; Z — длина, мм</text></svg>'
+      );
+    }
+    function millArt(result, projection) {
+      const c = root.CNCMillingCourse.config,
+        x = (v) => 80 + (v + 20) * 4.2;
+      const yz = projection === "XY",
+        y = (v) => (yz ? 225 - (v + 20) * 2.2 : 245 - (v + 12) * 2.8);
+      const axes = yz ? ["x", "y"] : ["x", "z"];
+      const rect = (x0, x1, y0, y1, color) =>
+        '<rect x="' +
+        x(x0) +
+        '" y="' +
+        y(y1) +
+        '" width="' +
+        (x1 - x0) * 4.2 +
+        '" height="' +
+        Math.abs(y(y0) - y(y1)) +
+        '" fill="' +
+        color +
+        '" stroke="#365b76"/>';
+      let svg =
+        '<svg viewBox="0 0 640 320" role="img" aria-label="Фрезерная проверка, проекция ' +
+        projection +
+        '">' +
+        rect(0, 60, yz ? 0 : -10, yz ? 40 : 0, "#d7e3ed") +
+        rect(
+          c.clamp.x0,
+          c.clamp.x1,
+          yz ? c.clamp.y0 : c.clamp.z0,
+          yz ? c.clamp.y1 : c.clamp.z1,
+          "#d9c3aa",
+        ) +
+        rect(
+          c.body.x0,
+          c.body.x1,
+          yz ? c.body.y0 : c.body.z0,
+          yz ? c.body.y1 : c.body.z1,
+          "#c8bbd7",
+        );
+      for (const p of result.log || [])
+        svg +=
+          '<path d="M' +
+          x(p.from.x) +
+          " " +
+          y(p.from[axes[1]]) +
+          "L" +
+          x(p.to.x) +
+          " " +
+          y(p.to[axes[1]]) +
+          '" fill="none" stroke="' +
+          (p.code ? "#b83245" : "#2c7453") +
+          '" stroke-width="3"' +
+          (p.code ? ' stroke-dasharray="7 4"' : "") +
+          "/>";
+      const f = result.incident,
+        from = f?.before.position;
+      if (from) {
+        svg +=
+          '<circle cx="' +
+          x(from.x) +
+          '" cy="' +
+          y(from[axes[1]]) +
+          '" r="5" fill="#2458ee"/>';
+        if (yz)
+          svg +=
+            '<ellipse cx="' +
+            x(from.x) +
+            '" cy="' +
+            y(from.y) +
+            '" rx="' +
+            c.radius * 4.2 +
+            '" ry="' +
+            c.radius * 2.2 +
+            '" fill="none" stroke="#2458ee"/>';
+        else
+          svg +=
+            rect(
+              from.x - c.radius,
+              from.x + c.radius,
+              from.z,
+              from.z + 15,
+              "#b5ccde",
+            ) +
+            rect(
+              from.x - c.holder.radius,
+              from.x + c.holder.radius,
+              from.z + c.holder.z0,
+              from.z + c.holder.z1,
+              "#aab8ce",
+            );
+        if (yz)
+          svg +=
+            '<ellipse cx="' +
+            x(from.x) +
+            '" cy="' +
+            y(from.y) +
+            '" rx="' +
+            c.holder.radius * 4.2 +
+            '" ry="' +
+            c.holder.radius * 2.2 +
+            '" fill="none" stroke="#526c90" stroke-dasharray="5 3"/>';
+        svg +=
+          '<circle cx="' +
+          x(from.x) +
+          '" cy="' +
+          y(from[axes[1]]) +
+          '" r="5" fill="#2458ee"/>';
+      }
+      return (
+        svg +
+        '<text x="80" y="28">' +
+        (yz ? "Вид сверху · X/Y" : "Вид сбоку · X/Z") +
+        '</text><text x="80" y="282">Светлый — заготовка; бежевый — крепление</text><text x="80" y="306">Фиолетовый — колонна корпуса</text></svg>'
+      );
+    }
+    function panel(t, result, label, source, key) {
+      const wrap = el("section"),
+        title = el("h3", label);
+      title.tabIndex = -1;
+      title.dataset.diagnosticPanel = key;
+      focusTargets[key] = title;
+      wrap.append(title);
+      const f = result.incident;
+      if (f) {
+        wrap.append(
+          el(
+            "p",
+            "Строка " + f.row + " · первый отказ [" + f.code + "]",
+            "start-value",
+          ),
+          el("pre", f.raw),
+          el("p", result.message),
+        );
+        const info = el("dl", undefined, "diagnostic-facts");
+        const add = (a, b) => {
+          info.append(el("dt", a), el("dd", b));
+        };
+        if (t.kind === "lathe") {
+          add(
+            "До строки · рабочие координаты",
+            coords(f.before.coordinates.work),
+          );
+          add(
+            "До строки · фактическая вершина",
+            coords(f.before.coordinates.actual),
+          );
+          add("Запрошено программой", coords(f.command?.work));
+          add("Запрошенное фактическое положение", coords(f.command?.actual));
+          add(
+            "Исходная наладка",
+            "T0" +
+              f.before.tool +
+              "0" +
+              f.before.tool +
+              " · G54 Z" +
+              mm(f.before.workOffset.z) +
+              " · вращение " +
+              (f.before.spindle ? "включено" : "выключено"),
+          );
+        } else {
+          add("Положение до отвергнутого отрезка", coords(f.before.position));
+          add("Запрошенная точка", coords(f.command.actual));
+          if (f.part || f.obstacle)
+            add(
+              "Часть сборки / препятствие",
+              [f.part, f.obstacle].filter(Boolean).join(" / "),
+            );
+          add("Вращение", f.before.spindle ? "включено" : "выключено");
+        }
+        wrap.append(info);
+      } else
+        wrap.append(
+          el(
+            "p",
+            result.ok
+              ? "Все движения проверки допустимы. Итог также сравнивается с заданием."
+              : result.message,
+            "start-value",
+          ),
+        );
+      for (const projection of t.kind === "mill" ? ["XY", "XZ"] : ["XZ"]) {
+        const figure = el("figure", undefined, "shaft-drawing start-board");
+        figure.innerHTML =
+          t.kind === "mill" ? millArt(result, projection) : latheArt(result);
+        figure.append(
+          el(
+            "figcaption",
+            f
+              ? "Синяя точка — положение до отказа. Красный пунктир — отвергнутое движение, оно не выполнено. Зелёный — выполненные движения копии."
+              : "Показан результат отдельной проверки, он не заменяет изготовление изделия.",
+          ),
+        );
+        wrap.append(figure);
+      }
+      if (t.kind === "mill")
+        wrap.append(
+          el(
+            "p",
+            "Сравнивайте оба вида: в каждой проекции скрыта одна координата. Габариты фрезы/державки показаны до отвергнутого движения.",
+            "start-note",
+          ),
+        );
+      const code = el("details", undefined, "course-reading");
+      code.append(
+        el("summary", "Полный текст проверенного варианта"),
+        sourceList(source, f?.row),
+      );
+      wrap.append(code);
+      return wrap;
+    }
+    function render(focus) {
+      const t = m.tasks[s.current],
+        accepted = s.done.some((d) => d.id === t.id),
+        title = el(headingTag, t.title);
+      title.tabIndex = -1;
+      host.replaceChildren(
+        el(
+          "p",
+          "ДИАГНОСТИКА · " +
+            (t.kind === "lathe" ? "ТОКАРНЫЙ" : "ФРЕЗЕРНЫЙ") +
+            " СТАНОК",
+          "eyebrow",
+        ),
+        title,
+        el(
+          "p",
+          "Задание " +
+            (s.current + 1) +
+            " из " +
+            m.tasks.length +
+            " · принято " +
+            s.done.length,
+          "start-value",
+        ),
+        el("p", t.goal),
+      );
+      const theory = el("details", undefined, "course-reading");
+      theory.append(
+        el("summary", "Что нужно знать перед проверкой"),
+        el("p", t.learn),
+      );
+      host.append(theory);
+      const originalCode = el("details", undefined, "course-reading");
+      originalCode.open = !s.inspected;
+      originalCode.append(
+        el("summary", "Исходный вариант с ошибкой"),
+        sourceList(t.bad, s.originalResult?.incident?.row),
+      );
+      originalCode.append(
+        el(
+          "p",
+          t.kind === "lathe"
+            ? "Исходно: T0" +
+                t.tool +
+                "0" +
+                t.tool +
+                " · G54 Z" +
+                t.zero +
+                "; заготовка Ø32, вылет 60 мм и отдельный зажим 15 мм."
+            : "Исходная точка: " +
+                coords({ x: t.start[0], y: t.start[1], z: t.start[2] }) +
+                ". Координаты XYZ линейные, Z0 — верх заготовки.",
+        ),
+      );
+      if (!s.inspected) host.append(originalCode);
+      if (!s.inspected && !accepted && !readOnly)
+        host.append(
+          button(
+            s.inspected
+              ? "Повторить исходную проверку"
+              : "1. Проверить исходный вариант на копии",
+            { type: "inspect" },
+            !s.inspected,
+          ),
+        );
+      if (s.originalResult)
+        host.append(
+          panel(t, s.originalResult, "Исходная проверка", t.bad, "original"),
+        );
+      if (s.inspected && !accepted && !readOnly) {
+        host.append(
+          el("h3", "2. Укажите причину и исправьте вариант"),
+          select("Какую причину вы исправляете?", "cause", [
+            ["", "Выберите причину"],
+            ...t.choices.map((k) => [k, m.causes[k]]),
+          ]),
+        );
+        if (t.kind === "lathe")
+          host.append(
+            select("Инструмент для проверки", "tool", [
+              ["1", "T0101 · проходной"],
+              ["3", "T0303 · торцевой"],
+              ["4", "T0404 · канавочный 2 мм"],
+            ]),
+            input("G54 · машинный Z торца, мм", "zero"),
+          );
+        else {
+          const label = el("label", "Шпиндель включён на копии", "field"),
+            check = el("input");
+          check.type = "checkbox";
+          check.checked = s.draft.spindle;
+          check.setAttribute("aria-label", "Шпиндель включён на копии");
+          check.onchange = () => {
+            s.draft.spindle = check.checked;
+            save();
+          };
+          label.append(check);
+          host.append(
+            label,
+            el(
+              "p",
+              "Строка маршрута: X Y Z G0/G1. До 6 строк; дробные числа с точкой.",
+              "start-note",
+            ),
+          );
+        }
+        const key = t.kind === "lathe" ? "program" : "route",
+          name =
+            t.kind === "lathe"
+              ? "Исправленная программа"
+              : "Исправленный маршрут",
+          label = el("label", name, "field"),
+          editor = el("textarea");
+        editor.rows = t.kind === "lathe" ? 12 : 6;
+        editor.maxLength = t.kind === "lathe" ? 4000 : 900;
+        editor.spellcheck = false;
+        editor.value = s.draft[key];
+        editor.setAttribute("aria-label", name);
+        editor.oninput = () => {
+          s.draft[key] = editor.value;
+          save();
+        };
+        label.append(editor);
+        host.append(
+          label,
+          button(
+            "3. Проверить причину и исправление",
+            () => ({ type: "repair", draft: s.draft }),
+            true,
+          ),
+        );
+        const hint = button(
+          s.help.includes(t.id) ? "Разбор открыт" : "Нужен разбор",
+          { type: "hint" },
+        );
+        hint.disabled = s.help.includes(t.id);
+        host.append(hint);
+        if (s.help.includes(t.id)) host.append(el("p", t.hint, "start-hint"));
+      }
+      if (s.repairResult) {
+        const actions = s.events.slice(
+            s.events.map((a) => a.type).lastIndexOf("next") + 1,
+          ),
+          last = actions.filter((a) => a.type === "repair").at(-1);
+        host.append(
+          panel(
+            t,
+            s.repairResult,
+            "Последняя проверка исправления",
+            t.kind === "lathe" ? last.draft.program : last.draft.route,
+            "repair",
+          ),
+        );
+      }
+      const feedback = el("p", notice || s.feedback, "start-feedback");
+      feedback.setAttribute("role", "status");
+      feedback.tabIndex = -1;
+      host.append(feedback);
+      if (accepted) {
+        host.append(
+          el(
+            "p",
+            "Причина и исправление подтверждены. Разбор " +
+              (s.help.includes(t.id) ? "открывался" : "не открывался") +
+              "; ошибок " +
+              s.errors[s.current] +
+              ".",
+            "start-value",
+          ),
+        );
+        if (!readOnly && !routeMode && s.current < m.tasks.length - 1)
+          host.append(
+            button("Следующая диагностическая задача", { type: "next" }, true),
+          );
+      }
+      const scope = el("details", undefined, "course-reading");
+      scope.append(
+        el("summary", "Границы проверки"),
+        el(
+          "p",
+          "Проверки выполняются на изолированной копии. Красная линия показывает отвергнутый кадр, не точную точку физического контакта. Причина сверяется с условием и наладкой; безопасного конца движения недостаточно. Этот блок не подтверждает изготовление и допуск к физическому станку.",
+        ),
+      );
+      host.append(scope);
+      const back = el("button", "К маршруту курса", "course-back");
+      back.onclick = onDone;
+      host.append(back);
+      if (focus === "title") title.focus();
+      else if (focus === "original" || focus === "repair") {
+        focusTargets[focus]?.focus();
+      } else if (focus) feedback.focus();
+    }
+    render();
+    return host;
+  }
+  root.CNCDiagnosticCourseUI = Object.freeze({ create });
+})(window);
 </script><script>(function (root, factory) {
   const api = factory();
   if (typeof module === "object" && module.exports) module.exports = api;
@@ -20784,6 +21434,12 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       copy: "Находим причины и проверяем исправления на копии.",
       art: "code",
     },
+    {
+      title: "Самостоятельное изделие",
+      ids: ["independentProject"],
+      copy: "Свой маршрут, программа с пустого редактора и полный контроль.",
+      art: "gauge",
+    },
   ];
   const artwork = {
     chuck:
@@ -20805,6 +21461,10 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       node("p", "ПОШАГОВОЕ ОБУЧЕНИЕ · ОТ НУЛЯ ДО ПЕРВОЙ ДЕТАЛИ", "eyebrow"),
     );
     const phase = {
+      independentProject: [
+        "Свой маршрут.<br>Собственная программа.",
+        "Изготовьте итоговый валик с дополнительным черновым проходом и подтвердите все размеры. Редактор программы — без шаблона.",
+      ],
       operations: [
         "От простого прохода —<br>к сложной обработке.",
         "Торцевание, канавки и конус: выбирайте инструмент, создавайте программу и проверяйте результат.",
@@ -20988,7 +21648,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     hero.append(intro, art);
     root.append(hero);
     const route = node("div", undefined, "home-route");
-    route.setAttribute("aria-label", "Восемь разделов курса");
+    route.setAttribute("aria-label", "Разделы курса");
     for (const [i, g] of groups.entries()) {
       const items = p.items.filter((item) => g.ids.includes(item.group)),
         done = items.filter((item) => item.done).length,
@@ -21596,8 +22256,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     demand(object(raw)&&raw.format===FORMAT&&raw.version===1&&object(raw.review)&&Array.isArray(raw.participants)&&raw.participants.length<=16);
     const n=empty();for(const c of checks){const r=raw.review[c.id];demand(object(r)&&['pending','approved','changes'].includes(r.status)&&text(r.note));demand(r.status!=='changes'||r.note.trim(),'Для замечания нужна конкретная причина.');n.review[c.id]={status:r.status,note:r.note};}
     function shot(s){
-      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57,63].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
-      const current=progress.summary(progress.empty()).rows,expected=s.rows.length===22?current.filter(r=>r.kind!=='coursePractice'):s.rows.length===51?current.filter(r=>r.group!=='turningDeep'&&r.group!=='metrology'):s.rows.length===57?current.filter(r=>r.group!=='metrology'):current;demand(expected.length===s.rows.length);demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
+      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57,63,64].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
+      const current=progress.summary(progress.empty()).rows,expected=s.rows.length===22?current.filter(r=>r.kind!=='coursePractice'):s.rows.length===51?current.filter(r=>r.group!=='turningDeep'&&r.group!=='metrology'&&r.group!=='independentProject'):s.rows.length===57?current.filter(r=>r.group!=='metrology'&&r.group!=='independentProject'):s.rows.length===63?current.filter(r=>r.group!=='independentProject'):current;demand(expected.length===s.rows.length);demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
       for(const [name,ids]of [['training',practical],['gcode',program]]){demand(Array.isArray(s[name])&&s[name].length===ids.length&&s[name].every((r,i)=>object(r)&&r.id===ids[i]&&typeof r.passed==='boolean'&&typeof r.independent==='boolean'&&(!r.independent||r.passed)));demand(Array.isArray(s.seen[name])&&s.seen[name].every(id=>ids.includes(id))&&new Set(s.seen[name]).size===s.seen[name].length);demand(s[name].every(r=>!r.passed||s.seen[name].includes(r.id)));}
       return {at:s.at,sourceAt:s.sourceAt,appVersion:s.appVersion,done:s.done,rows:s.rows.map(r=>({id:r.id,title:r.title,done:r.done,detail:r.detail})),training:s.training.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),gcode:s.gcode.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),seen:{training:[...s.seen.training],gcode:[...s.seen.gcode]}};
     }

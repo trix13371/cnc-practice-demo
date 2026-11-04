@@ -215,9 +215,17 @@
         node("h3", "Диагностика: причины и исправления"),
         node("p", "Принято " + d.done.length + " из " + d.total),
         table(
-          ["Задание", "Причина", "Разбор", "Ошибки"],
+          ["Задание", "Исходный отказ", "Причина", "Разбор", "Ошибки"],
           d.done.map((r) => [
             r.title || "Задание диагностики",
+            r.originalIncident
+              ? "Строка " +
+                r.originalIncident.row +
+                " · " +
+                r.originalIncident.source +
+                " · " +
+                r.originalIncident.code
+              : "Нет кадра этой версии",
             r.causeTitle || "Причина не описана в этой версии",
             r.help ? "Открывался" : "Не открывался",
             r.errors,

@@ -3079,6 +3079,32 @@ body[data-screen="course"] .course-index {
 .milling-course .shaft-drawing svg {
   width: 100%;
 }
+.diagnostic-facts {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) minmax(0, 1fr);
+  gap: 8px 20px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--panel, #fff);
+}
+.diagnostic-facts dt {
+  font-weight: 600;
+}
+.diagnostic-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 600px) {
+  .diagnostic-facts {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+  }
+  .diagnostic-facts dd {
+    margin-bottom: 10px;
+  }
+}
 @media (max-width: 650px) {
   .milling-course .shaft-measure-controls {
     grid-template-columns: 1fr;

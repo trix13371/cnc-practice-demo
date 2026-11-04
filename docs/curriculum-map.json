@@ -1069,6 +1069,26 @@
       "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
     },
     {
+      "id": "project-RF5-SHAFT-05",
+      "title": "Самостоятельное изделие · без шаблона",
+      "family": "projects",
+      "format": "transfer",
+      "competencies": [
+        "independent-project",
+        "planning",
+        "allowance"
+      ],
+      "prerequisites": [
+        "planning",
+        "gcode",
+        "tolerances",
+        "diagnosis"
+      ],
+      "objective": "В учебной модели самостоятельно составить программу с пустого редактора, распределить увеличенный припуск, изготовить изделие и подтвердить все размеры свежим контролем.",
+      "conditionId": "project-RF5-SHAFT-05",
+      "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
+    },
+    {
       "id": "milling-xyz-air",
       "title": "Три оси · движения в воздухе",
       "family": "milling-setup",

@@ -20,6 +20,7 @@ assert.equal(
   "Formatting an admin report must not mutate evidence or stored summaries",
 );
 assert.equal(report.diagnosticCourse.done[0].title, diagnostics.tasks[0].title);
+assert.deepEqual(report.diagnosticCourse.done[0].originalIncident,{row:5,source:'G0 Z-20',code:'COLLISION',part:null,obstacle:null});
 assert.equal(
   report.diagnosticCourse.done[0].causeTitle,
   diagnostics.causes.rapid,
