@@ -35,6 +35,23 @@ assert(
   ),
 );
 assert.deepEqual(report.progress, summary.progress);
+const curriculum = require("../curriculum-model.js");
+for (const row of report.rows) {
+  assert.equal(row.learningGoal, curriculum.get(row.id).objective);
+  assert.equal(row.evidenceScope, curriculum.get(row.id).evidenceScope);
+  const { learningGoal, evidenceScope, ...original } = row;
+  assert.deepEqual(
+    original,
+    summary.rows.find((r) => r.id === row.id),
+  );
+}
+assert.equal(
+  describe({ rows: [{ id: "constructor", done: true }] }).rows[0].learningGoal,
+  "Цель не описана в этой версии курса",
+);
+assert.deepEqual(describe({ progress: summary.progress }), {
+  progress: summary.progress,
+});
 assert.equal(describe(null), null);
 assert.equal(
   describe({

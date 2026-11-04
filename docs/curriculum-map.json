@@ -1,0 +1,1138 @@
+{
+  "version": 1,
+  "scope": "learning-path",
+  "prerequisitePolicy": {
+    "competency": "Связи понятий для полного изучения умения, а не условия допуска к первому знакомству с ним.",
+    "step": "Ожидаемое предварительное знакомство. На следующем шаге та же тема может углубляться; сложное действие может вводиться с сопровождением до полного изучения его составляющих. Это не подтверждение освоения и не автоматический допуск."
+  },
+  "families": [
+    {
+      "id": "drawing",
+      "title": "Чертёж и измерение",
+      "plannedObjectives": [
+        "Поверхности и разрезы",
+        "Выбор прибора",
+        "Пограничный размер"
+      ]
+    },
+    {
+      "id": "setup",
+      "title": "Заготовка, инструмент и наладка",
+      "plannedObjectives": [
+        "Состояния станка",
+        "Закрепление и вылет",
+        "Рабочий ноль"
+      ]
+    },
+    {
+      "id": "external-turning",
+      "title": "Наружное точение",
+      "plannedObjectives": [
+        "Сохранение соседней поверхности",
+        "Припуск и режим",
+        "Альтернативный маршрут"
+      ]
+    },
+    {
+      "id": "faces-grooves",
+      "title": "Торцы, канавки и отрезка",
+      "plannedObjectives": [
+        "Торец",
+        "Канавка",
+        "Отрезка с сохранением детали"
+      ]
+    },
+    {
+      "id": "holes",
+      "title": "Отверстия на токарном станке",
+      "plannedObjectives": [
+        "Сверление",
+        "Растачивание",
+        "Внутренний контроль"
+      ]
+    },
+    {
+      "id": "threads",
+      "title": "Резьба",
+      "plannedObjectives": [
+        "Профиль и шаг",
+        "Проходы",
+        "Контроль резьбы"
+      ]
+    },
+    {
+      "id": "milling-setup",
+      "title": "Фрезерные оси и установка",
+      "plannedObjectives": [
+        "Рабочая система координат",
+        "Длина инструмента",
+        "Крепление и сборка"
+      ]
+    },
+    {
+      "id": "milling-basic",
+      "title": "Плоскость и открытый паз",
+      "plannedObjectives": [
+        "Покрытие плоскости",
+        "Послойный паз",
+        "Свежий контроль дна"
+      ]
+    },
+    {
+      "id": "milling-2-5d",
+      "title": "Фрезерование 2,5D",
+      "plannedObjectives": [
+        "Замкнутый карман",
+        "Наружный контур",
+        "Группа отверстий"
+      ]
+    },
+    {
+      "id": "projects",
+      "title": "Самостоятельные проекты",
+      "plannedObjectives": [
+        "План и контроль",
+        "Несколько установок",
+        "Повторяемость серии"
+      ]
+    }
+  ],
+  "competencies": [
+    {
+      "id": "machine-parts",
+      "title": "Устройство токарного станка",
+      "prerequisites": []
+    },
+    {
+      "id": "safe-state",
+      "title": "Безопасное состояние перед действием",
+      "prerequisites": [
+        "machine-parts"
+      ]
+    },
+    {
+      "id": "dimensions",
+      "title": "Диаметр и длина",
+      "prerequisites": []
+    },
+    {
+      "id": "lathe-coordinates",
+      "title": "Диаметральная X и продольная Z",
+      "prerequisites": [
+        "dimensions"
+      ]
+    },
+    {
+      "id": "drawing",
+      "title": "Чтение размеров чертежа",
+      "prerequisites": [
+        "dimensions"
+      ]
+    },
+    {
+      "id": "metrology",
+      "title": "Выбор прибора и места измерения",
+      "prerequisites": [
+        "drawing",
+        "safe-state"
+      ]
+    },
+    {
+      "id": "tolerances",
+      "title": "Вывод о годности по интервалу допуска",
+      "prerequisites": [
+        "metrology"
+      ]
+    },
+    {
+      "id": "tools",
+      "title": "Назначение режущего инструмента",
+      "prerequisites": [
+        "machine-parts"
+      ]
+    },
+    {
+      "id": "setup",
+      "title": "Подготовка инструмента и рабочего нуля",
+      "prerequisites": [
+        "tools",
+        "lathe-coordinates",
+        "safe-state"
+      ]
+    },
+    {
+      "id": "allowance",
+      "title": "Припуск и распределение проходов",
+      "prerequisites": [
+        "dimensions"
+      ]
+    },
+    {
+      "id": "feeds",
+      "title": "Подача и частота вращения",
+      "prerequisites": [
+        "tools"
+      ]
+    },
+    {
+      "id": "lathe-profile",
+      "title": "Наружная продольная обработка",
+      "prerequisites": [
+        "setup",
+        "allowance",
+        "feeds"
+      ]
+    },
+    {
+      "id": "gcode",
+      "title": "Чтение и составление линейной программы",
+      "prerequisites": [
+        "lathe-coordinates",
+        "safe-state"
+      ]
+    },
+    {
+      "id": "planning",
+      "title": "Маршрут обработки и контроль",
+      "prerequisites": [
+        "lathe-profile",
+        "tolerances"
+      ]
+    },
+    {
+      "id": "facing",
+      "title": "Обработка торца",
+      "prerequisites": [
+        "setup",
+        "allowance",
+        "gcode"
+      ]
+    },
+    {
+      "id": "groove",
+      "title": "Наружная канавка и отвод пластины",
+      "prerequisites": [
+        "setup",
+        "gcode"
+      ]
+    },
+    {
+      "id": "taper",
+      "title": "Наружный конический участок",
+      "prerequisites": [
+        "lathe-profile",
+        "gcode"
+      ]
+    },
+    {
+      "id": "mill-coordinates",
+      "title": "Линейные координаты XYZ",
+      "prerequisites": [
+        "dimensions"
+      ]
+    },
+    {
+      "id": "mill-setup",
+      "title": "Фрезерная установка и крепление",
+      "prerequisites": [
+        "mill-coordinates",
+        "safe-state"
+      ]
+    },
+    {
+      "id": "mill-removal",
+      "title": "Открытый паз и послойное снятие",
+      "prerequisites": [
+        "mill-setup",
+        "feeds"
+      ]
+    },
+    {
+      "id": "collision",
+      "title": "Проверка пути инструмента и сборки",
+      "prerequisites": [
+        "safe-state"
+      ]
+    },
+    {
+      "id": "diagnosis",
+      "title": "Первая причина остановки и проверка исправления",
+      "prerequisites": [
+        "gcode",
+        "collision"
+      ]
+    },
+    {
+      "id": "independent-project",
+      "title": "Полный маршрут заданной детали в модели",
+      "prerequisites": [
+        "planning",
+        "gcode"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "id": "practice-firstSession",
+      "title": "Первое знакомство · действия с нуля",
+      "family": "setup",
+      "format": "orientation",
+      "competencies": [
+        "machine-parts",
+        "safe-state"
+      ],
+      "prerequisites": [],
+      "objective": "Найти заготовку, патрон и резец, различить вращение и остановку и выполнить первые действия в модели.",
+      "conditionId": "practice-firstSession",
+      "evidenceScope": "Действия вводного сценария; самостоятельная работа на реальном станке не проверяется."
+    },
+    {
+      "id": "machine",
+      "title": "Что делает станок",
+      "family": "setup",
+      "format": "concept",
+      "competencies": [
+        "machine-parts"
+      ],
+      "prerequisites": [],
+      "objective": "Объяснить, что вращается при точении и за счёт какого движения инструмент изменяет заготовку.",
+      "conditionId": "machine",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "safety",
+      "title": "Когда можно измерять",
+      "family": "setup",
+      "format": "concept",
+      "competencies": [
+        "safe-state"
+      ],
+      "prerequisites": [
+        "machine-parts"
+      ],
+      "objective": "Выбрать допустимый момент измерения после полной остановки и отличить его от выбега шпинделя.",
+      "conditionId": "safety",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "tool",
+      "title": "Выбираем резец",
+      "family": "setup",
+      "format": "concept",
+      "competencies": [
+        "tools"
+      ],
+      "prerequisites": [
+        "machine-parts"
+      ],
+      "objective": "Связать назначение резца с наружной обработкой детали и различить его с измерительным прибором.",
+      "conditionId": "tool",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "diameter",
+      "title": "Что означает диаметр",
+      "family": "drawing",
+      "format": "concept",
+      "competencies": [
+        "dimensions"
+      ],
+      "prerequisites": [],
+      "objective": "Различить диаметр и радиус круглой заготовки и правильно прочитать обозначение диаметра на схеме.",
+      "conditionId": "diameter",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "axes",
+      "title": "Как задать X и Z",
+      "family": "drawing",
+      "format": "concept",
+      "competencies": [
+        "lathe-coordinates"
+      ],
+      "prerequisites": [
+        "dimensions"
+      ],
+      "objective": "Связать диаметральную координату X и направление Z с диаметром и длиной обрабатываемого участка.",
+      "conditionId": "axes",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "practice-firstProcess",
+      "title": "Координаты и первый процесс",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "lathe-coordinates",
+        "lathe-profile",
+        "metrology"
+      ],
+      "prerequisites": [
+        "safe-state",
+        "tools",
+        "lathe-coordinates"
+      ],
+      "objective": "Задать координаты первого прохода, выполнить учебную обработку, остановить станок и проверить полученный размер.",
+      "conditionId": "practice-firstProcess",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "first-cut",
+      "title": "Выполняем первый проход",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "lathe-profile"
+      ],
+      "prerequisites": [
+        "lathe-coordinates",
+        "tools",
+        "safe-state"
+      ],
+      "objective": "Выполнить наружный проход до указанного диаметра и проследить изменение размера в учебной модели.",
+      "conditionId": "first-cut",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "practice-drawingSession",
+      "title": "Деталь, прибор и измерение",
+      "family": "drawing",
+      "format": "guided-practice",
+      "competencies": [
+        "drawing",
+        "metrology",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "dimensions",
+        "safe-state"
+      ],
+      "objective": "Найти требуемый размер детали, выбрать пригодный прибор и сопоставить результат измерения с требованием.",
+      "conditionId": "practice-drawingSession",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "control",
+      "title": "Зачем нужен замер",
+      "family": "drawing",
+      "format": "concept",
+      "competencies": [
+        "metrology"
+      ],
+      "prerequisites": [
+        "dimensions",
+        "safe-state"
+      ],
+      "objective": "Объяснить, зачем проверять фактический размер после прохода и почему заданной координаты недостаточно.",
+      "conditionId": "control",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "tolerance",
+      "title": "Сравниваем с допуском",
+      "family": "drawing",
+      "format": "concept",
+      "competencies": [
+        "tolerances"
+      ],
+      "prerequisites": [
+        "metrology"
+      ],
+      "objective": "Сопоставить измеренное значение с нижней и верхней границей допуска и сделать вывод о годности размера.",
+      "conditionId": "tolerance",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "first-control",
+      "title": "Измеряем и подтверждаем",
+      "family": "drawing",
+      "format": "guided-practice",
+      "competencies": [
+        "metrology",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "safe-state",
+        "tolerances"
+      ],
+      "objective": "Остановить обработку, получить измерение и подтвердить размер учебной детали по допустимому интервалу.",
+      "conditionId": "first-control",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "setup",
+      "title": "Подготовка станка",
+      "family": "setup",
+      "format": "concept",
+      "competencies": [
+        "setup"
+      ],
+      "prerequisites": [
+        "tools",
+        "lathe-coordinates",
+        "safe-state"
+      ],
+      "objective": "Разобрать подготовку станка, инструмента и рабочего нуля до начала учебной обработки детали.",
+      "conditionId": "setup",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "rough-finish",
+      "title": "Черновой и чистовой проходы",
+      "family": "external-turning",
+      "format": "concept",
+      "competencies": [
+        "allowance",
+        "lathe-profile"
+      ],
+      "prerequisites": [
+        "dimensions",
+        "tools"
+      ],
+      "objective": "Различить назначение чернового и чистового проходов и объяснить, зачем оставлять припуск на завершение.",
+      "conditionId": "rough-finish",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "feed",
+      "title": "Подача и обороты",
+      "family": "external-turning",
+      "format": "concept",
+      "competencies": [
+        "feeds"
+      ],
+      "prerequisites": [
+        "tools"
+      ],
+      "objective": "Различить подачу и обороты шпинделя и связать их изменение с поведением учебной обработки.",
+      "conditionId": "feed",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "pass-count",
+      "title": "Распределяем припуск",
+      "family": "external-turning",
+      "format": "concept",
+      "competencies": [
+        "allowance"
+      ],
+      "prerequisites": [
+        "dimensions"
+      ],
+      "objective": "Распределить снимаемый припуск между проходами с учётом радиальной глубины резания в учебном профиле.",
+      "conditionId": "pass-count",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "full-cycle",
+      "title": "Полный цикл с разбором",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "planning",
+        "lathe-profile",
+        "metrology"
+      ],
+      "prerequisites": [
+        "setup",
+        "allowance",
+        "feeds",
+        "tolerances"
+      ],
+      "objective": "Пройти подготовку, черновую и чистовую обработку и контроль одной детали с доступным разбором действий.",
+      "conditionId": "full-cycle",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "self-cycle",
+      "title": "Другой чертёж без помощи",
+      "family": "external-turning",
+      "format": "transfer",
+      "competencies": [
+        "planning",
+        "lathe-profile",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "planning"
+      ],
+      "objective": "Повторить полный цикл для другого чертежа в том же учебном профиле и проверить полученный размер.",
+      "conditionId": "self-cycle",
+      "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
+    },
+    {
+      "id": "code-coordinates",
+      "title": "Координаты в строке программы",
+      "family": "external-turning",
+      "format": "programming",
+      "competencies": [
+        "gcode",
+        "lathe-coordinates"
+      ],
+      "prerequisites": [
+        "lathe-coordinates",
+        "safe-state"
+      ],
+      "objective": "Прочитать координаты X и Z в строке программы и связать их с положением резца относительно детали.",
+      "conditionId": "code-coordinates",
+      "evidenceScope": "Программа и проверка в учебном интерпретаторе; перенос на другую стойку не проверяется."
+    },
+    {
+      "id": "code-motion",
+      "title": "Подход и рабочий ход",
+      "family": "external-turning",
+      "format": "programming",
+      "competencies": [
+        "gcode",
+        "collision"
+      ],
+      "prerequisites": [
+        "lathe-coordinates",
+        "safe-state"
+      ],
+      "objective": "Различить быстрый подвод и рабочее перемещение и выбрать движение для подхода к материалу.",
+      "conditionId": "code-motion",
+      "evidenceScope": "Программа и проверка в учебном интерпретаторе; перенос на другую стойку не проверяется."
+    },
+    {
+      "id": "code-modal",
+      "title": "Что сохраняется между строками",
+      "family": "external-turning",
+      "format": "programming",
+      "competencies": [
+        "gcode"
+      ],
+      "prerequisites": [
+        "gcode"
+      ],
+      "objective": "Проследить сохраняющиеся команды между строками и определить действующий режим последующего движения.",
+      "conditionId": "code-modal",
+      "evidenceScope": "Программа и проверка в учебном интерпретаторе; перенос на другую стойку не проверяется."
+    },
+    {
+      "id": "code-feed",
+      "title": "Подача в программе",
+      "family": "external-turning",
+      "format": "programming",
+      "competencies": [
+        "gcode",
+        "feeds"
+      ],
+      "prerequisites": [
+        "gcode",
+        "feeds"
+      ],
+      "objective": "Связать заданную подачу с рабочим ходом программы и проверить её смысл в выбранном учебном режиме.",
+      "conditionId": "code-feed",
+      "evidenceScope": "Программа и проверка в учебном интерпретаторе; перенос на другую стойку не проверяется."
+    },
+    {
+      "id": "code-spindle",
+      "title": "Команды запуска и остановки",
+      "family": "setup",
+      "format": "programming",
+      "competencies": [
+        "gcode",
+        "safe-state"
+      ],
+      "prerequisites": [
+        "gcode",
+        "safe-state"
+      ],
+      "objective": "Прочитать команды запуска и остановки шпинделя и определить состояние перед измерением детали.",
+      "conditionId": "code-spindle",
+      "evidenceScope": "Программа и проверка в учебном интерпретаторе; перенос на другую стойку не проверяется."
+    },
+    {
+      "id": "code-retract",
+      "title": "Отвод по X, затем по Z",
+      "family": "external-turning",
+      "format": "programming",
+      "competencies": [
+        "gcode",
+        "collision"
+      ],
+      "prerequisites": [
+        "gcode",
+        "lathe-coordinates"
+      ],
+      "objective": "Составить последовательность отвода по X и Z, чтобы инструмент вышел из материала перед возвратом.",
+      "conditionId": "code-retract",
+      "evidenceScope": "Программа и проверка в учебном интерпретаторе; перенос на другую стойку не проверяется."
+    },
+    {
+      "id": "practice-programSetup",
+      "title": "Программа и наладка · полный цикл",
+      "family": "setup",
+      "format": "guided-practice",
+      "competencies": [
+        "setup",
+        "gcode",
+        "metrology"
+      ],
+      "prerequisites": [
+        "setup",
+        "gcode",
+        "tolerances"
+      ],
+      "objective": "Согласовать учебную программу с инструментом и рабочим нулём, выполнить обработку и контроль результата.",
+      "conditionId": "practice-programSetup",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "self-code",
+      "title": "Программа для другого чертежа",
+      "family": "external-turning",
+      "format": "transfer",
+      "competencies": [
+        "gcode",
+        "planning"
+      ],
+      "prerequisites": [
+        "gcode",
+        "planning"
+      ],
+      "objective": "Составить программу под другой чертёж в поддерживаемом диалекте и проверить её траекторию и результат.",
+      "conditionId": "self-code",
+      "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
+    },
+    {
+      "id": "operation-face-first",
+      "title": "Первый торец",
+      "family": "faces-grooves",
+      "format": "guided-practice",
+      "competencies": [
+        "facing"
+      ],
+      "prerequisites": [
+        "setup",
+        "gcode",
+        "allowance"
+      ],
+      "objective": "В учебной модели выбрать торцевой инструмент, обработать первый торец и проверить изменение положения торцевой поверхности.",
+      "conditionId": "operation-face-first",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-face-two",
+      "title": "Торец в два прохода",
+      "family": "faces-grooves",
+      "format": "guided-practice",
+      "competencies": [
+        "facing",
+        "allowance"
+      ],
+      "prerequisites": [
+        "facing",
+        "allowance"
+      ],
+      "objective": "Распределить торцевой припуск на два допустимых прохода вместо одного чрезмерно глубокого снятия.",
+      "conditionId": "operation-face-two",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-groove-first",
+      "title": "Кольцевая канавка",
+      "family": "faces-grooves",
+      "format": "guided-practice",
+      "competencies": [
+        "groove"
+      ],
+      "prerequisites": [
+        "setup",
+        "gcode"
+      ],
+      "objective": "В учебной модели выполнить наружную кольцевую канавку подходящим инструментом и вывести пластину перед продольным движением.",
+      "conditionId": "operation-groove-first",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-taper",
+      "title": "Конус вместо цилиндра",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "taper"
+      ],
+      "prerequisites": [
+        "lathe-profile",
+        "gcode"
+      ],
+      "objective": "В учебной модели согласовать изменение X и Z при линейном рабочем ходе, чтобы получить конический участок вместо цилиндра.",
+      "conditionId": "operation-taper",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-grooves-project",
+      "title": "Две канавки · самостоятельный маршрут",
+      "family": "faces-grooves",
+      "format": "project",
+      "competencies": [
+        "groove",
+        "planning"
+      ],
+      "prerequisites": [
+        "groove",
+        "planning"
+      ],
+      "objective": "Спланировать последовательность двух канавок, выполнить безопасные отводы и проверить требуемый профиль.",
+      "conditionId": "operation-grooves-project",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "project-RF5-SHAFT-01",
+      "title": "Ступенчатый валик · базовый",
+      "family": "projects",
+      "format": "project",
+      "competencies": [
+        "independent-project",
+        "planning"
+      ],
+      "prerequisites": [
+        "planning",
+        "gcode",
+        "tolerances"
+      ],
+      "objective": "В учебной модели составить маршрут ступенчатого валика, обработать заданные участки и подтвердить их размеры измерениями.",
+      "conditionId": "shaft-standard",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "project-RF5-SHAFT-02",
+      "title": "Короткий валик",
+      "family": "projects",
+      "format": "project",
+      "competencies": [
+        "independent-project",
+        "planning"
+      ],
+      "prerequisites": [
+        "planning",
+        "gcode",
+        "tolerances"
+      ],
+      "objective": "В учебной модели адаптировать тот же маршрут ступенчатого валика к более короткой детали и повторить контроль размеров.",
+      "conditionId": "shaft-standard",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "project-RF5-SHAFT-03",
+      "title": "Валик с длинной шейкой",
+      "family": "projects",
+      "format": "project",
+      "competencies": [
+        "independent-project",
+        "planning"
+      ],
+      "prerequisites": [
+        "planning",
+        "gcode",
+        "tolerances"
+      ],
+      "objective": "В учебной модели адаптировать маршрут ступенчатого валика к длинной шейке, сохранив размеры соседних участков и контроль.",
+      "conditionId": "shaft-standard",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "project-RF5-SHAFT-04",
+      "title": "Валик с другим припуском",
+      "family": "projects",
+      "format": "project",
+      "competencies": [
+        "independent-project",
+        "allowance"
+      ],
+      "prerequisites": [
+        "planning",
+        "gcode",
+        "allowance"
+      ],
+      "objective": "В учебной модели перепланировать распределение проходов валика при другом припуске, затем обработать и проверить участки.",
+      "conditionId": "project-RF5-SHAFT-04",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "milling-xyz-air",
+      "title": "Три оси · движения в воздухе",
+      "family": "milling-setup",
+      "format": "guided-practice",
+      "competencies": [
+        "mill-coordinates"
+      ],
+      "prerequisites": [
+        "dimensions",
+        "safe-state"
+      ],
+      "objective": "Проследить линейные перемещения XYZ без резания и отличить координату инструмента от диаметральной X токарного станка.",
+      "conditionId": "milling-xyz-air",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "milling-clamp-crossing",
+      "title": "Пересечение с креплением",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "mill-setup",
+        "collision"
+      ],
+      "prerequisites": [
+        "mill-coordinates",
+        "safe-state"
+      ],
+      "objective": "Найти пересечение пути с креплением и проверить траекторию обхода, а не только её конечные точки.",
+      "conditionId": "milling-clamp-crossing",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "milling-rapid-stock",
+      "title": "Быстрый ход в материал · первый паз",
+      "family": "milling-basic",
+      "format": "guided-practice",
+      "competencies": [
+        "mill-removal",
+        "gcode"
+      ],
+      "prerequisites": [
+        "mill-coordinates",
+        "gcode",
+        "feeds"
+      ],
+      "objective": "Устранить быстрый ход через материал и выполнить первый открытый паз рабочими перемещениями в модели.",
+      "conditionId": "milling-rapid-stock",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "milling-depth-layers",
+      "title": "Глубокий паз · слои и исправление",
+      "family": "milling-basic",
+      "format": "diagnosis",
+      "competencies": [
+        "mill-removal",
+        "allowance"
+      ],
+      "prerequisites": [
+        "mill-removal",
+        "allowance"
+      ],
+      "objective": "Найти чрезмерную глубину первого слоя, разделить обработку паза на допустимые слои и проверить исправление.",
+      "conditionId": "milling-depth-layers",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "milling-holder-clearance",
+      "title": "Фреза проходит · державка задевает",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "collision",
+        "mill-setup"
+      ],
+      "prerequisites": [
+        "mill-coordinates",
+        "collision"
+      ],
+      "objective": "Отличить свободную траекторию фрезы от пересечения державки с креплением и проверить обход всей сборки.",
+      "conditionId": "milling-holder-clearance",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "milling-machine-column",
+      "title": "Обход корпуса станка",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "collision",
+        "mill-setup"
+      ],
+      "prerequisites": [
+        "mill-coordinates",
+        "collision"
+      ],
+      "objective": "Обнаружить пересечение с корпусом станка при допустимых координатах и проверить исправленный путь сборки.",
+      "conditionId": "milling-machine-column",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-rapid",
+      "title": "Почему быстрый ход опасен",
+      "family": "external-turning",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "collision"
+      ],
+      "prerequisites": [
+        "gcode",
+        "collision"
+      ],
+      "objective": "Найти быстрый ход в материал как первую причину остановки, исправить программу и повторно проверить её.",
+      "conditionId": "diagnostic-diag-rapid",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-tool",
+      "title": "Верная программа · неверный резец",
+      "family": "setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "tools"
+      ],
+      "prerequisites": [
+        "gcode",
+        "tools",
+        "collision"
+      ],
+      "objective": "Сопоставить операцию с установленным резцом, исправить выбор инструмента и проверить программу повторно.",
+      "conditionId": "diagnostic-diag-tool",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-blade",
+      "title": "Канавка: пластина остаётся в металле",
+      "family": "faces-grooves",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "groove"
+      ],
+      "prerequisites": [
+        "gcode",
+        "groove",
+        "collision"
+      ],
+      "objective": "Найти перемещение канавочной пластины вдоль материала без отвода и проверить безопасное исправление.",
+      "conditionId": "diagnostic-diag-blade",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-face-depth",
+      "title": "Почему нельзя снять торец сразу",
+      "family": "faces-grooves",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "facing",
+        "allowance"
+      ],
+      "prerequisites": [
+        "gcode",
+        "facing",
+        "allowance",
+        "collision"
+      ],
+      "objective": "Определить превышение глубины торцевого прохода, перераспределить припуск и проверить исправленный маршрут.",
+      "conditionId": "diagnostic-diag-face-depth",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-zero",
+      "title": "Причина глубже сообщения об ошибке",
+      "family": "setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "setup"
+      ],
+      "prerequisites": [
+        "setup",
+        "gcode",
+        "collision"
+      ],
+      "objective": "Найти неверный рабочий ноль за сообщением об ошибке и исправить наладку вместо подмены координат программы.",
+      "conditionId": "diagnostic-diag-zero",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-fixture",
+      "title": "Безопасные концы · опасная середина",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "collision"
+      ],
+      "prerequisites": [
+        "mill-setup",
+        "gcode",
+        "collision"
+      ],
+      "objective": "Найти столкновение с креплением в середине пути между свободными конечными точками и проверить обход.",
+      "conditionId": "diagnostic-diag-fixture",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-holder",
+      "title": "Фреза свободна · проверяем державку",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "collision"
+      ],
+      "prerequisites": [
+        "mill-setup",
+        "gcode",
+        "collision"
+      ],
+      "objective": "Определить столкновение державки при свободной фрезе и подтвердить отсутствие пересечения после исправления.",
+      "conditionId": "diagnostic-diag-holder",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-body",
+      "title": "Пределы осей не заменяют проверку корпуса",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "collision"
+      ],
+      "prerequisites": [
+        "mill-setup",
+        "gcode",
+        "collision"
+      ],
+      "objective": "Отличить пределы перемещений от геометрии корпуса станка и исправить пересечение с его препятствием.",
+      "conditionId": "diagnostic-diag-body",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-travel",
+      "title": "Опечатка в конечной координате",
+      "family": "milling-setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "mill-coordinates"
+      ],
+      "prerequisites": [
+        "mill-coordinates",
+        "gcode",
+        "collision"
+      ],
+      "objective": "Найти опечатку конечной координаты, вызывающую выход за ход оси, и повторно проверить исправленную программу.",
+      "conditionId": "diagnostic-diag-travel",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "diagnostic-diag-spindle",
+      "title": "Рабочая подача без вращения",
+      "family": "setup",
+      "format": "diagnosis",
+      "competencies": [
+        "diagnosis",
+        "safe-state"
+      ],
+      "prerequisites": [
+        "gcode",
+        "safe-state",
+        "collision"
+      ],
+      "objective": "Найти рабочий ход без вращения шпинделя, восстановить нужное состояние и повторно проверить выполнение.",
+      "conditionId": "diagnostic-diag-spindle",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    }
+  ]
+}

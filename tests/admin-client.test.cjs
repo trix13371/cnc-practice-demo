@@ -101,6 +101,17 @@ const progress = require("../progress-model.js"),
   );
   assert.match(diagnosticFold.textContent, /Почему быстрый ход опасен/);
   assert.match(diagnosticFold.textContent, /Быстрый ход внутри материала/);
+  const routeFold = detail.children.find(
+    (e) =>
+      e.tagName === "details" &&
+      e.children[0].textContent.startsWith("Подробный маршрут"),
+  );
+  assert.match(routeFold.textContent, /Цель и границы проверки/);
+  assert.match(routeFold.textContent, /Найти заготовку, патрон и резец/);
+  assert.match(
+    routeFold.textContent,
+    /выполнение операции этим ответом не подтверждается/,
+  );
   assert.doesNotMatch(
     diagnosticFold.textContent,
     /diag-rapid/,

@@ -2,11 +2,22 @@
 const diagnostics = require("../diagnostic-course-model.js");
 const milling = require("../milling-course-model.js");
 const operations = require("../operation-course-model.js");
+const curriculum = require("../curriculum-model.js");
 
 // Presentation fields only. Journal IDs, reasons and stored evidence stay intact.
 function describe(summary) {
   if (!summary) return summary;
   const result = { ...summary };
+  if (summary.rows)
+    result.rows = summary.rows.map((row) => {
+      const goal = curriculum.get(row.id);
+      return {
+        ...row,
+        learningGoal: goal?.objective || "Цель не описана в этой версии курса",
+        evidenceScope:
+          goal?.evidenceScope || "Область проверки требует уточнения.",
+      };
+    });
   for (const [key, tasks] of [
     ["diagnosticCourse", diagnostics.tasks],
     ["millingCourse", milling.lessons],

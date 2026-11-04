@@ -182,8 +182,18 @@
     const s = data.summary;
     detail.append(
       table(
-        ["Шаг", "Подтверждение"],
-        s.rows.map((r) => [r.title, r.done ? r.detail : "Предстоит"]),
+        ["Шаг", "Подтверждение", "Цель и границы проверки"],
+        s.rows.map((r) => {
+          const goal = node("div");
+          goal.append(
+            node("p", r.learningGoal || "Цель не описана в этой версии курса"),
+            node(
+              "small",
+              r.evidenceScope || "Область проверки требует уточнения.",
+            ),
+          );
+          return [r.title, r.done ? r.detail : "Предстоит", goal];
+        }),
       ),
       node("h3", "Самостоятельная практика и помощь"),
       table(
