@@ -27,7 +27,11 @@
   for(const [id,d] of Object.entries(icons))navigation.querySelector('#'+id).insertAdjacentHTML('afterbegin',`<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`);
   sidebar.append(navigation,make('div','sidebar-caption','От понимания станка<br>к самостоятельной работе.'));
   sidebar.append(make('div','sidebar-account','<span class="sidebar-avatar" aria-hidden="true">ЧП</span><div><strong>Ваша мастерская</strong><small>Локальная практика</small></div>'));
-  document.body.prepend(sidebar);
+  main.id='main-content';main.tabIndex=-1;
+  const skip=document.createElement('a');skip.className='skip-link';skip.href='#main-content';skip.textContent='Перейти к содержимому';
+  document.body.prepend(skip,sidebar);
+  navigation.addEventListener('keydown',event=>{const menu=navigation.querySelector('details');if(event.key==='Escape'&&menu.open){menu.open=false;menu.querySelector('summary').focus();event.preventDefault();event.stopPropagation();}});
+  const extraMenu=navigation.querySelector('details');extraMenu.addEventListener('focusout',event=>{if(event.relatedTarget&&!extraMenu.contains(event.relatedTarget))extraMenu.open=false;});
   q('.topbar').prepend(make('div','shell-breadcrumb','<span>Учебная мастерская</span><span aria-hidden="true">/</span><strong id="shell-page-label">Мой курс</strong>'));
   const catalog=make('section','catalog-screen','<div class="screen-heading"><div><h2>Выберите задание</h2><p>Семь упражнений: от первого прохода до наладки по замерам.</p></div><button type="button" class="button secondary" id="catalog-back">Вернуться к детали</button></div>');
   catalog.id='catalog-screen';for(const card of document.querySelectorAll('[data-task]')){const guide=window.CNCTaskGuides.get(card.dataset.task);if(guide){const copy=make('span','catalog-task-summary');copy.textContent=guide.learn;card.append(copy);card.title=guide.level+': '+guide.why;}}catalog.append($('difficulty-bar'),q('.lessons'));main.insertBefore(catalog,$('exam-level-bar'));
@@ -90,7 +94,7 @@
 
 
   function pause(){window.CNCDemo.pauseWorkshop();window.CNCSandboxUI?.pause();}
-  function setScreen(next){pause();screen=next;try{localStorage.setItem('cnc-workspace-screen-v1',next);}catch{}render();const title=next==='sandbox'?sandbox.querySelector('h1'):next==='course'?course.querySelector('h3'):next==='home'?document.querySelector('.home-screen h1'):next==='catalog'?catalog.querySelector('h1'):next==='training'?(training.querySelector('.cycle-heading h1')||q('.intro h1')):q('.intro h1');title.tabIndex=-1;title.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
+  function setScreen(next){pause();screen=next;try{localStorage.setItem('cnc-workspace-screen-v1',next);}catch{}render();const title=next==='sandbox'?sandbox.querySelector('h1'):next==='course'?course.querySelector('h1'):next==='home'?document.querySelector('.home-screen h1'):next==='catalog'?catalog.querySelector('h1'):next==='training'?(training.querySelector('.cycle-heading h1')||q('.intro h1')):q('.intro h1');title.tabIndex=-1;title.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
   function chooseStage(next){pause();stage=window.CNCLearningUI.capStage(Math.max(0,Math.min(3,next)));window.CNCMachineUI.saveStage(window.CNCDemo.readState().task,stage);render();
     const state=window.CNCDemo.readState();if(state.mode==='exam')return;
     if(!$('lab-workspace').hidden)$(stage<2?'lab-target':'lab-result').click();

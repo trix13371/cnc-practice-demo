@@ -9,6 +9,9 @@ for(const name of ['discovery-practice-model.js','course-discovery.js','discover
 const parent=new Element('main');parent.append(new Element('footer'));const root=window.CNCCourseUI.mount(parent,()=>{});
 const button=text=>{const b=root.querySelectorAll('button').find(n=>n.textContent===text);assert(b,'Missing button '+text);return b;};
 const answers=()=>JSON.parse(entries.get('cnc-foundations-v1')||'{"answers":{}}').answers;
+assert(root.querySelector('h1'),'Every course view needs a native main heading');
+window.CNCCourseUI.render(true);
+assert(root.querySelector('h1').focused,'Keyboard focus must enter the new course view');
 assert(root.querySelector('.lesson-goal'));assert(root.querySelector('.lesson-visual'));assert.equal(Object.keys(answers()).length,0);
 button('Теперь попробуем на схеме').click();assert.equal(button('Перейти к самостоятельной проверке').disabled,true);
 const hit=name=>{const b=root.querySelectorAll('button').find(n=>n.attributes['aria-label']===name);assert(b,'Missing scene target '+name);return b;};
@@ -44,6 +47,7 @@ assert.equal(draftState.step,6);
 window.CNCCourseUI.pathSnapshot().firstSession=intro.snapshot(draftState);
 window.CNCCourseUI.openRouteStep(require('../learning-path-model.js').get('practice-firstSession'));
 captured.onDraft('0,2');
+assert.equal(captured.headingTag,'h1','Route widgets retain native heading semantics on their own rerenders');
 assert.equal(window.CNCCourseUI.pathSnapshot().firstSessionDraft.value,'0,2');
 assert.equal(JSON.parse(entries.get('cnc-course-path-v1')).firstSessionDraft.value,'0,2');
 console.log('Course route: introductory scalar draft survives the guided widget storage boundary.');

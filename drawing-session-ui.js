@@ -37,7 +37,7 @@
       '<rect x="'+(right-2)+'" y="72" width="126" height="62" rx="7" fill="#203f57"/><rect x="'+(right+9)+'" y="82" width="104" height="33" rx="3" fill="#e8f1dd"/><text x="'+(right+16)+'" y="106" class="drawing-display">'+(s.reading===null?'— —':mm(s.reading))+'</text>'+
       '<text x="95" y="30">Внутренние губки</text><text x="95" y="273">Наружные губки</text></svg>';
   }
-  function create({saved,savedDraft,onDraft=()=>{},onChange=()=>{},onDone=()=>{},onNext}={}){
+  function create({headingTag='h3',saved,savedDraft,onDraft=()=>{},onChange=()=>{},onDone=()=>{},onNext}={}){
     let state=model.restore(saved)||model.create(),draft=model.validDraft(savedDraft,state)?{...savedDraft.values}:{},notice='';
     const host=el('section',undefined,'start-session drawing-session');
     function persist(){if(onChange(model.snapshot(state))===false)notice='Не удалось сохранить. Не закрывайте страницу: действия пока находятся в памяти.';}
@@ -46,7 +46,7 @@
     function field(label,name,form){const wrap=el('label',label,'field'),input=el('input');input.type='text';input.inputMode='decimal';input.maxLength=32;input.autocomplete='off';input.value=draft[name]||'';input.disabled=state.correct;input.setAttribute('aria-label',label);input.addEventListener('input',()=>{draft[name]=input.value;try{if(onDraft({step:state.step,values:{...draft}})===false)throw Error('Не удалось сохранить черновик. Не закрывайте страницу.');}catch(error){notice=error.message;host.querySelector('[role="status"]').textContent=notice;}});wrap.append(input);form.append(wrap);return input;}
     function board(svg,caption){const figure=el('figure',undefined,'start-board drawing-board');figure.innerHTML=svg;figure.append(el('figcaption',caption));host.append(figure);}
     function render(focus){
-      host.replaceChildren();const i=state.step,c=model.caseForStep(i),title=el('h3',state.complete?'Деталь и измерение — завершено':model.steps[i].title);title.tabIndex=-1;
+      host.replaceChildren();const i=state.step,c=model.caseForStep(i),title=el(headingTag,state.complete?'Деталь и измерение — завершено':model.steps[i].title);title.tabIndex=-1;
       host.append(el('p','ДЕТАЛЬ И ИЗМЕРЕНИЕ · '+(state.complete?'ИТОГ':'ДЕЙСТВИЕ '+(i+1)+' ИЗ '+model.steps.length),'eyebrow'),title);
       if(state.complete){
         host.append(el('p','Вы связали размер с поверхностью, проверили ноль, получили показания на двух деталях и сравнили интервал измерения с допуском.'),el('p','Ошибочных действий: '+state.errors.reduce((a,b)=>a+b,0)+'. Подсказки: '+(state.assisted?'открывались':'не открывались')+'.','start-value'),el('p','Это выполненное учебное упражнение. Реальные измерения требуют инструкции прибора, подходящего метода и практики с преподавателем.','start-note'));

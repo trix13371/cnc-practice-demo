@@ -11,6 +11,8 @@ const progress = require("../progress-model.js"),
   scopes = require("../server/public/account-storage.js"),
   f = require("./progress-fixtures.cjs");
 class Element {
+  addEventListener(type,listener){(this.listeners ||= {})[type]=listener;}
+  contains(other){return this===other||this.children.some(child=>child instanceof Element&&child.contains(other));}
   constructor(tag) {
     this.tag = tag;
     this.children = [];
@@ -200,6 +202,10 @@ async function boot(native, server, options = {}) {
   const login = accountBar(first.body).children.find(
     (n) => n.href === "/login",
   );
+  const menu=accountBar(first.body).children.find(n=>n.tag==='details');
+  assert.equal(typeof menu.listeners?.focusout,'function','A real bubbling focusout listener must be registered');
+  menu.open=true;menu.listeners.focusout({relatedTarget:menu.children[0]});assert.equal(menu.open,true);
+  menu.listeners.focusout({relatedTarget:first.body});assert.equal(menu.open,false,'Tab leaving the menu closes the overlay');
   assert.equal(login.textContent, "Войти снова");
   assert.equal(login.hidden, true);
   server.expired = true;

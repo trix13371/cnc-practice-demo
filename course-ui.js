@@ -26,9 +26,10 @@
       0,
       model.lessons.findIndex((l) => !hasAnswer(l.id)),
     );
-  current = view.kind !== "lesson" || !hasAnswer(path.selected)
-    ? model.lessons.findIndex((l) => l.id === path.selected)
-    : firstMissing();
+  current =
+    view.kind !== "lesson" || !hasAnswer(path.selected)
+      ? model.lessons.findIndex((l) => l.id === path.selected)
+      : firstMissing();
   const node = (tag, text, cls) => {
     const e = document.createElement(tag);
     if (text !== undefined) e.textContent = text;
@@ -108,6 +109,13 @@
       );
     article.append(reading);
   }
+  function presentArticle(article, focus) {
+    const title = article.querySelector("h1");
+    if (title) {
+      title.tabIndex = -1;
+      if (focus) title.focus();
+    }
+  }
   function render(focus = false) {
     if (!root) return;
     const routeStep = view.kind === "route" ? view.step : null;
@@ -174,7 +182,7 @@
           : `Урок ${current + 1} из ${model.lessons.length}${current < 4 ? " · Первое знакомство · без расчётов" : ""}`,
         "eyebrow",
       ),
-      node("h3", l.title),
+      node("h1", l.title),
     );
     const phases = unit
       ? [
@@ -216,11 +224,13 @@
       });
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     if (view.kind === "diagnosticCourse") {
       article.replaceChildren(
         window.CNCDiagnosticCourseUI.create({
+          headingTag: "h1",
           saved: path.diagnosticCourse,
           onChange: (s) => {
             path.diagnosticCourse = s;
@@ -232,11 +242,13 @@
       );
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     if (view.kind === "millingCourse") {
       article.replaceChildren(
         window.CNCMillingCourseUI.create({
+          headingTag: "h1",
           saved: path.millingCourse,
           onChange: (s) => {
             path.millingCourse = s;
@@ -253,11 +265,13 @@
       );
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     if (view.kind === "operationCourse") {
       article.replaceChildren(
         window.CNCOperationCourseUI.create({
+          headingTag: "h1",
           saved: path.operationCourse,
           onChange: (s) => {
             path.operationCourse = s;
@@ -272,6 +286,7 @@
       );
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     const introduction = model.startSession?.restore(path.firstSession);
@@ -284,6 +299,7 @@
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCStartSessionUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openDrawing(),
           saved: path.firstSession,
           savedDraft: path.firstSessionDraft,
@@ -318,10 +334,8 @@
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) {
-        const h = article.querySelector("h3");
-        h?.focus();
-      }
+      presentArticle(article, focus);
+
       return;
     }
     const drawing = model.drawingSession?.restore(path.drawingSession);
@@ -335,6 +349,7 @@
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCDrawingSessionUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openFirstProcess(),
           saved: path.drawingSession,
           savedDraft: path.drawingSessionDraft,
@@ -376,7 +391,8 @@
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     const process = model.firstProcess?.restore(path.firstProcess);
@@ -390,6 +406,7 @@
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCFirstProcessUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openProgramSetup(),
           saved: path.firstProcess,
           savedDraft: path.firstProcessDraft,
@@ -430,7 +447,8 @@
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     const ps = model.programSetup?.restore(path.programSetup);
@@ -444,6 +462,7 @@
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCProgramSetupUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openShaftProject(),
           saved: path.programSetup,
           savedDraft: path.programSetupDraft,
@@ -481,7 +500,8 @@
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     const shaft = model.shaftProject?.restore(path.shaftProject);
@@ -495,6 +515,7 @@
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCShaftProjectUI.create({
+          headingTag: "h1",
           saved: path.shaftProject,
           savedDraft: path.shaftProjectDraft,
           onDraft: (d) => {
@@ -531,7 +552,8 @@
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     if (phase === 0) {
@@ -783,11 +805,7 @@
     }
     layout.append(article);
     root.append(layout, note);
-    if (focus) {
-      const title = article.querySelector("h3");
-      title.tabIndex = -1;
-      title.focus();
-    }
+    presentArticle(article, focus);
   }
   function openPractice(kind) {
     window.CNCWorkshop.openLesson(views.lessonFor(kind));
@@ -933,7 +951,8 @@
       const saved = model.lessons.findIndex((l) => l.id === path.selected);
       current =
         saved >= 0 &&
-        (view.kind !== "lesson" || !hasAnswer(path.selected) ||
+        (view.kind !== "lesson" ||
+          !hasAnswer(path.selected) ||
           (path.selected === "verification" &&
             model.shaftProject.restore(path.shaftProject)?.events.length &&
             !model.shaftProject.restore(path.shaftProject)?.complete) ||

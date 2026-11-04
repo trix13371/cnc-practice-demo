@@ -110,7 +110,7 @@
 }
 .account-page :is(button, a):focus-visible,
 .account-bar :is(button, a):focus-visible {
-  outline: 3px solid #255beb80;
+  outline: 3px solid #255beb;
   outline-offset: 3px;
 }
 .login-card .account-note {

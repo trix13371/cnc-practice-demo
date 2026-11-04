@@ -67,6 +67,7 @@
     if(user.role==='admin'){const link=node('a','Участники бета-теста');link.href='/admin';actions.append(link);}
     actions.append(button('Выйти из аккаунта',logout));menu.append(actions);
     menu.onclick=event=>{if(event.target.closest('button,a'))menu.open=false;};menu.onkeydown=event=>{if(event.key==='Escape'){menu.open=false;summary.focus();}};
+    menu.addEventListener('focusout',event=>{if(event.relatedTarget&&!menu.contains(event.relatedTarget))menu.open=false;});
     document.addEventListener('click',event=>{if(!menu.contains(event.target))menu.open=false;});
     const accountSlot=document.querySelector('.sidebar-account');if(accountSlot)accountSlot.replaceChildren(menu);else bar.append(menu);
     loginLink=node('a','Войти снова');loginLink.href='/login';loginLink.hidden=true;bar.append(loginLink);document.querySelector('header').after(bar);

@@ -377,6 +377,9 @@
   margin: 12px 0;
 }
 .sandbox-screen details > summary {
+  min-height: 44px;
+  align-content: center;
+  box-sizing: border-box;
   cursor: pointer;
   font-size: 14px;
   font-weight: 550;

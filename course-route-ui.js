@@ -47,7 +47,7 @@
       }[key];
     if (proof && !step.subtask) {
       article.replaceChildren(
-        node("h3", step.title),
+        node("h1", step.title),
         node(
           "p",
           "Практический блок уже завершён. Результат подтверждён сохранённым журналом.",
@@ -146,6 +146,7 @@
       return available();
     };
     const widget = window[uiName].create({
+      headingTag: "h1",
       saved,
       savedDraft: readOnly ? undefined : path[key + "Draft"],
       readOnly,

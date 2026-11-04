@@ -2956,3 +2956,9 @@ footer {
     width: 100%;
   }
 }
+/* Shared disclosure targets stay usable without changing their native behavior. */
+summary {
+  min-height: 44px;
+  align-content: center;
+  box-sizing: border-box;
+}

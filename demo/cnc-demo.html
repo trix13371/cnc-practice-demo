@@ -3006,6 +3006,12 @@ footer {
     width: 100%;
   }
 }
+/* Shared disclosure targets stay usable without changing their native behavior. */
+summary {
+  min-height: 44px;
+  align-content: center;
+  box-sizing: border-box;
+}
 
 /* Source: styles/training.css */
 /* Workshop component layout and light engineering palette. */
@@ -6185,6 +6191,27 @@ body[data-screen="progress"] #learning-progress {
 
 /* Source: styles/layout.css */
 /* Light engineering workshop. Layout is independent of learner state. */
+.skip-link {
+  position: fixed;
+  left: 12px;
+  top: 12px;
+  z-index: 200;
+  padding: 12px 18px;
+  color: white;
+  background: #194dd9;
+  border-radius: 6px;
+  transform: translateY(-180%);
+}
+.skip-link:focus { transform: translateY(0); }
+.course-lesson h1 {
+  font-size: clamp(24px, 3vw, 30px);
+  line-height: 1.3;
+  margin: 0 0 20px;
+}
+.course-lesson h2 { font-size: 20px; line-height: 1.4; }
+@media (max-width: 760px) {
+  .course-menu button, .course-phases button { min-height: 44px; }
+}
 body {
   padding-left: var(--sidebar-width);
   background: var(--paper);
@@ -6201,7 +6228,7 @@ input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 summary:focus-visible {
-  outline: 3px solid #255beb80;
+  outline: 3px solid #255beb;
   outline-offset: 3px;
 }
 .app-sidebar {
@@ -7173,6 +7200,7 @@ footer {
   position: relative;
 }
 .account-menu > summary {
+  min-height: 44px;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -7373,7 +7401,7 @@ footer {
   }
   .app-sidebar .workshop-nav > button,
   .app-sidebar .practice-menu > summary {
-    min-height: 36px;
+    min-height: 44px;
     gap: 7px;
   }
   .nav-icon {
@@ -9631,6 +9659,9 @@ body[data-screen="course"] .course-index {
   margin: 12px 0;
 }
 .sandbox-screen details > summary {
+  min-height: 44px;
+  align-content: center;
+  box-sizing: border-box;
   cursor: pointer;
   font-size: 14px;
   font-weight: 550;
@@ -15811,14 +15842,14 @@ return {
   function diameterArt(before,after){
     return '<svg viewBox="0 0 640 285" aria-hidden="true"><circle cx="185" cy="140" r="108" fill="#f4d49a" stroke="#b18c4c" stroke-width="2"/><circle cx="185" cy="140" r="'+108*after/before+'" fill="#c9d8e3" stroke="#607c92" stroke-width="2"/><path d="M77 140H293" stroke="#345b79" stroke-dasharray="5 6"/><circle cx="185" cy="140" r="4" fill="#345b79"/><text x="345" y="90" fill="#345b79" font-size="24">Было: Ø'+before+' мм</text><text x="345" y="140" fill="#345b79" font-size="24">Стало: Ø'+after+' мм</text><text x="345" y="200" fill="#785723" font-size="19">Жёлтое кольцо —</text><text x="345" y="227" fill="#785723" font-size="19">снятый слой</text></svg>';
   }
-  function create({saved,savedDraft,onDraft=()=>true,onChange=()=>true,onDone=()=>{},onNext}={}){
+  function create({headingTag='h3',saved,savedDraft,onDraft=()=>true,onChange=()=>true,onDone=()=>{},onNext}={}){
     let state=model.restore(saved)||model.create(),notice='',draft=savedDraft?.step===state.step?String(savedDraft.value):'';
     const host=el('section',undefined,'start-session');
     function run(action){try{const keep=['scale','diameter','move'].includes(action.type)?document.activeElement:null,control=keep?.dataset?.startControl,range=keep?.type==='range';const next=model.transition(state,action);const saved=onChange(model.snapshot(next));state=next;notice=saved===false?'Сохранение недоступно. Не закрывайте страницу: действия пока находятся в памяти.':'';if(action.type==='next')draft='';render(action.type==='next'?'title':'feedback');if(control)[...host.querySelectorAll('button')].find(b=>b.dataset.startControl===control&&!b.disabled)?.focus({preventScroll:true});else if(range)host.querySelector('input[type="range"]')?.focus({preventScroll:true});}catch(error){notice=error.message;render('feedback');}}
     function render(focus){
       host.replaceChildren();host.dataset.startStep=String(state.step);
-      if(state.complete){host.append(el('p','Первое знакомство завершено','start-kicker'),el('h3','Теперь можно перейти к первому уроку'),el('p','Вы разобрали узлы, два вида движения, ожидание остановки, десятичные доли и связь диаметра со слоем.'),el('p',state.assisted?'Во время проверки вы открывали помощь. Это нормально: самостоятельное применение проверим на следующих новых условиях.':'Проверочные действия выполнены без открытия подсказок. Это вводное знакомство, а не допуск к реальному станку.'),button('Продолжить курс',onDone,'button primary'));if(onNext)host.append(button('Далее: деталь и измерение',onNext,'button primary'));if(focus){const h=host.querySelector('h3');h.tabIndex=-1;h.focus();}return;}
-      const step=state.step,check=[2,4,6,8].includes(step),title=el('h3',model.steps[step].title);title.tabIndex=-1;
+      if(state.complete){host.append(el('p','Первое знакомство завершено','start-kicker'),el(headingTag,'Теперь можно перейти к первому уроку'),el('p','Вы разобрали узлы, два вида движения, ожидание остановки, десятичные доли и связь диаметра со слоем.'),el('p',state.assisted?'Во время проверки вы открывали помощь. Это нормально: самостоятельное применение проверим на следующих новых условиях.':'Проверочные действия выполнены без открытия подсказок. Это вводное знакомство, а не допуск к реальному станку.'),button('Продолжить курс',onDone,'button primary'));if(onNext)host.append(button('Далее: деталь и измерение',onNext,'button primary'));if(focus){const h=host.querySelector(headingTag);h.tabIndex=-1;h.focus();}return;}
+      const step=state.step,check=[2,4,6,8].includes(step),title=el(headingTag,model.steps[step].title);title.tabIndex=-1;
       host.append(el('p','ПЕРВОЕ ЗНАКОМСТВО · '+(step+1)+' / '+model.steps.length,'start-kicker'),title);
       const meter=el('progress');meter.max=model.steps.length;meter.value=step;meter.setAttribute('aria-label','Действия вводного занятия');host.append(meter,el('p',copy[step][0],'start-lead'),el('p',copy[step][1]));
       const board=el('figure',undefined,'start-board');board.innerHTML=step<=4?machineArt(state,step===2):step<=6?scaleArt(state.scale):diameterArt(step===8?36:32,step===8?32:state.diameter);
@@ -15894,7 +15925,7 @@ return {
       '<rect x="'+(right-2)+'" y="72" width="126" height="62" rx="7" fill="#203f57"/><rect x="'+(right+9)+'" y="82" width="104" height="33" rx="3" fill="#e8f1dd"/><text x="'+(right+16)+'" y="106" class="drawing-display">'+(s.reading===null?'— —':mm(s.reading))+'</text>'+
       '<text x="95" y="30">Внутренние губки</text><text x="95" y="273">Наружные губки</text></svg>';
   }
-  function create({saved,savedDraft,onDraft=()=>{},onChange=()=>{},onDone=()=>{},onNext}={}){
+  function create({headingTag='h3',saved,savedDraft,onDraft=()=>{},onChange=()=>{},onDone=()=>{},onNext}={}){
     let state=model.restore(saved)||model.create(),draft=model.validDraft(savedDraft,state)?{...savedDraft.values}:{},notice='';
     const host=el('section',undefined,'start-session drawing-session');
     function persist(){if(onChange(model.snapshot(state))===false)notice='Не удалось сохранить. Не закрывайте страницу: действия пока находятся в памяти.';}
@@ -15903,7 +15934,7 @@ return {
     function field(label,name,form){const wrap=el('label',label,'field'),input=el('input');input.type='text';input.inputMode='decimal';input.maxLength=32;input.autocomplete='off';input.value=draft[name]||'';input.disabled=state.correct;input.setAttribute('aria-label',label);input.addEventListener('input',()=>{draft[name]=input.value;try{if(onDraft({step:state.step,values:{...draft}})===false)throw Error('Не удалось сохранить черновик. Не закрывайте страницу.');}catch(error){notice=error.message;host.querySelector('[role="status"]').textContent=notice;}});wrap.append(input);form.append(wrap);return input;}
     function board(svg,caption){const figure=el('figure',undefined,'start-board drawing-board');figure.innerHTML=svg;figure.append(el('figcaption',caption));host.append(figure);}
     function render(focus){
-      host.replaceChildren();const i=state.step,c=model.caseForStep(i),title=el('h3',state.complete?'Деталь и измерение — завершено':model.steps[i].title);title.tabIndex=-1;
+      host.replaceChildren();const i=state.step,c=model.caseForStep(i),title=el(headingTag,state.complete?'Деталь и измерение — завершено':model.steps[i].title);title.tabIndex=-1;
       host.append(el('p','ДЕТАЛЬ И ИЗМЕРЕНИЕ · '+(state.complete?'ИТОГ':'ДЕЙСТВИЕ '+(i+1)+' ИЗ '+model.steps.length),'eyebrow'),title);
       if(state.complete){
         host.append(el('p','Вы связали размер с поверхностью, проверили ноль, получили показания на двух деталях и сравнили интервал измерения с допуском.'),el('p','Ошибочных действий: '+state.errors.reduce((a,b)=>a+b,0)+'. Подсказки: '+(state.assisted?'открывались':'не открывались')+'.','start-value'),el('p','Это выполненное учебное упражнение. Реальные измерения требуют инструкции прибора, подходящего метода и практики с преподавателем.','start-note'));
@@ -15955,14 +15986,14 @@ return {
   ];
   const hints={2:'Смотрите на изменение Z, а не на направление стрелки на экране: уменьшение Z от свободного торца ведёт к патрону.',5:'После нового прохода записывайте новый результат. Если размер стал меньше нижней границы, прежнюю деталь обработкой не увеличить.',6:'Снятый металл не возвращается при увеличении командного X. Сравните показание с нижней границей.',7:'Допустима разная последовательность проходов. Проверьте конечный диаметр, длину и неизменённую поверхность за уступом; все замеры должны относиться к последнему проходу.'};
   function art(s){const mirrored=s.step===2,t=model.target(s.step),xp=z=>580+z*7,yp=d=>185-d*2.5;let u=0,path='M160 185',lower=[];for(const seg of s.machine.profile.segments){const a=160+u*7,b=a+seg.length*7;path+='L'+a+' '+yp(seg.diameter)+'H'+b;lower.unshift('L'+b+' '+(370-yp(seg.diameter))+'H'+a);u+=seg.length;}path+=lower.join('')+'Z';const pos=s.step<=2?s.position:{x:(s.machine.cuts.at(-1)?.x||t.stock)+4,z:5};const geometry='<rect x="90" y="72" width="70" height="226" rx="7" fill="'+(s.seen.includes('chuck')?'#537c9b':'#849caf')+'"/><path d="'+path+'" fill="#c3d4e1" stroke="#456b86" stroke-width="2"/><path d="M65 185H620" stroke="#7b95a8" stroke-dasharray="7 5"/><path d="M580 83V290" stroke="'+(s.seen.includes('face')?'#2458ee':'#8aa3b5')+'" stroke-width="3"/><path d="M580 185V35m-6 10 6-10 6 10M580 185H647m-9-6 9 6-9 6" fill="none" stroke="#2458ee" stroke-width="2"/><path d="M'+xp(pos.z)+' '+(yp(pos.x)-46)+'h16v30l-8 16-8-16z" fill="#2458ee"/>'+(s.measurement?'<path d="M'+xp(s.measurement.z)+' 92V280" stroke="'+(model.fresh(s)?'#238366':'#b1791d')+'" stroke-width="3" stroke-dasharray="4 4"/>':'');return '<svg viewBox="0 0 680 340" aria-hidden="true"><g'+(mirrored?' transform="translate(680 0) scale(-1 1)"':'')+'>'+geometry+'</g><text x="'+(mirrored?65:588)+'" y="29">+X</text><text x="'+(mirrored?12:630)+'" y="171">+Z</text><text x="'+(mirrored?52:524)+'" y="318">Z = 0</text><text x="'+(mirrored?510:88)+'" y="328">Патрон</text><text x="240" y="34">'+(s.step<=2?'X'+pos.x+' · Z'+pos.z:'Учебный профиль')+'</text></svg>';}
-  function create({saved,savedDraft,onDraft=()=>true,onChange=()=>true,onDone=()=>{},onNext}={}){
+  function create({headingTag='h3',saved,savedDraft,onDraft=()=>true,onChange=()=>true,onDone=()=>{},onNext}={}){
     let state=model.restore(saved)||model.create(),draft=model.validDraft(savedDraft,state)?{...savedDraft.values}:{},notice='';const host=el('section',undefined,'start-session drawing-session process-session');
     function run(a){try{state=model.transition(state,a);if(a.type==='next'||a.type==='restart'||state.correct)draft={};notice='';if(onChange(model.snapshot(state))===false)notice='Не удалось сохранить. Не закрывайте страницу: действия пока в памяти.';}catch(e){notice=e.message;}render(a.type==='next'?'title':'status');}
     function button(text,a){const b=el('button',text,'button secondary');b.type='button';b.disabled=state.correct;b.addEventListener('click',()=>run(a));return b;}
     function field(text,key,form,initial=''){const label=el('label',text,'field'),input=el('input');input.type='text';input.inputMode='decimal';input.maxLength=32;input.autocomplete='off';input.value=Object.hasOwn(draft,key)?draft[key]:initial;draft[key]=input.value;input.disabled=state.correct;input.setAttribute('aria-label',text);input.addEventListener('input',()=>{draft[key]=input.value;try{if(onDraft({step:state.step,values:{...draft}})===false)throw Error('Не удалось сохранить черновик. Не закрывайте страницу.');}catch(e){host.querySelector('[role="status"]').textContent=e.message;}});label.append(input);form.append(label);}
     function form(text,fields,action){const f=el('form',undefined,'start-answer');for(const spec of fields)field(...spec.slice(0,2),f,spec[2]||'');const b=el('button',text,'button primary');b.type='submit';b.disabled=state.correct;f.append(b);f.addEventListener('submit',e=>{e.preventDefault();run(action());});host.append(f);}
     function groupFrom(start,text,open){const box=el('details',undefined,'course-reading process-group');box.open=open;const items=[...host.children].slice(start);box.append(el('summary',text),...items);host.append(box);}
-    function render(focus){host.replaceChildren();const i=state.step,title=el('h3',state.complete?'Первый процесс — завершено':model.steps[i].title);title.tabIndex=-1;host.append(el('p','КООРДИНАТЫ И ПЕРВЫЙ ПРОЦЕСС · '+(state.complete?'ИТОГ':'ШАГ '+(i+1)+' ИЗ 8'),'eyebrow'),title);
+    function render(focus){host.replaceChildren();const i=state.step,title=el(headingTag,state.complete?'Первый процесс — завершено':model.steps[i].title);title.tabIndex=-1;host.append(el('p','КООРДИНАТЫ И ПЕРВЫЙ ПРОЦЕСС · '+(state.complete?'ИТОГ':'ШАГ '+(i+1)+' ИЗ 8'),'eyebrow'),title);
       if(state.complete){host.append(el('p','Вы связали X/Z с движением, оставили припуск, выполнили чистовой проход, разобрали пересъём и изготовили другую деталь с контролем двух поверхностей.'),el('p','Ошибок: '+state.errors.reduce((a,b)=>a+b,0)+'. Помощь: '+(state.assisted?'открывалась':'не открывалась')+'.','start-value'),el('p','Это результат учебной модели, а не допуск к реальному оборудованию. Наладка и условия доступа были подготовлены сценой.','start-note'));const done=el('button','Продолжить курс','button primary');done.type='button';done.addEventListener('click',onDone);host.append(done);if(onNext){const b=el('button','Далее: программа и наладка','button primary');b.type='button';b.addEventListener('click',onNext);host.append(b);}if(focus)title.focus();return;}
       host.append(el('p',copy[i]));const fig=el('figure',undefined,'start-board drawing-board');fig.innerHTML=art(state);fig.append(el('figcaption',i===2?'Развёрнутый вид. Направления задаются относительно торца и патрона.':'Z0 — свободный торец; X по диаметру. Схема упрощена. Проход рассчитывается целиком за одно действие.'));host.append(fig);
       if(i===0){const controls=el('div',undefined,'start-controls');for(const [value,text]of [['face','Свободный торец'],['axis','Ось детали'],['chuck','Патрон']])controls.append(button(text,{type:'inspect',value}));host.append(controls,el('p','Найдено ориентиров: '+state.seen.length+' из 3','start-value'));}
@@ -15993,7 +16024,7 @@ return {
   ];
   const hints={1:'G0/G1 сохраняются. Строка только с X или Z наследует вид движения. F при G99 — мм/об; S при G97 — об/мин.',2:'Вход в материал должен выполняться с рабочей подачей G1 и заданным F. Быстрый G0 не предназначен для снятия материала.',3:'Сначала известны машинные координаты, затем зажим и инструмент. Виртуальный щуп измеряет инструмент автоматически. Известный машинный Z торца вводится в G54, а не в геометрию резца.',4:'Проверьте X у торца и конечный Z рабочего прохода. Диаметр и длина должны совпасть с новым условием, а не с прошлой деталью.',5:'После правки программы или G54 вернитесь к проверке. HOLD не является подтверждением остановки шпинделя. После RESET повторный цикл начинайте на другой заготовке.',6:'Для обработанного участка выберите сечение между Z−25 и 0, затем измерьте оставшуюся поверхность между Z−60 и −25. Край уступа не подходит для однозначного замера.'};
   function art(state,profile,path,position){const m=state.machine,x=z=>535+z*6,y=d=>165-d*2.1;let u=0,d='M175 165',bottom=[];for(const seg of profile.segments){const a=175+u*6,b=a+seg.length*6;d+='L'+a+' '+y(seg.diameter)+'L'+b+' '+y(seg.endDiameter??seg.diameter);bottom.unshift('L'+b+' '+(330-y(seg.endDiameter??seg.diameter))+'L'+a+' '+(330-y(seg.diameter)));u+=seg.length;}d+=bottom.join('')+'Z';const segments=(path||[]).slice(-30).map(p=>'<path d="M'+x(p.from.z)+' '+y(p.from.x)+'L'+x(p.to.z)+' '+y(p.to.x)+'" fill="none" stroke="'+(p.motion===0?'#ba811e':'#2458ee')+'" stroke-width="3"'+(p.motion===0?' stroke-dasharray="5 4"':'')+'/>').join('');const px=Math.max(25,Math.min(650,x(position.z))),py=Math.max(25,Math.min(280,y(position.x)));return '<svg viewBox="0 0 680 300" aria-hidden="true"><rect x="110" y="62" width="65" height="206" rx="6" fill="#7d96ab"/><path d="'+d+'" fill="#ccdae5" stroke="#466980" stroke-width="2"/><path d="M90 165H620" stroke="#8da3b3" stroke-dasharray="6 5"/>'+segments+'<path d="M'+(px-8)+' '+(py-28)+'h16v16l-8 12-8-12z" fill="#2458ee"/><path d="M535 55V276" stroke="#7293ae"/><text x="505" y="294">Z0</text><text x="106" y="294">Патрон</text><text x="15" y="25">Ø'+m.stock.diameter+' · вылет '+m.stock.length+' мм</text></svg>';}
-  function create({saved,savedDraft,onDraft=()=>true,onChange=()=>true,onDone=()=>{},onNext}={}){
+  function create({headingTag='h3',saved,savedDraft,onDraft=()=>true,onChange=()=>true,onDone=()=>{},onNext}={}){
     let state=model.restore(saved)||model.create(),draft=model.validDraft(savedDraft,state)?{...savedDraft.values}:{},notice='';const host=el('section',undefined,'start-session drawing-session program-setup-session');
     function currentSource(){return draft.program??state.source;}
     function run(a){const prev=state.step;try{state=model.transition(state,a);notice='';if(state.step!==prev||a.type==='restart')draft={};if(onChange(model.snapshot(state))===false)notice='Не удалось сохранить. Не закрывайте страницу: действия пока в памяти.';}catch(e){notice=e.message;}render(state.step!==prev?'title':'status');}
@@ -16003,7 +16034,7 @@ return {
     function form(parent,label,spec,action){const f=el('form',undefined,'start-answer');for(const [text,key,initial] of spec)field(f,text,key,initial||'');const b=el('button',label,'button primary');b.type='submit';f.append(b);f.addEventListener('submit',e=>{e.preventDefault();run(action());});parent.append(f);}
     function code(parent,source,index){const list=el('ol',undefined,'ps-code');source.split('\n').forEach((line,i)=>{const item=el('li',line||' ');if(i===index){item.className='is-current';item.setAttribute('aria-current','step');}list.append(item);});list.setAttribute('aria-label','Программа, подсвечен следующий кадр');parent.append(list);}
     function editor(parent){const label=el('label','Программа учебной детали','field'),area=el('textarea');area.rows=10;area.maxLength=4000;area.spellcheck=false;area.autocomplete='off';area.value=currentSource();draft.program=area.value;area.setAttribute('aria-label','Программа учебной детали');area.addEventListener('input',()=>{saveDraft('program',area.value);const start=host.querySelector('[data-cycle-start]'),next=host.querySelector('[data-lesson-next]');if(start)start.disabled=!model.approved(state,area.value);if(next&&[2,4].includes(state.step))next.disabled=!state.correct||area.value!==state.source;host.querySelector('.start-feedback').textContent=area.value!==state.source?'Текст изменён. Для продолжения нужна повторная проверка.':state.feedback;});label.append(area);parent.append(label,el('p','В G-коде дробь записывают с точкой: F0.1. В числовых полях допускается также запятая.','start-note'));}
-    function render(focus){host.replaceChildren();const i=state.step,m=state.machine,title=el('h3',state.complete?'Программа и наладка — завершено':model.steps[i].title);title.tabIndex=-1;host.append(el('p','ПРОГРАММА И НАЛАДКА · '+(state.complete?'ИТОГ':'ШАГ '+(i+1)+' ИЗ 7'),'eyebrow'),title);
+    function render(focus){host.replaceChildren();const i=state.step,m=state.machine,title=el(headingTag,state.complete?'Программа и наладка — завершено':model.steps[i].title);title.tabIndex=-1;host.append(el('p','ПРОГРАММА И НАЛАДКА · '+(state.complete?'ИТОГ':'ШАГ '+(i+1)+' ИЗ 7'),'eyebrow'),title);
       if(state.complete){host.append(el('p','Вы связали кадры с движениями, исправили опасный быстрый ход, подготовили другую установку, проверили программу на копии и выполнили её с контролем изделия.'),el('p','Ошибок: '+state.errors.reduce((a,b)=>a+b,0)+'. Помощь: '+(state.assisted?'открывалась':'не открывалась')+'.','start-value'),el('p','Привязка инструмента выполнена виртуальным щупом. Ручное касание и работа на физическом оборудовании этим результатом не подтверждаются.','start-note'));const done=el('button','Продолжить курс','button primary');done.type='button';done.addEventListener('click',onDone);host.append(done);if(onNext){const b=el('button','Далее: проект ступенчатого валика','button primary');b.type='button';b.addEventListener('click',onNext);host.append(b);}if(focus)title.focus();return;}
       host.append(el('p',intro[i]));const figure=el('figure',undefined,'start-board drawing-board');figure.innerHTML=art(state,m.profile,m.path,m.position);figure.append(el('figcaption','Учебная деталь · выполненные движения. Синий — рабочая подача, пунктир — быстрый ход. X по диаметру.'));host.append(figure);
       const display=root.CNCRealMachine.display(m);host.append(el('p','Рабочие (WORK): X'+display.work.x+' Z'+display.work.z+' · шпиндель '+(m.spindle?'включён':'выключен в модели')+' · снято проходов: '+m.cuts.length,'start-value'));if(i>=3)host.append(el('p','Положение осей (MACHINE): X'+display.machine.x+' Z'+display.machine.z+'. Машинный Z100 торца — известное условие установки, а не текущее положение резца.','start-note'));
@@ -16023,7 +16054,7 @@ return {
   root.CNCProgramSetupUI=Object.freeze({create});
 })(window);
 </script><script>(function(root){
-  'use strict';function create(options={}){const model=root.CNCShaftProject.forTask(options.saved?.taskId||'RF5-SHAFT-01'),t=model.task,el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;},mm=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:3});
+  'use strict';function create(options={}){const headingTag=options.headingTag==='h1'?'h1':'h3',model=root.CNCShaftProject.forTask(options.saved?.taskId||'RF5-SHAFT-01'),t=model.task,el=(tag,text,cls)=>{const e=document.createElement(tag);if(text!==undefined)e.textContent=text;if(cls)e.className=cls;return e;},mm=n=>Number(n).toLocaleString('ru-RU',{maximumFractionDigits:3});
   const intros=[
     'Изготовьте ступенчатый валик по учебному чертежу. Прочитайте требования к участкам A, B и C. Размеры в миллиметрах; X задаётся по диаметру, Z0 — свободный торец. Заготовка Ø'+t.base+', вылет '+t.stock.length+' мм; зажатые 15 мм указаны отдельно.',
     'Составьте порядок наружных переходов. За один проход T0101 допускает до 2 мм на радиус. Выберите операции и проверьте выполнимость. Это проверка плана на отдельной подготовленной копии — ваша заготовка ещё не обработана.',
@@ -16063,7 +16094,7 @@ return {
     function editor(parent){const label=el('label','Программа валика','field'),input=el('textarea');input.rows=12;input.maxLength=4000;input.spellcheck=false;input.value=currentSource();draft.program=input.value;input.setAttribute('aria-label','Программа валика');input.addEventListener('input',()=>{saveDraft('program',input.value);const launch=host.querySelector('[data-shaft-start]'),next=host.querySelector('[data-shaft-next]');if(launch)launch.disabled=!model.approved(state,input.value);if(next&&state.step===3)next.disabled=!state.correct||input.value!==state.source;host.querySelector('.start-feedback').textContent=input.value!==state.source?'Текст изменён: нужна повторная проверка.':state.feedback;});label.append(input);parent.append(label,el('p','Дробные значения в G-коде пишутся с точкой. Шаблон содержит только режимы и завершение; переходы добавьте самостоятельно.','start-note'));}
     function code(parent){const list=el('ol',undefined,'ps-code');state.source.split('\n').forEach((text,i)=>{const item=el('li',text||' ');if(i===state.machine.program.index){item.className='is-current';item.setAttribute('aria-current','step');}list.append(item);});parent.append(list);}
     function map(parent){const wrap=el('div',undefined,'shaft-table-wrap'),table=el('table',undefined,'shaft-control-table'),head=el('tr');for(const title of ['Параметр','Требование, мм','Запись, мм'])head.append(el('th',title));const thead=el('thead');thead.append(head);table.append(thead);const body=el('tbody');for(const row of model.rows){const tr=el('tr'),r=state.records[row.id];if(row.id===selected&&state.step===5)tr.className='is-current';tr.append(el('th',row.title),el('td',row.tolerance===null?mm(t.reach)+'* · справочно':mm(row.nominal)+(row.tolerance?' ±'+mm(row.tolerance):' · сохранить')),el('td',r?mm(r.value)+' · '+(model.inTolerance(row,r.value)?'записано':'вне допуска'):'—'));body.append(tr);}table.append(body);wrap.append(table);parent.append(wrap);}
-    function render(focus){host.replaceChildren();const i=state.step,m=state.machine,title=el('h3',state.complete?'Валик изготовлен · протокол принят':model.steps[i].title);title.tabIndex=-1;host.append(el('p','ПРОЕКТ · СТУПЕНЧАТЫЙ ВАЛИК · '+(state.complete?'ИТОГ':'ЭТАП '+(i+1)+' ИЗ 7'),'eyebrow'),title);
+    function render(focus){host.replaceChildren();const i=state.step,m=state.machine,title=el(headingTag,state.complete?'Валик изготовлен · протокол принят':model.steps[i].title);title.tabIndex=-1;host.append(el('p','ПРОЕКТ · СТУПЕНЧАТЫЙ ВАЛИК · '+(state.complete?'ИТОГ':'ЭТАП '+(i+1)+' ИЗ 7'),'eyebrow'),title);
       const exportReport=()=>download('cnc-shaft-protocol.txt',model.report(state));
       host.append(el('p',t.title+' · '+t.id,'start-note'));
       if(!options.readOnly&&(!state.events.length||state.complete)){const chooser=el('div',undefined,'start-controls');for(const v of model.variants){if(v.id===t.id||state.completedProjects.some(p=>(p.taskId||'RF5-SHAFT-01')===v.id))continue;const b=el('button','Другой чертёж: '+v.title,'button secondary');b.type='button';b.addEventListener('click',()=>{try{const next=model.transition(state,{type:'selectVariant',id:v.id}),saved=model.snapshot(next);if(onChange(saved)===false)throw Error('Не удалось сохранить выбор.');host.replaceWith(create({...options,saved,savedDraft:undefined}));}catch(e){notice=e.message;render();}});chooser.append(b);}host.append(chooser);}
@@ -16073,10 +16104,10 @@ return {
       if(i===0){const row=el('div',undefined,'start-controls');for(const id of ['A','B','C'])row.append(button('Участок '+id,{type:'inspect',id}));host.append(row,el('p','Изучено поверхностей: '+state.seen.length+' из 3','start-value'));const save=el('button','Скачать учебный чертёж SVG','course-back');save.type='button';save.addEventListener('click',()=>download('shaft-'+t.id+'.svg',drawing(state,target),'image/svg+xml'));host.append(save);}
       if(i===1){const plan=el('ol',undefined,'shaft-route');for(const id of state.plan)plan.append(el('li',model.operations[id].title));host.append(plan);const row=el('div',undefined,'start-controls');for(const [id,o]of Object.entries(model.operations)){const b=button('Добавить: '+o.title,{type:'append',id});b.disabled=state.plan.length>=6;row.append(b);}const remove=button('Убрать последнюю операцию',{type:'remove'});remove.disabled=!state.plan.length;row.append(remove);host.append(row,button('Проверить маршрут',{type:'checkPlan'}));}
       if(i===2){const list=el('ul',undefined,'ps-checklist');for(const [ok,label]of [[m.referenced,'Машинные координаты'],[m.clamped,'Закрепление'],[m.tool===1,'T0101 · проходной'],[m.tool===1&&m.offsets['1'].calibrated,'Измерение инструмента щупом'],[m.workOffset.confirmed&&m.workOffset.z===100,'G54 по машинному Z100 торца'],[m.doorClosed,'Ограждение закрыто']])list.append(el('li',(ok?'✓ ':'○ ')+label));host.append(list);if(!m.referenced)host.append(button('Выполнить учебный референс',{type:'reference'}));else if(!m.clamped)host.append(button('Закрепить заготовку',{type:'clamp'}));else if(m.tool!==1)host.append(button('Выбрать T0101 · до 2 мм на радиус',{type:'tool',value:1}),button('Выбрать T0202 · до 0,5 мм на радиус',{type:'tool',value:2}));else if(!m.offsets['1'].calibrated)host.append(button('Измерить инструмент виртуальным щупом',{type:'preset'}));else if(!m.workOffset.confirmed||m.workOffset.z!==100)form(host,'Подтвердить G54',[['Машинный Z свободного торца, мм','zero']],()=>({type:'zero',value:draft.zero||''}));else if(!m.doorClosed)host.append(button('Закрыть ограждение',{type:'door',value:true}));}
-      if(i===3){editor(host);host.append(button('Проверить программу на копии',()=>({type:'preview',source:currentSource()})));if(state.preview){const box=el('div',undefined,'ps-preview');box.append(el('h4','Результат графики · копия'),el('p',state.preview.message));if(state.preview.profile){const f=el('figure',undefined,'start-board drawing-board shaft-drawing');f.innerHTML=drawing(state,state.preview.profile,true);box.append(f);}host.append(box);}}
+      if(i===3){editor(host);host.append(button('Проверить программу на копии',()=>({type:'preview',source:currentSource()})));if(state.preview){const box=el('div',undefined,'ps-preview');box.append(el(headingTag==='h1'?'h2':'h4','Результат графики · копия'),el('p',state.preview.message));if(state.preview.profile){const f=el('figure',undefined,'start-board drawing-board shaft-drawing');f.innerHTML=drawing(state,state.preview.profile,true);box.append(f);}host.append(box);}}
       if(i===4){const display=root.CNCRealMachine.display(m);host.append(el('p','Рабочие X'+display.work.x+' Z'+display.work.z+' · шпиндель '+(m.spindle?'включён':'выключен в модели')+' · переходов со съёмом: '+m.path.filter(p=>p.cutting).length,'start-value'));const status={empty:'не запущена',running:'выполнение',hold:'пауза',done:'завершено',ready:'готово',alarm:'авария',stopped:'прервано'};host.append(el('p','Программа: '+(status[m.program.status]||m.program.status)));code(host);if(!state.executed){const start=button('Запустить проверенную программу',()=>({type:'start',source:currentSource()}));start.dataset.shaftStart='';start.disabled=!model.approved(state,currentSource());start.className='button primary';host.append(start,button('Вернуться к программе',{type:'back'}));const change=el('details',undefined,'course-reading');change.append(el('summary','Изменить текст или G54 до запуска'));editor(change);form(change,'Изменить G54',[['Машинный Z торца, мм','zero',String(m.workOffset.z)]],()=>({type:'zero',value:draft.zero||''}));host.append(change);}else if(!state.correct){if(m.program.status==='running'){const label=el('label','Режим исполнения','field'),select=el('select');select.setAttribute('aria-label','Режим исполнения');for(const [value,text]of [['auto','До ближайшей остановки'],['step','По одному кадру']]){const o=el('option',text);o.value=value;select.append(o);}select.value=execution;select.addEventListener('change',()=>{execution=select.value;render();});label.append(select);host.append(label,button(execution==='auto'?'Выполнить до остановки':'Выполнить следующий кадр',{type:execution==='auto'?'run':'step'}),button('HOLD · пауза подачи',{type:'hold'}));}if(m.program.status==='hold')host.append(button('Продолжить цикл',()=>({type:'start',source:state.source})));host.append(button('RESET · прервать цикл',{type:'reset'}));if(!m.spindle&&!['running','hold'].includes(m.program.status))host.append(button('Новая заготовка и наладка',{type:'restart'}));}}
       if(i===5){map(host);if(m.doorClosed)host.append(button('Открыть ограждение для контроля',{type:'door',value:false}));else{const row=el('div',undefined,'shaft-measure-controls'),label=el('label','Параметр карты контроля','field'),select=el('select');select.setAttribute('aria-label','Параметр карты контроля');for(const r of model.rows){const o=el('option',r.title);o.value=r.id;select.append(o);}select.value=selected;select.addEventListener('change',()=>{selected=select.value;draft.value='';draft.z='';saveDraft('row',selected);render();});label.append(select);row.append(label);const current=model.rows.find(r=>r.id===selected);if(current.method!=='calculation'){const instrument=el('label','Прибор','field'),choice=el('select');choice.setAttribute('aria-label','Прибор');for(const [value,text]of [['micrometer','Наружный микрометр · отсчёт 0,01 мм'],['depth','Учебный глубиномер · отсчёт 0,01 мм']]){const o=el('option',text);o.value=value;choice.append(o);}choice.value=method;choice.addEventListener('change',()=>{method=choice.value;saveDraft('method',method);render();});instrument.append(choice);row.append(instrument);if(method==='micrometer')form(row,'Измерить выбранный параметр',[['Сечение замера Z, мм','z']],()=>({type:'measure',id:selected,method,z:draft.z||''}));else row.append(button('Подвести к выбранному уступу',{type:'measure',id:selected,method,z:''}));if(state.measurement)row.append(el('output','Последний замер: '+model.rows.find(r=>r.id===state.measurement.id).title+' = '+mm(state.measurement.value)+' мм','drawing-reading'));}else row.append(el('p','Длина B = дальний отсчёт − ближний отсчёт. Используйте две записанные глубины текущей детали.','start-hint'));form(row,current.method==='calculation'?'Записать вычисленную длину B':'Записать показание в протокол',[['Значение выбранного параметра, мм','value']],()=>({type:'record',id:selected,value:draft.value||''}));host.append(row);}}
-      if(i===6){map(host);const routes=el('div',undefined,'shaft-route-comparison');routes.append(el('h4','План'),el('p',state.plan.map(id=>model.operations[id].title).join(' → ')),el('h4','Выполненные рабочие перемещения со съёмом'));const list=el('ol');for(const path of model.trace(m.path))list.append(el('li','X'+mm(path[0])+' Z'+mm(path[2])+' → X'+mm(path[1])+' Z'+mm(path[3])));routes.append(list,el('p','Показаны рабочие перемещения в пределах вылета; подходы перед торцом в сравнение маршрута не входят.','start-note'));host.append(routes);const form=el('form',undefined,'shaft-verdict');for(const [label,name,options]of [['Сравнение с планом','route',[['followed','Рабочие переходы совпали с планом'],['changed','Маршрут изменён при программировании']]],['Вывод по изделию','decision',[['accept','Размеры подтверждены в учебной модели'],['reject','Изделие не соответствует требованиям']]]]){const wrap=el('label',label,'field'),select=el('select');select.name=name;select.setAttribute('aria-label',label);const placeholder=el('option','Выберите вывод');placeholder.value='';select.append(placeholder);for(const [value,text]of options){const option=el('option',text);option.value=value;select.append(option);}select.value=state.report?.[name]??draft[name]??'';select.disabled=state.correct;select.addEventListener('change',()=>saveDraft(name,select.value));wrap.append(select);form.append(wrap);}field(form,'Примечание к протоколу','note','',500);const confirm=el('button','Принять изделие и протокол','button primary');confirm.type='submit';confirm.disabled=state.correct;form.append(confirm);form.addEventListener('submit',e=>{e.preventDefault();run({type:'verdict',route:form.elements.route.value,decision:form.elements.decision.value,note:draft.note||''});});const review=button('Вернуться к карте контроля',{type:'review'});review.disabled=state.correct;host.append(form,review);}
+      if(i===6){map(host);const routes=el('div',undefined,'shaft-route-comparison');routes.append(el(headingTag==='h1'?'h2':'h4','План'),el('p',state.plan.map(id=>model.operations[id].title).join(' → ')),el(headingTag==='h1'?'h2':'h4','Выполненные рабочие перемещения со съёмом'));const list=el('ol');for(const path of model.trace(m.path))list.append(el('li','X'+mm(path[0])+' Z'+mm(path[2])+' → X'+mm(path[1])+' Z'+mm(path[3])));routes.append(list,el('p','Показаны рабочие перемещения в пределах вылета; подходы перед торцом в сравнение маршрута не входят.','start-note'));host.append(routes);const form=el('form',undefined,'shaft-verdict');for(const [label,name,options]of [['Сравнение с планом','route',[['followed','Рабочие переходы совпали с планом'],['changed','Маршрут изменён при программировании']]],['Вывод по изделию','decision',[['accept','Размеры подтверждены в учебной модели'],['reject','Изделие не соответствует требованиям']]]]){const wrap=el('label',label,'field'),select=el('select');select.name=name;select.setAttribute('aria-label',label);const placeholder=el('option','Выберите вывод');placeholder.value='';select.append(placeholder);for(const [value,text]of options){const option=el('option',text);option.value=value;select.append(option);}select.value=state.report?.[name]??draft[name]??'';select.disabled=state.correct;select.addEventListener('change',()=>saveDraft(name,select.value));wrap.append(select);form.append(wrap);}field(form,'Примечание к протоколу','note','',500);const confirm=el('button','Принять изделие и протокол','button primary');confirm.type='submit';confirm.disabled=state.correct;form.append(confirm);form.addEventListener('submit',e=>{e.preventDefault();run({type:'verdict',route:form.elements.route.value,decision:form.elements.decision.value,note:draft.note||''});});const review=button('Вернуться к карте контроля',{type:'review'});review.disabled=state.correct;host.append(form,review);}
       if(i>=5){const save=el('button','Скачать текущий протокол','course-back');save.type='button';save.addEventListener('click',exportReport);host.append(save);}
       const feedback=el('div',undefined,'start-feedback');feedback.setAttribute('role','status');feedback.tabIndex=-1;if(notice)feedback.append(el('p',notice));if(state.feedback)feedback.append(el('p',state.feedback));host.append(feedback);if(!state.correct){const help=button(state.hints.includes(i)?'Подсказка открыта':'Нужна подсказка',{type:'hint'});help.disabled=state.hints.includes(i);host.append(help);}if(state.hints.includes(i))host.append(el('p',hints[i],'start-hint'));
       const ready=i===0?state.seen.length===3:i===1?state.planReady:i===2?model.ready(state):i===5?model.recordsReady(state):state.correct,next=button(i===6?'Завершить проект':'Следующий этап',()=>({type:'next',source:currentSource()}));next.dataset.shaftNext='';next.className='button primary';next.disabled=!ready||i===3&&currentSource()!==state.source;host.append(next);
@@ -16086,19 +16117,19 @@ return {
   return mount(options);}
   root.CNCShaftProjectUI=Object.freeze({create});
 })(window);
-</script><script>(function(root){'use strict';const m=root.CNCOperationCourse,e=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),view='target',notice='';const host=e('section',undefined,'start-session shaft-project-session');
+</script><script>(function(root){'use strict';const m=root.CNCOperationCourse,e=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({headingTag='h3',saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),view='target',notice='';const host=e('section',undefined,'start-session shaft-project-session');
 function persist(){if(onChange(m.snapshot(s))===false)notice='Сохранение недоступно. Не закрывайте страницу.';}
 function run(a){try{s=m.transition(s,a);notice='';persist();}catch(err){notice=err.message;}render();}
 function b(label,action){const n=e('button',label,'button secondary');n.type='button';n.onclick=()=>run(typeof action==='function'?action():action);return n;}
 function input(parent,label,value,submit,button){const form=e('form',undefined,'start-answer'),wrap=e('label',label,'field'),i=e('input');i.type='text';i.inputMode='decimal';i.maxLength=32;i.value=value;i.setAttribute('aria-label',label);wrap.append(i);const n=e('button',button,'button secondary');n.type='submit';form.append(wrap,n);form.onsubmit=ev=>{ev.preventDefault();run(submit(i.value));};parent.append(form);}
 function draw(profile){let u=0,upper='',lower=[];const x=u=>50+u*8,y=d=>130-d*2.5;for(const p of profile.segments){const a=x(u),bb=x(u+p.length);upper+='L'+a+' '+y(p.diameter)+'L'+bb+' '+y(p.endDiameter??p.diameter);lower.unshift('L'+bb+' '+(260-y(p.endDiameter??p.diameter))+'L'+a+' '+(260-y(p.diameter)));u+=p.length;}return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 290" role="img" aria-label="'+(view==='target'?'Требуемый профиль':'Фактический профиль')+'"><g fill="#24465f" font-family="Arial,sans-serif"><path d="M50 130'+upper+lower.join('')+'Z" fill="#cadce8" stroke="#45677e" stroke-width="2"/><path d="M30 130H570" stroke="#8199ab" stroke-dasharray="6 5"/><text x="50" y="245">Z−60</text><text x="500" y="245">Z0 · прежний торец</text><text x="35" y="25">'+(view==='target'?'Целевой профиль':'Снятый металл сохраняется')+'</text><text x="35" y="278">Размеры — в условии; вид сбоку, не 3D-модель</text></g></svg>';}
-function render(){const t=m.tasks[s.current],st=s.machine,accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(e('p','ПРАКТИКУМ ОПЕРАЦИЙ · ТОКАРНЫЙ СТАНОК','eyebrow'),e('h3',t.title),e('p','Задание '+(s.current+1)+' из '+m.tasks.length+' · уровень '+t.level+' · принято '+s.done.length,'start-value'));const list=e('ol');m.tasks.forEach((task,i)=>list.append(e('li',(i<s.current?'✓ ':i===s.current?'Сейчас: ':'Далее: ')+task.title)));host.append(list,e('p',t.goal),e('p',t.learn),e('p','Заготовка Ø32, вылет 60 мм; зажатые 15 мм отдельно. G54: известный машинный Z торца 100. Требуется T0'+t.tool+'0'+t.tool+'. S800, F0.1 / F0.08 — условия упражнения, не рекомендации для материала.','start-note'));
+function render(){const t=m.tasks[s.current],st=s.machine,accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(e('p','ПРАКТИКУМ ОПЕРАЦИЙ · ТОКАРНЫЙ СТАНОК','eyebrow'),e(headingTag,t.title),e('p','Задание '+(s.current+1)+' из '+m.tasks.length+' · уровень '+t.level+' · принято '+s.done.length,'start-value'));const list=e('ol');m.tasks.forEach((task,i)=>list.append(e('li',(i<s.current?'✓ ':i===s.current?'Сейчас: ':'Далее: ')+task.title)));host.append(list,e('p',t.goal),e('p',t.learn),e('p','Заготовка Ø32, вылет 60 мм; зажатые 15 мм отдельно. G54: известный машинный Z торца 100. Требуется T0'+t.tool+'0'+t.tool+'. S800, F0.1 / F0.08 — условия упражнения, не рекомендации для материала.','start-note'));
 const views=e('div',undefined,'start-controls');for(const [key,label]of [['target','Чертёж задания'],['actual','Моя деталь']]){const n=e('button',label,'button secondary');n.type='button';n.setAttribute('aria-pressed',String(view===key));n.onclick=()=>{view=key;render();};views.append(n);}host.append(views);const figure=e('figure',undefined,'shaft-drawing start-board');figure.innerHTML=draw(view==='target'?m.expected(t):st.profile);host.append(figure);
-if(!accepted){if(!s.executed){host.append(e('h4','1. Подготовьте установку'));const setup=e('div',undefined,'start-controls');setup.append(b('Референс',{type:'machine',action:{type:'reference'}}),b('Закрепить',{type:'machine',action:{type:'clamp',value:true}}));for(const tool of [1,3,4])setup.append(b('Выбрать T0'+tool+'0'+tool,{type:'machine',action:{type:'tool',tool}}));setup.append(b('Измерить инструмент щупом',{type:'machine',action:{type:'preset'}}),b('Закрыть ограждение',{type:'machine',action:{type:'door',value:true}}));host.append(setup);input(host,'G54 · машинный Z торца, мм',String(st.workOffset.z),v=>({type:'machine',action:{type:'workOffset',z:Number(v.replace(',','.'))}}),'Подтвердить G54');host.append(e('p','Референс '+(st.referenced?'✓':'—')+' · заготовка '+(st.clamped?'✓':'—')+' · T'+st.tool+' · инструмент '+(st.offsets[String(st.tool)]?.calibrated?'измерен':'не измерен')+' · G54 '+st.workOffset.z+' · ограждение '+(st.doorClosed?'закрыто':'открыто'),'start-value'));host.append(e('h4','2. Составьте программу'));const label=e('label','Программа задания','field'),code=e('textarea');code.rows=12;code.maxLength=4000;code.spellcheck=false;code.value=s.draft;code.setAttribute('aria-label','Программа задания');code.oninput=()=>{s.draft=code.value;persist();const start=host.querySelector('[data-op-start]');if(start)start.disabled=!s.approval||code.value!==s.source;};label.append(code);host.append(label,b('Проверить на копии',()=>({type:'preview',source:s.draft})));const start=b('Запустить проверенную программу',()=>({type:'start',source:s.draft}));start.dataset.opStart='';start.disabled=!s.approval||s.draft!==s.source;host.append(start);}else{host.append(e('h4','3. Выполните и проконтролируйте'));host.append(e('p','Программа: '+st.program.status+' · проходов '+st.cuts.length+' · шпиндель '+(st.spindle?'включён':'выключен')));if(st.program.status==='running')host.append(b('Выполнить до остановки',{type:'run'}));host.append(b('RESET · прервать цикл',{type:'machine',action:{type:'reset'}}));if(st.program.status==='done'){if(st.doorClosed)host.append(b('Открыть ограждение',{type:'machine',action:{type:'door',value:false}}));host.append(e('p','Карта контроля: '+t.points.map(([z,d])=>'Z'+z+': Ø'+d).join('; ')));input(host,'Сечение Z для микрометра, мм','',v=>({type:'machine',action:{type:'measure',z:Number(v.replace(',','.')),instrument:'micrometer'}}),'Измерить');const readings=e('ul');for(const r of st.readings)readings.append(e('li','Z'+r.z+' · Ø'+r.reading+' · '+(r.afterCut===st.cuts.length?'свежий замер':'устарел')));host.append(readings);if(t.depth){host.append(b('Получить осевой отсчёт торца',{type:'depth'}));if(s.depthReading!==null)host.append(e('output','Отсчёт от прежнего торца: '+s.depthReading+' мм'));input(host,'Запишите осевой съём, мм','',v=>({type:'recordDepth',value:v}),'Записать отсчёт');}host.append(b('Принять операцию по контролю',{type:'confirm'}));}if(!st.spindle&&!['running','hold'].includes(st.program.status))host.append(b('Новая заготовка · ошибки сохраняются',{type:'restart'}));}
+if(!accepted){if(!s.executed){host.append(e(headingTag==='h1'?'h2':'h4','1. Подготовьте установку'));const setup=e('div',undefined,'start-controls');setup.append(b('Референс',{type:'machine',action:{type:'reference'}}),b('Закрепить',{type:'machine',action:{type:'clamp',value:true}}));for(const tool of [1,3,4])setup.append(b('Выбрать T0'+tool+'0'+tool,{type:'machine',action:{type:'tool',tool}}));setup.append(b('Измерить инструмент щупом',{type:'machine',action:{type:'preset'}}),b('Закрыть ограждение',{type:'machine',action:{type:'door',value:true}}));host.append(setup);input(host,'G54 · машинный Z торца, мм',String(st.workOffset.z),v=>({type:'machine',action:{type:'workOffset',z:Number(v.replace(',','.'))}}),'Подтвердить G54');host.append(e('p','Референс '+(st.referenced?'✓':'—')+' · заготовка '+(st.clamped?'✓':'—')+' · T'+st.tool+' · инструмент '+(st.offsets[String(st.tool)]?.calibrated?'измерен':'не измерен')+' · G54 '+st.workOffset.z+' · ограждение '+(st.doorClosed?'закрыто':'открыто'),'start-value'));host.append(e(headingTag==='h1'?'h2':'h4','2. Составьте программу'));const label=e('label','Программа задания','field'),code=e('textarea');code.rows=12;code.maxLength=4000;code.spellcheck=false;code.value=s.draft;code.setAttribute('aria-label','Программа задания');code.oninput=()=>{s.draft=code.value;persist();const start=host.querySelector('[data-op-start]');if(start)start.disabled=!s.approval||code.value!==s.source;};label.append(code);host.append(label,b('Проверить на копии',()=>({type:'preview',source:s.draft})));const start=b('Запустить проверенную программу',()=>({type:'start',source:s.draft}));start.dataset.opStart='';start.disabled=!s.approval||s.draft!==s.source;host.append(start);}else{host.append(e(headingTag==='h1'?'h2':'h4','3. Выполните и проконтролируйте'));host.append(e('p','Программа: '+st.program.status+' · проходов '+st.cuts.length+' · шпиндель '+(st.spindle?'включён':'выключен')));if(st.program.status==='running')host.append(b('Выполнить до остановки',{type:'run'}));host.append(b('RESET · прервать цикл',{type:'machine',action:{type:'reset'}}));if(st.program.status==='done'){if(st.doorClosed)host.append(b('Открыть ограждение',{type:'machine',action:{type:'door',value:false}}));host.append(e('p','Карта контроля: '+t.points.map(([z,d])=>'Z'+z+': Ø'+d).join('; ')));input(host,'Сечение Z для микрометра, мм','',v=>({type:'machine',action:{type:'measure',z:Number(v.replace(',','.')),instrument:'micrometer'}}),'Измерить');const readings=e('ul');for(const r of st.readings)readings.append(e('li','Z'+r.z+' · Ø'+r.reading+' · '+(r.afterCut===st.cuts.length?'свежий замер':'устарел')));host.append(readings);if(t.depth){host.append(b('Получить осевой отсчёт торца',{type:'depth'}));if(s.depthReading!==null)host.append(e('output','Отсчёт от прежнего торца: '+s.depthReading+' мм'));input(host,'Запишите осевой съём, мм','',v=>({type:'recordDepth',value:v}),'Записать отсчёт');}host.append(b('Принять операцию по контролю',{type:'confirm'}));}if(!st.spindle&&!['running','hold'].includes(st.program.status))host.append(b('Новая заготовка · ошибки сохраняются',{type:'restart'}));}
 const hint=b(s.help.includes(t.id)?'Разбор открыт':'Нужен разбор',{type:'hint'});hint.disabled=s.help.includes(t.id);host.append(hint);if(s.help.includes(t.id))host.append(e('p',t.hint,'start-hint'));}else{host.append(e('p','Изготовление и контроль приняты. Разбор '+(s.help.includes(t.id)?'открывался':'не открывался')+'; ошибок '+s.errors[s.current]+'.','start-value'));if(!readOnly&&!routeMode&&s.current<m.tasks.length-1)host.append(b('Следующая операция',{type:'next'}));else if(s.current===m.tasks.length-1)host.append(e('p','Все пять операций пройдены. Следующий блок — самостоятельный перенос на другие условия.'));}
 const feedback=e('p',notice||s.feedback,'start-feedback');feedback.setAttribute('role','status');host.append(feedback);const limits=e('details',undefined,'course-reading');limits.append(e('summary','Ограничения проверки'),e('p','Общий токарный движок: T0303 торцевание, T0404 канавка 2 мм, T0101 линейный конус. Щуп автоматический. Контроль конуса идеальный; угловая погрешность, шероховатость, усилия и выбег не моделируются. Осевой отсчёт вычислен по геометрии. Это учебная геометрическая проверка, не подтверждение ГОСТ или допуска к оборудованию.'));host.append(limits);const back=e('button','Вернуться к курсу','course-back');back.onclick=onDone;host.append(back);}
 render();return host;}root.CNCOperationCourseUI=Object.freeze({create});})(window);
-</script><script>(function(root){'use strict';const m=root.CNCMillingCourse,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),notice='';const host=el('section',undefined,'start-session shaft-project-session milling-course');
+</script><script>(function(root){'use strict';const m=root.CNCMillingCourse,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({headingTag='h3',saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),notice='';const host=el('section',undefined,'start-session shaft-project-session milling-course');
 function run(a){try{s=m.transition(s,a);notice='';if(onChange(m.snapshot(s))===false)notice='Не удалось сохранить. Не закрывайте страницу.';}catch(e){notice=e.message;}render();}
 function button(text,a){const b=el('button',text,'button secondary');b.type='button';b.setAttribute('aria-label',text);b.onclick=()=>run(typeof a==='function'?a():a);return b;}
 function board(){const x=n=>70+(n+20)*4,y=n=>240-(n+20)*3;let svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 350" role="img" aria-label="Фрезерная установка: вид сверху, инструмент, крепление и траектории"><g font-family="Arial,sans-serif" font-size="13"><rect x="70" y="0" width="400" height="240" fill="#f0f5f8" stroke="#91a7b7"/>';
@@ -16108,7 +16139,7 @@ if(s.profile===2){const body=m.config.body;svg+='<rect x="'+x(body.x0)+'" y="'+y
 for(const p of s.path)svg+='<line x1="'+x(p.from.x)+'" y1="'+y(p.from.y)+'" x2="'+x(p.to.x)+'" y2="'+y(p.to.y)+'" stroke="'+(p.cutting?'#146c93':'#7392ae')+'" stroke-width="2"/>';
 const last=s.lastCheck;if(last&&!last.ok){svg+='<line x1="'+x(last.from.x)+'" y1="'+y(last.from.y)+'" x2="'+x(last.to.x)+'" y2="'+y(last.to.y)+'" stroke="#c54b4b" stroke-width="3" stroke-dasharray="5 3"/>';if(last.point)svg+='<circle cx="'+x(last.point.x)+'" cy="'+y(last.point.y)+'" r="5" fill="#bc2f3b"/>';}
 svg+='<ellipse cx="'+x(s.position.x)+'" cy="'+y(s.position.y)+'" rx="12" ry="9" fill="none" stroke="#2456d8" stroke-width="3"/><text x="80" y="300" fill="#24465f">X → · Y ↑ · Z: '+s.position.z+' мм · верх плиты Z0</text><text x="80" y="325" fill="#24465f">'+(s.profile===2?'Синий — фреза Ø6; оранжевый — державка Ø24; голубой — съём':'Синий — фреза Ø6; голубой — съём')+'</text></g></svg>';return svg;}
-function render(){const t=m.lessons[s.current],accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(el('p','ФРЕЗЕРНЫЙ СТАНОК XYZ · УЧЕБНЫЙ ПРОФИЛЬ','eyebrow'),el('h3',t.title),el('p','Задание '+(s.current+1)+' из '+m.lessonCount(s)+' · уровень '+t.level+' · принято '+s.done.length,'start-value'),el('p',t.goal),el('p',t.learn));const figure=el('figure',undefined,'shaft-drawing start-board');figure.innerHTML=board();host.append(figure);if(s.profile===2)host.append(el('p','Высоты сборки: фреза Z'+s.position.z+'…'+(s.position.z+15)+'; державка Z'+(s.position.z+8)+'…'+(s.position.z+28)+' мм. Проекции на вид сверху перекрываются даже при разных высотах.','start-note'));host.append(el('p','X'+s.position.x+' Y'+s.position.y+' Z'+s.position.z+' · шпиндель '+(s.spindle?'включён':'выключен')+' · съёмов '+s.cuts,'start-value'));
+function render(){const t=m.lessons[s.current],accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(el('p','ФРЕЗЕРНЫЙ СТАНОК XYZ · УЧЕБНЫЙ ПРОФИЛЬ','eyebrow'),el(headingTag,t.title),el('p','Задание '+(s.current+1)+' из '+m.lessonCount(s)+' · уровень '+t.level+' · принято '+s.done.length,'start-value'),el('p',t.goal),el('p',t.learn));const figure=el('figure',undefined,'shaft-drawing start-board');figure.innerHTML=board();host.append(figure);if(s.profile===2)host.append(el('p','Высоты сборки: фреза Z'+s.position.z+'…'+(s.position.z+15)+'; державка Z'+(s.position.z+8)+'…'+(s.position.z+28)+' мм. Проекции на вид сверху перекрываются даже при разных высотах.','start-note'));host.append(el('p','X'+s.position.x+' Y'+s.position.y+' Z'+s.position.z+' · шпиндель '+(s.spindle?'включён':'выключен')+' · съёмов '+s.cuts,'start-value'));
 const message=el('p',notice||s.feedback,'start-feedback');message.setAttribute('role','status');host.append(message);
 if(!accepted){const setup=el('details',undefined,'course-reading');setup.open=!m.ready(s);setup.append(el('summary','Наладка и ограждение'));for(const [key,label]of [['reference','Референс'],['clamped','Заготовка закреплена'],['tool','Фреза Ø6 измерена автоматическим щупом'],['zero','G54: X/Y — угол плиты, Z — верх'],['door','Ограждение закрыто']])setup.append(button((s.setup[key]?'✓ ':'— ')+label,{type:'setup',key,value:!s.setup[key]}));host.append(setup);const controls=el('div',undefined,'start-controls');controls.append(button(s.spindle?'Остановить шпиндель':'Включить шпиндель',{type:'spindle',value:!s.spindle}),button('RESET · сбросить ошибку и остановить',{type:'reset'}));host.append(controls);
 const form=el('form',undefined,'shaft-measure-controls'),inputs={};for(const k of ['x','y','z']){const label=el('label','Конечный '+k.toUpperCase()+', мм','field'),i=el('input');i.type='text';i.inputMode='decimal';i.maxLength=24;i.value=String(s.position[k]);i.setAttribute('aria-label','Конечный '+k.toUpperCase()+', мм');inputs[k]=i;label.append(i);form.append(label);}const wrap=el('label','Движение','field'),mode=el('select');mode.setAttribute('aria-label','Движение');for(const [value,text]of [['G0','G0 · быстрый ход'],['G1','G1 · рабочая подача']]){const o=el('option',text);o.value=value;mode.append(o);}wrap.append(mode);form.append(wrap);const action=type=>{const out={type,mode:mode.value};for(const k of ['x','y','z']){const v=inputs[k].value.trim();if(!/^[+-]?(?:\d+(?:[.,]\d+)?|[.,]\d+)$/.test(v))throw Error('Введите числовые X/Y/Z без выражений.');out[k]=Number(v.replace(',','.'));}return out;};for(const [type,label]of [['preview','Проверить путь на копии'],['move','Выполнить движение']]){const b=el('button',label,'button secondary');b.type='button';b.onclick=()=>{try{run(action(type));}catch(e){notice=e.message;render();}};form.append(b);}form.onsubmit=e=>e.preventDefault();host.append(form);
@@ -16119,10 +16150,10 @@ if(s.lastCheck&&!s.lastCheck.ok)host.append(el('p','Отвергнутый пу�
 const log=el('details',undefined,'course-reading');log.append(el('summary','Журнал траекторий с ошибками · '+s.incidents.length));for(const event of s.incidents)log.append(el('p',event.lesson+' · '+event.code+(event.part?' · '+event.part+' / '+event.obstacle:'')+' · '+(event.preview?'найдено на копии':'движение заблокировано')+' · X'+event.from.x+' Y'+event.from.y+' Z'+event.from.z+' → X'+event.to.x+' Y'+event.to.y+' Z'+event.to.z));host.append(log);
 const limits=el('details',undefined,'course-reading');limits.append(el('summary','Геометрия и ограничения профиля'),el('p','Плита 60×40×10 мм, фреза Ø6 с осевым врезанием. Сетка 2 мм: снимается материал в центрах ячеек, точная форма стенок и объём не вычисляются. Зона крепления консервативно расширена на радиус фрезы: это запас, а не точный контакт цилиндра в углах. Проверяется весь отрезок движения. G0 внутри исходного габарита запрещён и после снятия материала, кроме вертикального выхода вверх без изменения X/Y. G1 ниже верха допускает только горизонтальный ход или отдельное вертикальное врезание. Максимум 1 мм нового съёма на ячейку. Пределы X−20…80, Y−20…60, Z−12…40. Щуп, контроль поверхности и остановка идеализированы. '+(s.profile===1?'Прежний профиль: державка и корпус не проверяются; после четырёх заданий доступно продолжение.':'Новый профиль: державка Ø24 занимает Z вершины +8…+28. Колонна корпуса: X54…62, Y−18…−8, Z−10…35. Фреза, державка, крепление, заготовка и колонна проверяются непрерывно по отрезку, выбирается самый ранний вход. Корпус ограничен одной условной колонной, все остальные узлы станка не моделируются.')+' Стойка, G-код, усилия и точная метрология не моделируются. Это вводная ветка, не полный фрезерный симулятор и не допуск к оборудованию.'));host.append(limits);const back=el('button','Вернуться к курсу','course-back');back.onclick=onDone;host.append(back);}
 render();return host;}root.CNCMillingCourseUI=Object.freeze({create});})(window);
-</script><script>(function(root){'use strict';const m=root.CNCDiagnosticCourse,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),notice='';const host=el('section',undefined,'start-session shaft-project-session diagnostic-course');function save(){if(onChange(m.snapshot(s))===false)notice='Сохранение недоступно. Не закрывайте страницу.';}function run(a){try{s=m.transition(s,a);notice='';save();}catch(e){notice=e.message;}render();}function b(text,a){const n=el('button',text,'button secondary');n.type='button';n.onclick=()=>run(typeof a==='function'?a():a);return n;}function field(parent,label,key){const wrap=el('label',label,'field'),input=el('input');input.type='text';input.maxLength=32;input.inputMode='decimal';input.value=s.draft[key];input.setAttribute('aria-label',label);input.oninput=()=>{s.draft[key]=input.value;save();};wrap.append(input);parent.append(wrap);}
+</script><script>(function(root){'use strict';const m=root.CNCDiagnosticCourse,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({headingTag='h3',saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),notice='';const host=el('section',undefined,'start-session shaft-project-session diagnostic-course');function save(){if(onChange(m.snapshot(s))===false)notice='Сохранение недоступно. Не закрывайте страницу.';}function run(a){try{s=m.transition(s,a);notice='';save();}catch(e){notice=e.message;}render();}function b(text,a){const n=el('button',text,'button secondary');n.type='button';n.onclick=()=>run(typeof a==='function'?a():a);return n;}function field(parent,label,key){const wrap=el('label',label,'field'),input=el('input');input.type='text';input.maxLength=32;input.inputMode='decimal';input.value=s.draft[key];input.setAttribute('aria-label',label);input.oninput=()=>{s.draft[key]=input.value;save();};wrap.append(input);parent.append(wrap);}
 function diagram(t){if(t.kind==='mill'){const x=v=>65+(v+20)*4,y=v=>245-(v+20)*3;let svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 310" role="img" aria-label="Проверяемая траектория на копии"><rect x="145" y="65" width="240" height="120" fill="#ccdbe5"/><rect x="245" y="89" width="40" height="24" fill="#b58b67"/><rect x="361" y="209" width="32" height="30" fill="#b1a4c2"/>';for(const p of s.result?.log||[])svg+='<line x1="'+x(p.from.x)+'" y1="'+y(p.from.y)+'" x2="'+x(p.to.x)+'" y2="'+y(p.to.y)+'" stroke="'+(p.code?'#bd3545':'#26744d')+'" stroke-width="3"/>';return svg+'<text x="65" y="280" fill="#24465f">Плита · крепление · колонна; красный — отвергнутый отрезок</text></svg>';}
 const profile=s.result?.profile||m.expected(t).profile;let u=0,p='M50 130',lower=[];for(const seg of profile.segments){const a=50+u*8,bb=50+(u+seg.length)*8,y=130-seg.diameter*2.5,ey=130-(seg.endDiameter??seg.diameter)*2.5;p+='L'+a+' '+y+'L'+bb+' '+ey;lower.unshift('L'+bb+' '+(260-ey)+'L'+a+' '+(260-y));u+=seg.length;}return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 290" role="img" aria-label="Геометрический результат проверки"><path d="'+p+lower.join('')+'Z" fill="#cadce8" stroke="#416780" stroke-width="2"/><text x="40" y="245" fill="#24465f">'+(s.result?'Профиль после проверки на копии':'Требуемый профиль')+'</text><text x="40" y="273" fill="#24465f">Точные размеры заданы в условии</text></svg>';}
-function render(){const t=m.tasks[s.current],accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(el('p','ДИАГНОСТИКА · '+(t.kind==='lathe'?'ТОКАРНЫЙ':'ФРЕЗЕРНЫЙ')+' СТАНОК','eyebrow'),el('h3',t.title),el('p','Задание '+(s.current+1)+' из '+m.tasks.length+' · уровень '+t.level+' · принято '+s.done.length,'start-value'),el('p',t.learn),el('p',t.goal));const figure=el('figure',undefined,'shaft-drawing start-board');figure.innerHTML=diagram(t);host.append(figure);const original=el('details',undefined,'course-reading');original.append(el('summary','Исходный вариант с ошибкой'),el('pre',t.bad));if(t.kind==='lathe')original.append(el('p','Исходно: T0'+t.tool+'0'+t.tool+', G54 Z'+t.zero+'. Заготовка Ø32 × 60, зажатые 15 мм отдельно.'));host.append(original);
+function render(){const t=m.tasks[s.current],accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(el('p','ДИАГНОСТИКА · '+(t.kind==='lathe'?'ТОКАРНЫЙ':'ФРЕЗЕРНЫЙ')+' СТАНОК','eyebrow'),el(headingTag,t.title),el('p','Задание '+(s.current+1)+' из '+m.tasks.length+' · уровень '+t.level+' · принято '+s.done.length,'start-value'),el('p',t.learn),el('p',t.goal));const figure=el('figure',undefined,'shaft-drawing start-board');figure.innerHTML=diagram(t);host.append(figure);const original=el('details',undefined,'course-reading');original.append(el('summary','Исходный вариант с ошибкой'),el('pre',t.bad));if(t.kind==='lathe')original.append(el('p','Исходно: T0'+t.tool+'0'+t.tool+', G54 Z'+t.zero+'. Заготовка Ø32 × 60, зажатые 15 мм отдельно.'));host.append(original);
 if(!accepted&&!readOnly){host.append(b('Проверить исходный вариант на копии',{type:'inspect'}));const causeWrap=el('label','Причина ошибки','field'),cause=el('select');cause.setAttribute('aria-label','Причина ошибки');const placeholder=el('option','Выберите причину');placeholder.value='';cause.append(placeholder);for(const key of t.choices){const option=el('option',m.causes[key]);option.value=key;cause.append(option);}cause.value=s.draft.cause;cause.onchange=()=>{s.draft.cause=cause.value;save();};causeWrap.append(cause);host.append(causeWrap);if(t.kind==='lathe'){const tools=el('label','Инструмент для проверки','field'),select=el('select');select.setAttribute('aria-label','Инструмент для проверки');for(const [id,label]of [['1','T0101 · проходной'],['3','T0303 · торцевой'],['4','T0404 · канавочный 2 мм']]){const o=el('option',label);o.value=id;select.append(o);}select.value=s.draft.tool;select.onchange=()=>{s.draft.tool=select.value;save();};tools.append(select);host.append(tools);field(host,'G54 · машинный Z торца, мм','zero');}else{const label=el('label','Шпиндель включён на копии','field'),check=el('input');check.type='checkbox';check.checked=s.draft.spindle;check.setAttribute('aria-label','Шпиндель включён на копии');check.onchange=()=>{s.draft.spindle=check.checked;save();};label.append(check);host.append(label);host.append(el('p','Строка маршрута: X Y Z G0/G1, например -10 10 12 G0. До 6 строк; дробные числа с точкой.','start-note'));}
 const key=t.kind==='lathe'?'program':'route',label=el('label',t.kind==='lathe'?'Исправленная программа':'Исправленный маршрут','field'),input=el('textarea');input.rows=t.kind==='lathe'?12:6;input.maxLength=t.kind==='lathe'?4000:900;input.spellcheck=false;input.value=s.draft[key];input.setAttribute('aria-label',t.kind==='lathe'?'Исправленная программа':'Исправленный маршрут');input.oninput=()=>{s.draft[key]=input.value;save();};label.append(input);host.append(label,b('Проверить причину и исправление',()=>({type:'repair',draft:s.draft})));const hint=b(s.help.includes(t.id)?'Разбор открыт':'Нужен разбор',{type:'hint'});hint.disabled=s.help.includes(t.id);host.append(hint);if(s.help.includes(t.id))host.append(el('p',t.hint,'start-hint'));}else if(accepted){host.append(el('p','Причина и исправление подтверждены на копии. Ошибок: '+s.errors[s.current]+'; разбор '+(s.help.includes(t.id)?'открывался':'не открывался')+'.','start-value'));if(!readOnly&&!routeMode&&s.current<m.tasks.length-1)host.append(b('Следующая диагностическая задача',{type:'next'}));}
 const feedback=el('p',notice||s.feedback,'start-feedback');feedback.setAttribute('role','status');host.append(feedback);if(s.result?.log){const list=el('ol');for(const p of s.result.log)list.append(el('li','X'+p.from.x+' Y'+p.from.y+' Z'+p.from.z+' → X'+p.to.x+' Y'+p.to.y+' Z'+p.to.z+' · '+(p.code||'допустимо')+(p.part?' · '+p.part+' / '+p.obstacle:'')));host.append(list);}host.append(el('p','Проверки выполняются на изолированной подготовленной копии. Изготовление, наладка физического станка и метрологический контроль этим блоком не подтверждаются. Режимы заданы упражнением. Ограничения токарного и фрезерного профилей сохраняются.','start-note'));const back=el('button','К маршруту курса','course-back');back.onclick=onDone;host.append(back);}
@@ -16225,7 +16256,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       }[key];
     if (proof && !step.subtask) {
       article.replaceChildren(
-        node("h3", step.title),
+        node("h1", step.title),
         node(
           "p",
           "Практический блок уже завершён. Результат подтверждён сохранённым журналом.",
@@ -16324,6 +16355,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       return available();
     };
     const widget = window[uiName].create({
+      headingTag: "h1",
       saved,
       savedDraft: readOnly ? undefined : path[key + "Draft"],
       readOnly,
@@ -16364,9 +16396,10 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       0,
       model.lessons.findIndex((l) => !hasAnswer(l.id)),
     );
-  current = view.kind !== "lesson" || !hasAnswer(path.selected)
-    ? model.lessons.findIndex((l) => l.id === path.selected)
-    : firstMissing();
+  current =
+    view.kind !== "lesson" || !hasAnswer(path.selected)
+      ? model.lessons.findIndex((l) => l.id === path.selected)
+      : firstMissing();
   const node = (tag, text, cls) => {
     const e = document.createElement(tag);
     if (text !== undefined) e.textContent = text;
@@ -16446,6 +16479,13 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
     article.append(reading);
   }
+  function presentArticle(article, focus) {
+    const title = article.querySelector("h1");
+    if (title) {
+      title.tabIndex = -1;
+      if (focus) title.focus();
+    }
+  }
   function render(focus = false) {
     if (!root) return;
     const routeStep = view.kind === "route" ? view.step : null;
@@ -16512,7 +16552,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
           : `Урок ${current + 1} из ${model.lessons.length}${current < 4 ? " · Первое знакомство · без расчётов" : ""}`,
         "eyebrow",
       ),
-      node("h3", l.title),
+      node("h1", l.title),
     );
     const phases = unit
       ? [
@@ -16554,11 +16594,13 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       });
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     if (view.kind === "diagnosticCourse") {
       article.replaceChildren(
         window.CNCDiagnosticCourseUI.create({
+          headingTag: "h1",
           saved: path.diagnosticCourse,
           onChange: (s) => {
             path.diagnosticCourse = s;
@@ -16570,11 +16612,13 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     if (view.kind === "millingCourse") {
       article.replaceChildren(
         window.CNCMillingCourseUI.create({
+          headingTag: "h1",
           saved: path.millingCourse,
           onChange: (s) => {
             path.millingCourse = s;
@@ -16591,11 +16635,13 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     if (view.kind === "operationCourse") {
       article.replaceChildren(
         window.CNCOperationCourseUI.create({
+          headingTag: "h1",
           saved: path.operationCourse,
           onChange: (s) => {
             path.operationCourse = s;
@@ -16610,6 +16656,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
+      presentArticle(article, focus);
       return;
     }
     const introduction = model.startSession?.restore(path.firstSession);
@@ -16622,6 +16669,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCStartSessionUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openDrawing(),
           saved: path.firstSession,
           savedDraft: path.firstSessionDraft,
@@ -16656,10 +16704,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) {
-        const h = article.querySelector("h3");
-        h?.focus();
-      }
+      presentArticle(article, focus);
+
       return;
     }
     const drawing = model.drawingSession?.restore(path.drawingSession);
@@ -16673,6 +16719,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCDrawingSessionUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openFirstProcess(),
           saved: path.drawingSession,
           savedDraft: path.drawingSessionDraft,
@@ -16714,7 +16761,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     const process = model.firstProcess?.restore(path.firstProcess);
@@ -16728,6 +16776,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCFirstProcessUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openProgramSetup(),
           saved: path.firstProcess,
           savedDraft: path.firstProcessDraft,
@@ -16768,7 +16817,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     const ps = model.programSetup?.restore(path.programSetup);
@@ -16782,6 +16832,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCProgramSetupUI.create({
+          headingTag: "h1",
           onNext: () => window.CNCCourseUI.openShaftProject(),
           saved: path.programSetup,
           savedDraft: path.programSetupDraft,
@@ -16819,7 +16870,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     const shaft = model.shaftProject?.restore(path.shaftProject);
@@ -16833,6 +16885,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       article.dataset.phase = "introduction";
       article.replaceChildren(
         window.CNCShaftProjectUI.create({
+          headingTag: "h1",
           saved: path.shaftProject,
           savedDraft: path.shaftProjectDraft,
           onDraft: (d) => {
@@ -16869,7 +16922,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       );
       layout.append(article);
       root.append(layout, note);
-      if (focus) article.querySelector("h3")?.focus();
+      presentArticle(article, focus);
+
       return;
     }
     if (phase === 0) {
@@ -17121,11 +17175,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     }
     layout.append(article);
     root.append(layout, note);
-    if (focus) {
-      const title = article.querySelector("h3");
-      title.tabIndex = -1;
-      title.focus();
-    }
+    presentArticle(article, focus);
   }
   function openPractice(kind) {
     window.CNCWorkshop.openLesson(views.lessonFor(kind));
@@ -17271,7 +17321,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       const saved = model.lessons.findIndex((l) => l.id === path.selected);
       current =
         saved >= 0 &&
-        (view.kind !== "lesson" || !hasAnswer(path.selected) ||
+        (view.kind !== "lesson" ||
+          !hasAnswer(path.selected) ||
           (path.selected === "verification" &&
             model.shaftProject.restore(path.shaftProject)?.events.length &&
             !model.shaftProject.restore(path.shaftProject)?.complete) ||
@@ -19078,7 +19129,11 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
   for(const [id,d] of Object.entries(icons))navigation.querySelector('#'+id).insertAdjacentHTML('afterbegin',`<svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" aria-hidden="true"><path d="${d}"/></svg>`);
   sidebar.append(navigation,make('div','sidebar-caption','От понимания станка<br>к самостоятельной работе.'));
   sidebar.append(make('div','sidebar-account','<span class="sidebar-avatar" aria-hidden="true">ЧП</span><div><strong>Ваша мастерская</strong><small>Локальная практика</small></div>'));
-  document.body.prepend(sidebar);
+  main.id='main-content';main.tabIndex=-1;
+  const skip=document.createElement('a');skip.className='skip-link';skip.href='#main-content';skip.textContent='Перейти к содержимому';
+  document.body.prepend(skip,sidebar);
+  navigation.addEventListener('keydown',event=>{const menu=navigation.querySelector('details');if(event.key==='Escape'&&menu.open){menu.open=false;menu.querySelector('summary').focus();event.preventDefault();event.stopPropagation();}});
+  const extraMenu=navigation.querySelector('details');extraMenu.addEventListener('focusout',event=>{if(event.relatedTarget&&!extraMenu.contains(event.relatedTarget))extraMenu.open=false;});
   q('.topbar').prepend(make('div','shell-breadcrumb','<span>Учебная мастерская</span><span aria-hidden="true">/</span><strong id="shell-page-label">Мой курс</strong>'));
   const catalog=make('section','catalog-screen','<div class="screen-heading"><div><h2>Выберите задание</h2><p>Семь упражнений: от первого прохода до наладки по замерам.</p></div><button type="button" class="button secondary" id="catalog-back">Вернуться к детали</button></div>');
   catalog.id='catalog-screen';for(const card of document.querySelectorAll('[data-task]')){const guide=window.CNCTaskGuides.get(card.dataset.task);if(guide){const copy=make('span','catalog-task-summary');copy.textContent=guide.learn;card.append(copy);card.title=guide.level+': '+guide.why;}}catalog.append($('difficulty-bar'),q('.lessons'));main.insertBefore(catalog,$('exam-level-bar'));
@@ -19141,7 +19196,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
 
 
   function pause(){window.CNCDemo.pauseWorkshop();window.CNCSandboxUI?.pause();}
-  function setScreen(next){pause();screen=next;try{localStorage.setItem('cnc-workspace-screen-v1',next);}catch{}render();const title=next==='sandbox'?sandbox.querySelector('h1'):next==='course'?course.querySelector('h3'):next==='home'?document.querySelector('.home-screen h1'):next==='catalog'?catalog.querySelector('h1'):next==='training'?(training.querySelector('.cycle-heading h1')||q('.intro h1')):q('.intro h1');title.tabIndex=-1;title.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
+  function setScreen(next){pause();screen=next;try{localStorage.setItem('cnc-workspace-screen-v1',next);}catch{}render();const title=next==='sandbox'?sandbox.querySelector('h1'):next==='course'?course.querySelector('h1'):next==='home'?document.querySelector('.home-screen h1'):next==='catalog'?catalog.querySelector('h1'):next==='training'?(training.querySelector('.cycle-heading h1')||q('.intro h1')):q('.intro h1');title.tabIndex=-1;title.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
   function chooseStage(next){pause();stage=window.CNCLearningUI.capStage(Math.max(0,Math.min(3,next)));window.CNCMachineUI.saveStage(window.CNCDemo.readState().task,stage);render();
     const state=window.CNCDemo.readState();if(state.mode==='exam')return;
     if(!$('lab-workspace').hidden)$(stage<2?'lab-target':'lab-result').click();
