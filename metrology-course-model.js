@@ -559,6 +559,15 @@
       s.events.push(copy(a));
       return s;
     }
+    function advanceAction(s) {
+      const t = s && tasks[s.current];
+      if (!t || !s.done.some((d) => d.id === t.id)) return null;
+      if (s.current >= tasks.length - 1) return null;
+      return {
+        type: "next",
+        assignment: copy(tasks[s.current + 1].assignment),
+      };
+    }
     function snapshot(s) {
       return { version: 1, events: copy(s.events), draft: copy(s.draft) };
     }
@@ -622,6 +631,7 @@
       restore,
       transition,
       review,
+      advanceAction,
       aggregate,
       classify,
       recordFor,

@@ -936,6 +936,16 @@
     s.events.push(copy(a));
     return s;
   }
+  function advanceAction(s) {
+    const t = s && lessons[s.current];
+    if (!t || !s.done.some((d) => d.id === t.id)) return null;
+    if (
+      (s.profile === 1 && s.current === 3) ||
+      (s.profile === 2 && s.current === 5)
+    )
+      return { type: "upgrade" };
+    return s.current < lessonCount(s) - 1 ? { type: "next" } : null;
+  }
   function snapshot(s) {
     if (s.profile === 3)
       return { version: 3, baseline: s.baseline, events: copy(s.events) };
@@ -985,6 +995,7 @@
     return null;
   }
   return freeze({
+    advanceAction,
     prepared,
     coordinates,
     coverage,

@@ -91,29 +91,12 @@
         );
     } else if (step.subtask) {
       let s = current || engine.create();
-      const definitions =
-          key === "operationCourse"
-            ? engine.tasks
-            : key === "diagnosticCourse"
-              ? engine.tasks
-              : engine.lessons,
+      const definitions = engine.tasks || engine.lessons,
         target = definitions.findIndex((t) => t.id === step.subtask);
-      while (
-        s.current < target &&
-        s.done.some((d) => d.id === definitions[s.current].id)
-      ) {
-        s = engine.transition(s, {
-          type:
-            key === "operationCourse" && s.version === 1 && s.current === 4
-              ? "upgrade"
-              : key === "millingCourse" && ((s.profile === 1 && s.current === 3) || (s.profile === 2 && s.current === 5))
-                ? "upgrade"
-                : "next",
-          ...(key === "metrologyCourse" ||
-          (key === "operationCourse" && (s.version === 2 || s.current === 4))
-            ? { assignment: definitions[s.current + 1].assignment }
-            : {}),
-        });
+      while (s.current < target) {
+        const action = engine.advanceAction(s);
+        if (!action) break;
+        s = engine.transition(s, action);
       }
       saved = engine.snapshot(s);
       if (JSON.stringify(saved) !== JSON.stringify(raw)) {

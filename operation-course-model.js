@@ -642,6 +642,19 @@
       s.events.push(copy(a));
       return s;
     }
+    function advanceAction(s) {
+      const t = s && tasks[s.current];
+      if (!t || !s.done.some((d) => d.id === t.id)) return null;
+      if (s.version === 1 && s.current === 4)
+        return { type: "upgrade", assignment: copy(tasks[5].assignment) };
+      if (s.current >= taskCount(s) - 1) return null;
+      return {
+        type: "next",
+        ...(s.version === 2
+          ? { assignment: copy(tasks[s.current + 1].assignment) }
+          : {}),
+      };
+    }
     function snapshot(s) {
       return {
         version: s.version,
@@ -711,6 +724,7 @@
       expected,
       inspected,
       assessment,
+      advanceAction,
       taskCount,
       hasWork,
     });
