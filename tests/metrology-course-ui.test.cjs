@@ -22,6 +22,18 @@ const host = ui.create({
 });
 assert.match(host.textContent, /Поверхность, прибор/);
 assert(host.querySelector("figure").markup.includes('role="img"'));
+const decision = (view) =>
+  view
+    .all()
+    .find(
+      (el) =>
+        el.tagName === "button" && el.textContent === "Подтвердить по размеру",
+    );
+assert.equal(
+  decision(host),
+  undefined,
+  "No dimensional decision before measurements and limits",
+);
 host
   .all()
   .find((e) => e.tagName === "button" && e.textContent === "Сплошная")
@@ -40,6 +52,51 @@ const corrupt = structuredClone(saved);
 corrupt.events[0].assignment.criteriaVersion = 99;
 assert.match(ui.create({ saved: corrupt }).textContent, /не заменена новой/);
 const complete = require("./metrology-course-fixtures.cjs").complete();
+let replay = m.create(),
+  switched,
+  coarse,
+  revised,
+  beforeFirstVerdict;
+for (const event of complete.events.slice(1)) {
+  if (!beforeFirstVerdict && event.type === "verdict")
+    beforeFirstVerdict = m.snapshot(replay);
+  replay = m.transition(replay, event);
+  if (!coarse && m.tasks[replay.current].refine && replay.coarseReviewed)
+    coarse = m.snapshot(replay);
+  if (!revised && m.tasks[replay.current].revised && replay.revision === 1)
+    revised = m.snapshot(replay);
+  if (
+    !switched &&
+    m.tasks[replay.current].id === "bushing-transfer" &&
+    replay.surface === "B" &&
+    replay.records.length === 2
+  )
+    switched = m.snapshot(replay);
+}
+assert(
+  decision(ui.create({ saved: beforeFirstVerdict })),
+  "Complete fresh records and limits unlock decision",
+);
+const coarseView = ui.create({ saved: coarse }),
+  revisedView = ui.create({ saved: revised });
+assert.equal(
+  decision(coarseView),
+  undefined,
+  "Coarse readings cannot unlock the refined decision",
+);
+assert.match(coarseView.textContent, /Уточняющий контроль/);
+assert.equal(
+  decision(revisedView),
+  undefined,
+  "Old revision cannot unlock the new decision",
+);
+assert.match(revisedView.textContent, /Деталь после доработки/);
+assert.match(revisedView.textContent, /свежих замеров 0 из 2/);
+assert.equal(
+  ui.create({ saved: switched }).querySelector(".start-feedback").textContent,
+  "",
+  "A change of surface cannot retain a previous success message",
+);
 for (const id of ["section-hole", "bushing-transfer"]) {
   const diagram = ui
     .create({ saved: m.review(m.snapshot(complete), id) })
@@ -49,7 +106,7 @@ for (const id of ["section-hole", "bushing-transfer"]) {
     "Opening removes the front edge before drawing only bore boundaries",
   );
   assert(
-    !diagram.includes('fill="#fff" stroke='),
+    !/<rect\b[^>]*fill="#fff"[^>]*stroke=/.test(diagram),
     "A closed rectangle must not cap the bore opening",
   );
 }

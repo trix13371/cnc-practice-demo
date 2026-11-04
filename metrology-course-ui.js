@@ -95,7 +95,7 @@
         '" role="img" aria-label="Учебная схема: ' +
         (section ? "продольный разрез" : "вид сбоку") +
         (hole
-          ? "; штриховка — материал, светлая область — полость; B указывает на внутреннюю поверхность отверстия"
+          ? "; штриховка — материал, светлая область — отверстие; стрелка B указывает внутрь полости"
           : "") +
         '"><defs><marker id="met-leader" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0 0L10 5L0 10Z" fill="#365b76"/></marker><pattern id="met-hatch" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 10L10 0" stroke="#a9bdca"/></pattern></defs><path d="' +
         outline +
@@ -130,20 +130,89 @@
           ? '<text x="160" y="75">B · база</text><text x="400" y="75">A · шейка</text>'
           : '<text x="145" y="65">A · наружная поверхность</text><path d="M300 72V90" fill="none" stroke="#365b76" stroke-width="1.5" marker-end="url(#met-leader)"/>') +
         (hole
-          ? '<path d="M400 282V258L480 ' +
-            (155 + half) +
-            '" fill="none" stroke="#365b76" stroke-width="1.5" marker-end="url(#met-leader)"/><text x="400" y="307" text-anchor="middle">B · поверхность отверстия</text>'
+          ? '<path d="M400 282V258L470 170" fill="none" stroke="#365b76" stroke-width="1.5" marker-end="url(#met-leader)"/><circle cx="470" cy="170" r="3" fill="#365b76"/><text x="400" y="307" text-anchor="middle">B · отверстие</text>'
           : "") +
+        sectionMarks(t, half, stepped, section) +
         '<text x="90" y="260">Z−55</text><text x="550" y="260" text-anchor="end">Z0 · торец</text><text x="90" y="28">' +
         (section ? "Продольный разрез" : "Вид сбоку · внутренность скрыта") +
         "</text></svg>"
       );
     }
+    function sectionMarks(t, half, stepped, section) {
+      const surface = t.surfaces.find((v) => v.id === s.surface);
+      if (!surface || (surface.kind === "inner" && !section)) return "";
+      const top =
+          surface.kind === "inner"
+            ? 155 - half
+            : stepped && surface.id === "A"
+              ? 98
+              : 90,
+        bottom =
+          surface.kind === "inner"
+            ? 155 + half
+            : stepped && surface.id === "A"
+              ? 212
+              : 220;
+      return surface.points
+        .map((p) => {
+          const x = 550 + (460 * p.z) / 55,
+            active =
+              s.contact?.surface === surface.id && s.contact.point === p.id;
+          return (
+            '<g><path d="M' +
+            x +
+            " " +
+            top +
+            "V" +
+            bottom +
+            '" stroke="#2458ee" stroke-dasharray="4 4"/>' +
+            '<circle cx="' +
+            x +
+            '" cy="' +
+            (top + 20) +
+            '" r="10" fill="' +
+            (active ? "#2458ee" : "#fff") +
+            '" stroke="#2458ee"/>' +
+            '<text x="' +
+            x +
+            '" y="' +
+            (top + 24) +
+            '" text-anchor="middle" style="font-size:13px;fill:' +
+            (active ? "#fff" : "#173fbc") +
+            '">' +
+            p.id +
+            "</text></g>"
+          );
+        })
+        .join("");
+    }
     function render() {
       const t = m.tasks[s.current],
         accepted = s.done.some((r) => r.id === t.id),
         surface = t.surfaces.find((v) => v.id === s.surface),
-        g = m.instruments[s.instrument];
+        g = m.instruments[s.instrument],
+        progress = t.required.map((id) => {
+          const v = t.surfaces.find((v) => v.id === id);
+          return {
+            id,
+            total: v.points.length,
+            recorded: v.points.filter((p) => {
+              const r = m.recordFor(s, id, p.id);
+              return (
+                r &&
+                (!t.refine ||
+                  !s.coarseReviewed ||
+                  r.instrument === "micrometer")
+              );
+            }).length,
+            bounds: !!s.bounds[id],
+          };
+        }),
+        awaitingRevision = t.revised && s.initialReviewed && !s.revision,
+        decisionReady =
+          s.section === t.section &&
+          !awaitingRevision &&
+          progress.every((p) => p.recorded === p.total && p.bounds);
       host.replaceChildren(
         e(
           "p",
@@ -153,6 +222,26 @@
         e(headingTag, t.title),
         e("p", t.goal),
       );
+      if (!accepted && t.refine && s.coarseReviewed)
+        host.append(
+          e(
+            "p",
+            "Уточняющий контроль: выберите микрометр и заново запишите оба сечения. Предварительные замеры штангенциркулем не заменяют уточняющие.",
+            "start-value",
+          ),
+        );
+      if (!accepted && t.revised)
+        host.append(
+          e(
+            "p",
+            s.revision
+              ? "Деталь после доработки · состояние 2. Старые замеры относятся к состоянию 1; нужны новые записи."
+              : awaitingRevision
+                ? "Исходный контроль завершён. Получите деталь после доработки для повторного измерения."
+                : "Исходная деталь · состояние 1. Сначала выполните её контроль.",
+            "start-value",
+          ),
+        );
       const reading = e("details", undefined, "course-reading");
       reading.append(e("summary", "Как рассуждать"), e("p", t.reading));
       if (t.mode === "guided")
@@ -184,8 +273,17 @@
           e(
             "figcaption",
             view === "section"
-              ? "Штриховка — материал детали. Светлая область — полость отверстия. Стрелка B указывает на внутреннюю поверхность, по которой измеряют диаметр."
+              ? "Штриховка — материал детали. Светлая область — отверстие: пустота внутри детали. Стрелка B указывает внутрь этой полости; размер B — её внутренний диаметр."
               : "На виде сбоку внутренняя поверхность скрыта. Чтобы увидеть отверстие, выберите «Разрез».",
+          ),
+        );
+      if (surface && (surface.kind !== "inner" || view === "section"))
+        figure.append(
+          e(
+            "figcaption",
+            "Метки 1 и 2 — сечения контроля выбранной поверхности " +
+              surface.id +
+              ". Их координаты Z указаны на кнопках измерения.",
           ),
         );
       host.append(views, figure);
@@ -222,6 +320,14 @@
           kinds.append(b);
         }
         host.append(kinds);
+        if (s.section && s.section !== t.section)
+          host.append(
+            e(
+              "p",
+              "Выбранный вариант не совпадает с разрезом. Сопоставьте светлую полость с её выходом к торцам.",
+              "start-hint",
+            ),
+          );
         if (s.section === t.section) {
           const choices = e("div", undefined, "start-controls");
           for (const v of t.surfaces) {
@@ -270,7 +376,7 @@
                     " мм.",
                   "start-note",
                 ),
-                button("Убрать контролируемую деталь", { type: "release" }),
+                button("Разомкнуть прибор", { type: "release" }),
                 button(
                   g.reference
                     ? "Проверить установку по эталону " +
@@ -288,11 +394,11 @@
               for (const p of surface.points)
                 points.append(
                   button(
-                    "Контакт · " +
+                    "Измерить " +
                       surface.id +
                       " · сечение " +
                       p.id +
-                      " · Z" +
+                      " · Z = " +
                       p.z +
                       " мм",
                     { type: "contact", point: p.id },
@@ -332,6 +438,20 @@
                 "Записать пределы " + surface.id,
               ),
             );
+            if (s.bounds[surface.id])
+              host.append(
+                e(
+                  "p",
+                  "Пределы " +
+                    surface.id +
+                    " записаны: " +
+                    mm(s.bounds[surface.id].lower) +
+                    "…" +
+                    mm(s.bounds[surface.id].upper) +
+                    " мм.",
+                  "start-note",
+                ),
+              );
           }
         }
         if (t.revised && s.initialReviewed && !s.revision)
@@ -352,14 +472,37 @@
                 mm(r.reading) +
                 " мм · " +
                 m.instruments[r.instrument].title +
-                " · редакция " +
-                r.revision +
-                (r.revision !== s.revision ? " · устарело" : ""),
+                " · состояние " +
+                (r.revision + 1) +
+                (r.revision !== s.revision
+                  ? " · устарело, нужен новый замер"
+                  : t.refine &&
+                      s.coarseReviewed &&
+                      r.instrument !== "micrometer"
+                    ? " · предварительный, нужен микрометр"
+                    : ""),
             ),
           );
         host.append(e("p", "Протокол измерений"), log);
       }
       if (!accepted && !readOnly) {
+        const checklist = e("ul");
+        for (const p of progress)
+          checklist.append(
+            e(
+              "li",
+              p.id +
+                (t.refine && s.coarseReviewed
+                  ? " · замеров микрометром "
+                  : " · свежих замеров ") +
+                p.recorded +
+                " из " +
+                p.total +
+                " · пределы " +
+                (p.bounds ? "записаны" : "не записаны"),
+            ),
+          );
+        host.append(e("p", "Готовность к решению по размеру"), checklist);
         const decisions = e("div", undefined, "start-controls");
         for (const [value, label] of [
           ["accept", "Подтвердить по размеру"],
@@ -372,7 +515,8 @@
           { type: "hint" },
         );
         hint.disabled = s.help.includes(t.id);
-        host.append(decisions, hint);
+        if (decisionReady) host.append(decisions);
+        host.append(hint);
         if (s.help.includes(t.id)) host.append(e("p", t.hint, "start-hint"));
       }
       if (accepted) {
@@ -393,7 +537,17 @@
             }),
           );
       }
-      const status = e("p", notice || s.feedback, "start-feedback");
+      const changedSelection = [
+        "section",
+        "surface",
+        "instrument",
+        "release",
+      ].includes(s.events.at(-1)?.type);
+      const status = e(
+        "p",
+        notice || (changedSelection ? "" : s.feedback),
+        "start-feedback",
+      );
       status.setAttribute("role", "status");
       host.append(status);
       const scope = e("details", undefined, "course-reading");
