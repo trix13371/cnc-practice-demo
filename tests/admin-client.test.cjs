@@ -47,7 +47,7 @@ const progress = require("../progress-model.js"),
     username: "admin",
     role: "admin",
     done: 0,
-    total: 57,
+    total: 63,
   };
   const context = {
     Node: Element,

@@ -691,6 +691,78 @@
       "kindLabel": "Методика обучения"
     }
   ],
+  "contentReviews": [
+    {
+      "id": "metrology-drawing",
+      "kind": "normative",
+      "tasks": [
+        "outer-control",
+        "section-hole",
+        "two-sections",
+        "refine-border",
+        "fresh-revision",
+        "bushing-transfer"
+      ],
+      "claim": "Оформление учебных видов, разрезов и размеров",
+      "sources": [
+        {
+          "id": "DRAW-SIZES",
+          "clause": null
+        }
+      ],
+      "checkedOn": "2026-11-04",
+      "status": "pending_clauses",
+      "evidence": "Сверены карточки ГОСТ 2.307-2011 и ГОСТ Р 2.307-2026. Для последнего указан ввод 01.10.2027 с правом досрочного применения; PDF на официальной карточке не загружен. Соответствие всех схем ЕСКД не подтверждено."
+    },
+    {
+      "id": "metrology-instruments",
+      "kind": "simulation",
+      "tasks": [
+        "outer-control",
+        "section-hole",
+        "two-sections",
+        "refine-border",
+        "fresh-revision",
+        "bushing-transfer"
+      ],
+      "claim": "Диапазоны, дискретность и границы ошибки виртуальных приборов",
+      "sources": [
+        {
+          "id": "CALIPER",
+          "clause": null
+        },
+        {
+          "id": "MICROMETER",
+          "clause": null
+        }
+      ],
+      "checkedOn": "2026-11-04",
+      "status": "implementation_checked",
+      "evidence": "Значения заданы metrology-course-model.js, не выведены из таблиц ГОСТ. Карточка ГОСТ 166-89 повторно сверена; нормативная применимость конкретных пунктов и паспортов требует отдельной проверки."
+    },
+    {
+      "id": "metrology-verdict",
+      "kind": "simulation",
+      "tasks": [
+        "outer-control",
+        "section-hole",
+        "two-sections",
+        "refine-border",
+        "fresh-revision",
+        "bushing-transfer"
+      ],
+      "claim": "Три исхода сравнения интервала отдельного сечения с его пределами",
+      "sources": [
+        {
+          "id": "MEASURE-ERROR",
+          "clause": null
+        }
+      ],
+      "checkedOn": "2026-11-04",
+      "status": "implementation_checked",
+      "evidence": "Правило задано учебной моделью. Карточка ГОСТ 8.051-81 подтверждает наличие темы приёмочных границ, но само правило тренажёра не объявляется полной нормативной методикой."
+    }
+  ],
   "coverage": {
     "articles": [
       {

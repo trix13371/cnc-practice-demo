@@ -20,6 +20,11 @@
     storageAvailable = false;
   }
   let view = views.restore(path);
+  if (path.activePractice === "metrologyCourse" && path.selected === "control") {
+    const saved = model.metrologyCourse.restore(path.metrologyCourse) || model.metrologyCourse.create();
+    const step = window.CNCLearningPath.get("metrology-" + model.metrologyCourse.tasks[saved.current].id);
+    view = views.create("route", step);
+  }
   const hasAnswer = (id) => Object.hasOwn(state.answers, id);
   const firstMissing = () =>
     Math.max(
@@ -879,13 +884,14 @@
           drawingSession: "control",
           firstProcess: "axes",
           programSetup: "setup",
+          metrologyCourse: "control",
         }[step.target] || "verification";
       window.CNCWorkshop.openLesson(id, true);
       view = views.create("route", step);
       path.activePractice =
         step.target === "diagnosticCourse"
           ? "diagnosticCourse"
-          : ["operationCourse", "millingCourse"].includes(step.target)
+          : ["operationCourse", "millingCourse", "metrologyCourse"].includes(step.target)
             ? step.target
             : "course";
       save();

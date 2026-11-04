@@ -2,6 +2,7 @@
   'use strict';
 
   const GROUPS = {
+    metrology:{id:'metrology',name:'Чертёж, прибор и решение'},
     turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
     size: { id: 'size', name: 'Размер и координаты' },
@@ -41,6 +42,8 @@
 
   const before=(id,step)=>STEPS.splice(STEPS.findIndex(s=>s.id===id),0,step);
   STEPS.unshift({"id":"practice-firstSession","target":"firstSession","title":"Первое знакомство · действия с нуля","group":"meet","kind":"coursePractice"});
+  const metrologyTasks=typeof module==='object'&&module.exports?require('./metrology-course-model.js'):root.CNCMetrologyCourse;
+  for(const task of metrologyTasks.tasks)before('setup',{id:'metrology-'+task.id,target:'metrologyCourse',title:task.title,group:'metrology',kind:'coursePractice',subtask:task.id});
   before('control',{"id":"practice-drawingSession","target":"drawingSession","title":"Деталь, прибор и измерение","group":"measure","kind":"coursePractice"});
   before('first-cut',{"id":"practice-firstProcess","target":"firstProcess","title":"Координаты и первый процесс","group":"cut","kind":"coursePractice"});
   before('self-code',{"id":"practice-programSetup","target":"programSetup","title":"Программа и наладка · полный цикл","group":"gcode","kind":"coursePractice"});

@@ -264,6 +264,27 @@
       if (mill.fault)
         detail.append(node("p", "Текущая ошибка: " + mill.fault.title));
     }
+    if (s.metrologyCourse) {
+      detail.append(
+        node("h3", "Чертёж и контроль размеров"),
+        table(
+          ["Условие", "Вывод", "Помощь", "Версия"],
+          s.metrologyCourse.done.map((d) => [
+            d.title,
+            {
+              accept: "По размерам подтверждено",
+              reject: "Несоответствие обнаружено",
+              uncertain: "Нужен уточняющий контроль",
+            }[d.verdict],
+            d.independent ? "Без разбора" : "С разбором",
+            "Условие " +
+              d.assignment.contentVersion +
+              " · критерии " +
+              d.assignment.criteriaVersion,
+          ]),
+        ),
+      );
+    }
     if (s.operationCourse) {
       detail.append(
         node("h3", "Практикум токарных операций"),

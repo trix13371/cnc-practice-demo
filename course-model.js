@@ -3,6 +3,7 @@
   const startSession=typeof module!=='undefined'&&module.exports?require('./start-session-model.js'):root.CNCStartSession;
   const diagnosticCourse=typeof module!=='undefined'&&module.exports?require('./diagnostic-course-model.js'):root.CNCDiagnosticCourse;
   const millingCourse=typeof module!=='undefined'&&module.exports?require('./milling-course-model.js'):root.CNCMillingCourse;
+  const metrologyCourse=typeof module!=='undefined'&&module.exports?require('./metrology-course-model.js'):root.CNCMetrologyCourse;
   const operationCourse=typeof module!=='undefined'&&module.exports?require('./operation-course-model.js'):root.CNCOperationCourse;
   const shaftProject=typeof module!=='undefined'&&module.exports?require('./shaft-project-model.js'):root.CNCShaftProject;
   const programSetup=typeof module!=='undefined'&&module.exports?require('./program-setup-model.js'):root.CNCProgramSetup;
@@ -67,13 +68,14 @@
     if(value.drawingSession!==undefined){const d=drawingSession.restore(value.drawingSession);if(d){path.drawingSession=drawingSession.snapshot(d);if(drawingSession.validDraft(value.drawingSessionDraft,d))path.drawingSessionDraft=JSON.parse(JSON.stringify(value.drawingSessionDraft));}}
     if(value.firstProcess!==undefined){const s=firstProcess.restore(value.firstProcess);if(s){path.firstProcess=firstProcess.snapshot(s);if(firstProcess.validDraft(value.firstProcessDraft,s))path.firstProcessDraft=JSON.parse(JSON.stringify(value.firstProcessDraft));}}
     if(value.programSetup!==undefined){const s=programSetup.restore(value.programSetup);if(s){path.programSetup=programSetup.snapshot(s);if(programSetup.validDraft(value.programSetupDraft,s))path.programSetupDraft=JSON.parse(JSON.stringify(value.programSetupDraft));}}
-    if(['course','operationCourse','millingCourse','diagnosticCourse'].includes(value.activePractice))path.activePractice=value.activePractice;
+    if(['course','operationCourse','millingCourse','diagnosticCourse','metrologyCourse'].includes(value.activePractice))path.activePractice=value.activePractice;
     if(value.diagnosticCourse!==undefined){const s=diagnosticCourse.restore(value.diagnosticCourse);if(s)path.diagnosticCourse=diagnosticCourse.snapshot(s);}
     if(value.millingCourse!==undefined){const s=millingCourse.restore(value.millingCourse);if(s)path.millingCourse=millingCourse.snapshot(s);}
+    if(value.metrologyCourse!==undefined){const s=metrologyCourse.restore(value.metrologyCourse);if(s)path.metrologyCourse=metrologyCourse.snapshot(s);}
     if(value.operationCourse!==undefined){const s=operationCourse.restore(value.operationCourse);if(s)path.operationCourse=operationCourse.snapshot(s);}
     if(value.shaftProject!==undefined){const s=shaftProject.restore(value.shaftProject);if(s){path.shaftProject=shaftProject.snapshot(s);if(shaftProject.validDraft(value.shaftProjectDraft,s))path.shaftProjectDraft=JSON.parse(JSON.stringify(value.shaftProjectDraft));}}
     return path;
   }
   function canCheck(id,path,answers){return Object.hasOwn(byId,id)&&(!discoveryIds.includes(id)||path.explored.includes(id)||Object.hasOwn(answers,id));}
-  const api={diagnosticCourse,millingCourse,operationCourse,shaftProject,programSetup,firstProcess,drawingSession,startSession,validFirstSessionDraft,lessons,evaluate,restore,restorePath,canCheck,discoveryIds,practice};root.CNCCourse=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={metrologyCourse,diagnosticCourse,millingCourse,operationCourse,shaftProject,programSetup,firstProcess,drawingSession,startSession,validFirstSessionDraft,lessons,evaluate,restore,restorePath,canCheck,discoveryIds,practice};root.CNCCourse=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

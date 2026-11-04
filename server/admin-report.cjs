@@ -2,6 +2,7 @@
 const diagnostics = require("../diagnostic-course-model.js");
 const milling = require("../milling-course-model.js");
 const operations = require("../operation-course-model.js");
+const metrology = require("../metrology-course-model.js");
 const curriculum = require("../curriculum-model.js");
 
 // Presentation fields only. Journal IDs, reasons and stored evidence stay intact.
@@ -19,6 +20,7 @@ function describe(summary) {
       };
     });
   for (const [key, tasks] of [
+    ["metrologyCourse", metrology.tasks],
     ["diagnosticCourse", diagnostics.tasks],
     ["millingCourse", milling.lessons],
     ["operationCourse", operations.tasks],

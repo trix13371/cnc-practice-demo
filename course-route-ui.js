@@ -38,6 +38,7 @@
       uiName = {
         firstSession: "CNCStartSessionUI",
         drawingSession: "CNCDrawingSessionUI",
+        metrologyCourse: "CNCMetrologyCourseUI",
         firstProcess: "CNCFirstProcessUI",
         programSetup: "CNCProgramSetupUI",
         shaftProject: "CNCShaftProjectUI",
@@ -108,7 +109,8 @@
               : key === "millingCourse" && s.profile === 1 && s.current === 3
                 ? "upgrade"
                 : "next",
-          ...(key === "operationCourse" && (s.version === 2 || s.current === 4)
+          ...(key === "metrologyCourse" ||
+          (key === "operationCourse" && (s.version === 2 || s.current === 4))
             ? { assignment: definitions[s.current + 1].assignment }
             : {}),
         });

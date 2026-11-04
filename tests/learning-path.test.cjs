@@ -32,16 +32,16 @@ assert.equal(path.restore({ version: 1, active: 'true', selected: '__proto__', c
 assert.equal(path.status({ lessons: ['machine', 'machine', null], basic: [], records: [] }).done, 1);
 console.log('Learning path: early practice, fresh control, historical records, prerequisites and recovery passed.');
 const cycleLessons=[...lessons,'setup','rough-finish','feed','pass-count'];
-const readyCycle={lessons:cycleLessons,courseSteps:prep,records:{diameter:record}};
+const readyCycle={lessons:cycleLessons,courseSteps:[...prep,...require('../metrology-course-model.js').tasks.map(t=>'metrology-'+t.id)],records:{diameter:record}};
 assert.equal(path.next(readyCycle).id,'full-cycle');
 assert.equal(path.next({...readyCycle,training:{guidedPassed:true}}).id,'self-cycle');
 assert.equal(path.status({...readyCycle,training:{guidedPassed:true,transferPassed:true}}).cycleComplete,true);
 assert.equal(path.status({...readyCycle,training:{guidedPassed:true,transferPassed:false}}).complete,false);
 assert.equal(path.resume({version:1,active:true,selected:'self-cycle'},readyCycle).id,'full-cycle');
-assert.equal(path.following('first-control').id,'setup');
-assert.equal(path.steps.length,57);
+assert.equal(path.following('first-control').id,'metrology-outer-control');
+assert.equal(path.steps.length,63);
 
-const readyCode={...readyCycle,courseSteps:[...prep,'practice-programSetup'],training:{guidedPassed:true,transferPassed:true},gcode:{core:['coordinates','motion','modal','feed','spindle','retract'],final:false}};
+const readyCode={...readyCycle,courseSteps:[...readyCycle.courseSteps,'practice-programSetup'],training:{guidedPassed:true,transferPassed:true},gcode:{core:['coordinates','motion','modal','feed','spindle','retract'],final:false}};
 assert.equal(path.next(readyCode).id,'self-code');
 assert.equal(path.status({...readyCode,gcode:{...readyCode.gcode,final:true}}).complete,false);
 assert.equal(path.status({...readyCode,gcode:{core:[],final:true}}).complete,false);

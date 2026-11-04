@@ -66,7 +66,7 @@ assert(context.CNCAccountStorage && context.CNCProgressStore);
 vm.runInContext(groups[1].bytes.toString("utf8"), context);
 assert.equal(
   context.CNCProgress.summary(context.CNCProgress.empty()).progress.total,
-  57,
+  63,
 );
 assert.equal(context.CNCPilot.empty().version, 1);
 assert.deepEqual(

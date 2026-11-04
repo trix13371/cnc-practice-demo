@@ -15,7 +15,7 @@ assert.deepEqual(
   path.steps.map((s) => s.id).sort(),
   "Every existing route step must have an explicit pedagogical mapping",
 );
-assert.equal(new Set(manifest.steps.map((s) => s.id)).size, 57);
+assert.equal(new Set(manifest.steps.map((s) => s.id)).size, 63);
 const skills = new Map(manifest.competencies.map((s) => [s.id, s]));
 assert.equal(
   skills.size,
@@ -84,8 +84,8 @@ assert.notEqual(
   "A changed planning decision is distinct from changing dimensions",
 );
 const coverage = curriculum.coverage();
-assert.equal(coverage.routeSteps, 57);
-assert.equal(coverage.conditions, 55);
+assert.equal(coverage.routeSteps, 63);
+assert.equal(coverage.conditions, 61);
 assert.equal(coverage.parameterVariants, 2);
 assert.equal(coverage.families.find((f) => f.id === "holes").status, "planned");
 assert(
@@ -114,5 +114,5 @@ assert.deepEqual(
   "The reviewable JSON must match the executable registry",
 );
 console.log(
-  "Curriculum: complete 57-step mapping, prerequisite DAG, honest content coverage, variant accounting and immutable metadata passed.",
+  "Curriculum: complete 63-step mapping, prerequisite DAG, honest content coverage, variant accounting and immutable metadata passed.",
 );

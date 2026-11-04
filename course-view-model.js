@@ -7,6 +7,7 @@
   const lessons = Object.freeze({
     firstSession: "machine",
     drawingSession: "control",
+    metrologyCourse: "control",
     firstProcess: "axes",
     programSetup: "setup",
     shaftProject: "verification",

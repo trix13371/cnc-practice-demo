@@ -65,3 +65,18 @@ assert.equal(JSON.parse(entries.get('cnc-course-path-v1')).selected,'verificatio
 window.CNCCourseUI.openLesson('machine');
 assert.equal(window.CNCCourseUI.pathSnapshot().activePractice,'course');
 console.log('Course view: completed foundations retain the selected free practice across reload and edits.');
+
+// A new metrology route must return to its own widget after reload.
+window.CNCLearningPath=require('../learning-path-model.js');
+window.CNCMetrologyCourseUI={create:options=>{captured=options;return new Element('section');}};
+let metrology=course.metrologyCourse.transition(course.metrologyCourse.create(),{type:'section',value:'solid'});
+const metroPath=course.restorePath(null);metroPath.selected='control';metroPath.activePractice='metrologyCourse';metroPath.metrologyCourse=course.metrologyCourse.snapshot(metrology);
+entries.set('cnc-course-path-v1',JSON.stringify(metroPath));
+vm.runInContext(fs.readFileSync(require.resolve('../course-ui.js'),'utf8'),context);
+window.CNCCourseUI.mount(parent,()=>{});
+assert.equal(captured.routeMode,true);
+assert.equal(course.metrologyCourse.restore(captured.saved)?.section,'solid');
+metrology=course.metrologyCourse.transition(metrology,{type:'surface',id:'A'});
+captured.onChange(course.metrologyCourse.snapshot(metrology));
+assert.equal(JSON.parse(entries.get('cnc-course-path-v1')).activePractice,'metrologyCourse');
+assert.equal(JSON.parse(entries.get('cnc-course-path-v1')).metrologyCourse.events.at(-1).id,'A');

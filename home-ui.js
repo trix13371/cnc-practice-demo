@@ -22,8 +22,8 @@
     },
     {
       title: "Обработка и контроль",
-      ids: ["measure", "cycle", "transfer"],
-      copy: "Измеряем деталь и выполняем полный цикл обработки.",
+      ids: ["measure", "metrology", "cycle", "transfer"],
+      copy: "Читаем разрезы, выбираем прибор и подтверждаем размеры детали.",
       art: "gauge",
     },
     {
@@ -34,7 +34,7 @@
     },
     {
       title: "Токарные операции",
-      ids: ["operations"],
+      ids: ["operations", "turningDeep"],
       copy: "Торец, канавки, конус и самостоятельные программы.",
       art: "part",
     },

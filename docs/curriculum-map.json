@@ -273,6 +273,109 @@
   ],
   "steps": [
     {
+      "id": "metrology-outer-control",
+      "title": "Поверхность, прибор и два сечения",
+      "family": "drawing",
+      "format": "guided-practice",
+      "competencies": [
+        "drawing",
+        "metrology"
+      ],
+      "prerequisites": [
+        "dimensions",
+        "safe-state"
+      ],
+      "objective": "Связать размер с выбранной поверхностью, проверить установку виртуального прибора и записать два измерения с пределами размера.",
+      "conditionId": "metrology-outer-control",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "metrology-section-hole",
+      "title": "Разрез: где находится отверстие",
+      "family": "drawing",
+      "format": "guided-practice",
+      "competencies": [
+        "drawing",
+        "metrology"
+      ],
+      "prerequisites": [
+        "drawing",
+        "metrology"
+      ],
+      "objective": "По продольному разрезу отличить глухое отверстие от сквозного и выбрать внутренний прибор для контроля двух сечений.",
+      "conditionId": "metrology-section-hole",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "metrology-two-sections",
+      "title": "Один замер не подтверждает весь участок",
+      "family": "drawing",
+      "format": "diagnosis",
+      "competencies": [
+        "metrology",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "metrology"
+      ],
+      "objective": "Сопоставить два сечения со своими пределами и обнаружить несоответствие, которое не показывает один благополучный замер.",
+      "conditionId": "metrology-two-sections",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "metrology-refine-border",
+      "title": "Пограничный замер: уточните контроль",
+      "family": "drawing",
+      "format": "guided-practice",
+      "competencies": [
+        "metrology",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "metrology",
+        "tolerances"
+      ],
+      "objective": "Зафиксировать неопределённость пограничного замера и уточнить оба сечения другим прибором с отдельной проверкой установки.",
+      "conditionId": "metrology-refine-border",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "metrology-fresh-revision",
+      "title": "После доработки нужны новые измерения",
+      "family": "drawing",
+      "format": "diagnosis",
+      "competencies": [
+        "metrology",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "metrology",
+        "tolerances"
+      ],
+      "objective": "Различить редакции детали, сохранить старые записи как устаревшие и выполнить свежий контроль после доработки.",
+      "conditionId": "metrology-fresh-revision",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "metrology-bushing-transfer",
+      "title": "Самостоятельный контроль втулки",
+      "family": "drawing",
+      "format": "transfer",
+      "competencies": [
+        "drawing",
+        "metrology",
+        "tolerances"
+      ],
+      "prerequisites": [
+        "drawing",
+        "metrology",
+        "tolerances"
+      ],
+      "objective": "Самостоятельно проверить наружную и внутреннюю поверхности втулки и обосновать общий вывод отдельными интервалами каждого сечения.",
+      "conditionId": "metrology-bushing-transfer",
+      "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
+    },
+    {
       "id": "practice-firstSession",
       "title": "Первое знакомство · действия с нуля",
       "family": "setup",

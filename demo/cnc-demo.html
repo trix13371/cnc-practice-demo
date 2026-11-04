@@ -11254,6 +11254,11 @@ body.cloud-loading {
     {id:'HAAS-PROGRAM',designation:'Руководство Haas',title:'Программирование токарной обработки',url:'https://haascnc.com/service/online-operator-s-manuals/lathe-operator-s-manual/lathe---programming.html',reviewLabel:'Документация изготовителя; учебное подмножество описано отдельно',note:'Источник соглашений конкретного управления. Приложение не воспроизводит все функции Haas или FANUC и не является их официальным эмулятором.'},
     {id:'EAEU-MACHINE',designation:'ТР ТС 010/2011',title:'О безопасности машин и оборудования',url:'https://eec.eaeunion.org/comission/department/deptexreg/tr/bezopMashines.php',reviewLabel:'Проверена официальная страница и перечень изменений; применимость пунктов требует проверки',note:'Нормативный контекст для оборудования. Браузерный тренажёр не является физическим станком.'}
   ].map(s=>({...s,checkedOn,type:s.id==='HAAS-PROGRAM'?'manufacturer':s.id==='WORK-SAFETY'||s.id==='EAEU-MACHINE'?'regulation':'standard',verification:s.id==='WORK-SAFETY'?'pending':s.id==='AXES'||s.id==='CODE'?'catalog':s.id==='HAAS-PROGRAM'?'manufacturer':'metadata',reviewLabel:s.reviewLabel||card}));
+  const contentReviews=freeze([
+    {id:'metrology-drawing',kind:'normative',tasks:['outer-control','section-hole','two-sections','refine-border','fresh-revision','bushing-transfer'],claim:'Оформление учебных видов, разрезов и размеров',sources:[{id:'DRAW-SIZES',clause:null}],checkedOn:'2026-11-04',status:'pending_clauses',evidence:'Сверены карточки ГОСТ 2.307-2011 и ГОСТ Р 2.307-2026. Для последнего указан ввод 01.10.2027 с правом досрочного применения; PDF на официальной карточке не загружен. Соответствие всех схем ЕСКД не подтверждено.'},
+    {id:'metrology-instruments',kind:'simulation',tasks:['outer-control','section-hole','two-sections','refine-border','fresh-revision','bushing-transfer'],claim:'Диапазоны, дискретность и границы ошибки виртуальных приборов',sources:[{id:'CALIPER',clause:null},{id:'MICROMETER',clause:null}],checkedOn:'2026-11-04',status:'implementation_checked',evidence:'Значения заданы metrology-course-model.js, не выведены из таблиц ГОСТ. Карточка ГОСТ 166-89 повторно сверена; нормативная применимость конкретных пунктов и паспортов требует отдельной проверки.'},
+    {id:'metrology-verdict',kind:'simulation',tasks:['outer-control','section-hole','two-sections','refine-border','fresh-revision','bushing-transfer'],claim:'Три исхода сравнения интервала отдельного сечения с его пределами',sources:[{id:'MEASURE-ERROR',clause:null}],checkedOn:'2026-11-04',status:'implementation_checked',evidence:'Правило задано учебной моделью. Карточка ГОСТ 8.051-81 подтверждает наличие темы приёмочных границ, но само правило тренажёра не объявляется полной нормативной методикой.'}
+  ]);
   const profiles=[
     {id:'editor',title:'Учебный редактор G-кода',description:'Короткие задания на чтение программы и прогноз траектории. Наладка стойки не моделируется.',
       gCodes:[0,1,18,21,97,98,99],mCodes:[3,5,30],
@@ -11281,7 +11286,7 @@ body.cloud-loading {
   const forTarget=(kind,id)=>typeof id==='string'?rules.filter(r=>r[kind].includes(id)):[];
   function sourcesForRules(list){const ids=new Set(list.flatMap(r=>r.sources.map(s=>s.id)));return sources.filter(s=>ids.has(s.id));}
   function textForArticle(id){const list=forTarget('articles',id);return list.length?'Основания и ограничения. Проверка источников: '+checkedOn+'. Автоматическое отслеживание изменений не включено.\n'+list.map(r=>[r.title,r.kindLabel+' · '+r.reviewLabel,r.statement,r.scope,...r.limitations,...r.sources.map(ref=>{const s=source(ref.id);return s.designation+' — '+s.title+'\n'+s.url+'\n'+s.reviewLabel+'\n'+s.note+(s.amendmentUrl?'\n'+s.amendmentUrl:'')+(s.transition?'\nПереход: '+s.transition.title+', '+s.transition.effectiveOn+'. '+s.transition.note+'\n'+s.transition.url:'');})].join('\n')).join('\n\n'):'';}
-  return freeze({checkedOn,sources,rules,profiles,source,rulesForArticle:id=>forTarget('articles',id),rulesForLesson:id=>forTarget('lessons',id),sourcesForRules,textForArticle});
+  return freeze({checkedOn,sources,rules,profiles,contentReviews,source,rulesForArticle:id=>forTarget('articles',id),rulesForLesson:id=>forTarget('lessons',id),sourcesForRules,textForArticle});
 });
 </script><script>(function(root){
   'use strict';
@@ -12500,6 +12505,636 @@ body.cloud-loading {
   });
 });
 </script><script>(function (root, factory) {
+  const api =
+    typeof module === "object" && module.exports
+      ? factory(
+          require("./assignment-model.js"),
+          require("./start-session-model.js"),
+        )
+      : factory(root.CNCAssignment, root.CNCStartSession);
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.CNCMetrologyCourse = api;
+})(
+  typeof globalThis !== "undefined" ? globalThis : this,
+  function (assign, numbers) {
+    "use strict";
+    const copy = (x) => JSON.parse(JSON.stringify(x)),
+      fail = (m) => {
+        throw Error(m);
+      };
+    function freeze(x) {
+      if (x && typeof x === "object") {
+        Object.values(x).forEach(freeze);
+        Object.freeze(x);
+      }
+      return x;
+    }
+    const instruments = freeze({
+      outside: {
+        title: "Штангенциркуль · наружные губки",
+        kind: "outer",
+        range: [0, 150000],
+        resolution: 10,
+        error: 30,
+        reference: 0,
+      },
+      inside: {
+        title: "Штангенциркуль · внутренние губки",
+        kind: "inner",
+        range: [5000, 150000],
+        resolution: 10,
+        error: 30,
+        reference: 0,
+      },
+      micrometer: {
+        title: "Микрометр 25–50 мм",
+        kind: "outer",
+        range: [25000, 50000],
+        resolution: 1,
+        error: 5,
+        reference: 25000,
+      },
+      bore: {
+        title: "Учебный нутромер 10–30 мм",
+        kind: "inner",
+        range: [10000, 30000],
+        resolution: 2,
+        error: 8,
+        reference: 20000,
+      },
+    });
+    const surface = (id, title, kind, nominal, lower, upper, values) => ({
+      id,
+      title,
+      kind,
+      nominal,
+      lower,
+      upper,
+      points: values.map((value, i) => ({
+        id: String(i + 1),
+        z: nominal === 32000 ? (i ? -45 : -35) : i ? -15 : -5,
+        value,
+      })),
+    });
+    const tasks = freeze(
+      [
+        {
+          id: "outer-control",
+          title: "Поверхность, прибор и два сечения",
+          section: "solid",
+          mode: "guided",
+          goal: "Проконтролируйте наружную шейку A: Ø28 ±0,20 мм. Базовая поверхность B имеет Ø32 и не заменяет контроль шейки.",
+          reading:
+            "Выберите размер и поверхность. Проверка нуля выполняется без контакта с деталью. После выбора сечения установите контакт и запишите отсчёт; отдельно рассчитайте пределы размера.",
+          hint: "Нужна поверхность A и наружный прибор. Пределы A: 27,80…28,20 мм. Для каждого показания учитывается граница ошибки выбранного учебного прибора.",
+          surfaces: [
+            surface("A", "Шейка", "outer", 28000, 27800, 28200, [28080, 28090]),
+            surface("B", "База", "outer", 32000, 31800, 32200, [32000, 32000]),
+          ],
+          required: ["A"],
+        },
+        {
+          id: "section-hole",
+          title: "Разрез: где находится отверстие",
+          section: "blind",
+          mode: "guided",
+          goal: "Глухое отверстие B глубиной 20 мм: Ø20 ±0,10 мм. Наружная поверхность A имеет Ø32. Определите тип заготовки по разрезу и проконтролируйте именно внутреннюю поверхность.",
+          reading:
+            "Внешний вид цилиндра не показывает, сплошной ли он. На продольном разрезе светлая полоса заканчивается внутри детали. Наружный микрометр не измеряет отверстие.",
+          hint: "Выберите глухое отверстие и поверхность B. Для неё доступны внутренние губки либо нутромер подходящего диапазона. Пределы: 19,90…20,10 мм.",
+          surfaces: [
+            surface(
+              "A",
+              "Наружная поверхность",
+              "outer",
+              32000,
+              31800,
+              32200,
+              [32000, 32000],
+            ),
+            surface(
+              "B",
+              "Отверстие",
+              "inner",
+              20000,
+              19900,
+              20100,
+              [20040, 20050],
+            ),
+          ],
+          required: ["B"],
+        },
+        {
+          id: "two-sections",
+          title: "Один замер не подтверждает весь участок",
+          section: "solid",
+          mode: "practice",
+          goal: "Проверьте A Ø30 ±0,10 мм в двух сечениях. Вывод относится ко всей карте контроля: благополучное первое сечение не отменяет результат второго.",
+          reading:
+            "Сравнивайте каждое сечение с его требованием. Если хотя бы в одном сечении весь интервал измерения вне допуска, соответствие размера не подтверждается.",
+          hint: "Измерьте A в обеих точках. При наружном штангенциркуле второе показание 30,14 ±0,03 даёт интервал 30,11…30,17 — полностью выше верхнего предела.",
+          surfaces: [
+            surface(
+              "A",
+              "Контролируемый участок",
+              "outer",
+              30000,
+              29900,
+              30100,
+              [29980, 30140],
+            ),
+          ],
+          required: ["A"],
+        },
+        {
+          id: "refine-border",
+          title: "Пограничный замер: уточните контроль",
+          section: "solid",
+          mode: "practice",
+          refine: true,
+          goal: "A Ø30 ±0,10 мм. Сначала выполните контроль наружным штангенциркулем. Если его интервал пересекает границу, зафиксируйте неопределённость, затем повторите контроль микрометром.",
+          reading:
+            "Дискретность дисплея и граница ошибки — разные характеристики. Данные приборов здесь заданы условием. Смена прибора требует своей проверки нуля и нового контакта.",
+          hint: "Штангенциркуль показывает 30,08 ±0,03: верх интервала 30,11 пересекает предел 30,10. Нужен вывод «уточнить», затем новые замеры микрометром; его показание 30,082 ±0,005.",
+          surfaces: [
+            surface(
+              "A",
+              "Пограничная шейка",
+              "outer",
+              30000,
+              29900,
+              30100,
+              [30082, 30082],
+            ),
+          ],
+          required: ["A"],
+        },
+        {
+          id: "fresh-revision",
+          title: "После доработки нужны новые измерения",
+          section: "solid",
+          mode: "practice",
+          revised: true,
+          goal: "A Ø28 ±0,10 мм. Оцените исходную деталь. Затем получите редакцию после доработки и выполните контроль заново. Старая запись не подтверждает новую редакцию.",
+          reading:
+            "Доработка здесь представлена сменой учебной редакции детали; физическая обработка не моделируется. Записи сохраняются с номером редакции, поверхностью, сечением и прибором.",
+          hint: "Первоначальный размер 28,20 выше допуска. После смены редакции прежние записи устаревают. Заново измерьте обе точки A и примите решение по новым значениям.",
+          surfaces: [
+            surface(
+              "A",
+              "Доработанная шейка",
+              "outer",
+              28000,
+              27900,
+              28100,
+              [28200, 28200],
+            ),
+          ],
+          required: ["A"],
+        },
+        {
+          id: "bushing-transfer",
+          title: "Самостоятельный контроль втулки",
+          section: "through",
+          mode: "transfer",
+          goal: "По виду и разрезу проконтролируйте втулку: наружная A Ø30 ±0,10 мм; отверстие B Ø20 с отклонениями +0,10/0 мм. Нужны два сечения каждой поверхности и отдельные пределы каждого размера.",
+          reading:
+            "Используйте схему, паспорта приборов и пустой протокол. Итог относится только к указанным размерам; форму, шероховатость и остальные требования этот контроль не подтверждает.",
+          hint: "Нужны обе поверхности A и B. Для A — наружный прибор, для B — внутренний. Пределы A 29,90…30,10; B 20,00…20,10. Соберите четыре свежие записи и сравните каждый интервал отдельно.",
+          surfaces: [
+            surface(
+              "A",
+              "Наружный диаметр",
+              "outer",
+              30000,
+              29900,
+              30100,
+              [30020, 30030],
+            ),
+            surface(
+              "B",
+              "Отверстие",
+              "inner",
+              20000,
+              20000,
+              20100,
+              [20040, 20050],
+            ),
+          ],
+          required: ["A", "B"],
+        },
+      ].map((t) => ({
+        ...t,
+        assignment: {
+          id: "metrology-" + t.id,
+          contentVersion: 1,
+          criteriaVersion: 1,
+          profileId: "dimensional-control",
+          profileVersion: 1,
+          seed: "fixed-01",
+        },
+      })),
+    );
+    function exact(o, keys) {
+      if (
+        !o ||
+        typeof o !== "object" ||
+        Array.isArray(o) ||
+        Object.keys(o).sort().join(",") !== [...keys].sort().join(",")
+      )
+        fail("Повреждена запись контроля.");
+    }
+    function number(raw) {
+      if (typeof raw !== "string" || raw.length > 32)
+        fail("Введите размер в мм.");
+      const n = numbers.parseNumber(raw);
+      if (
+        n === null ||
+        Math.abs(n) > 1000 ||
+        Math.abs(n * 1000 - Math.round(n * 1000)) > 1e-7
+      )
+        fail("Точность ввода — до 0,001 мм.");
+      return Math.round(n * 1000);
+    }
+    function classify(reading, error, lower, upper) {
+      const low = reading - error,
+        high = reading + error;
+      return {
+        low,
+        high,
+        verdict:
+          low >= lower && high <= upper
+            ? "accept"
+            : high < lower || low > upper
+              ? "reject"
+              : "uncertain",
+      };
+    }
+    function aggregate(verdicts) {
+      if (!verdicts.length) fail("Нет замеров.");
+      return verdicts.includes("reject")
+        ? "reject"
+        : verdicts.includes("uncertain")
+          ? "uncertain"
+          : "accept";
+    }
+    const local = () => ({
+      surface: null,
+      instrument: null,
+      contact: null,
+      section: null,
+      records: [],
+      bounds: {},
+      revision: 0,
+      coarseReviewed: false,
+      initialReviewed: false,
+      draft: { reading: "", lower: "", upper: "" },
+    });
+    function initial() {
+      return {
+        version: 1,
+        events: [],
+        current: 0,
+        done: [],
+        help: [],
+        errors: Array(6).fill(0),
+        zeroed: [],
+        feedback: "",
+        ...local(),
+      };
+    }
+    function create() {
+      return apply(initial(), {
+        type: "begin",
+        assignment: tasks[0].assignment,
+      });
+    }
+    function recordFor(s, id, point) {
+      return s.records.find(
+        (r) =>
+          r.surface === id && r.point === point && r.revision === s.revision,
+      );
+    }
+    function verdicts(s) {
+      const t = tasks[s.current];
+      return t.required.flatMap((id) =>
+        t.surfaces
+          .find((v) => v.id === id)
+          .points.map((point) => {
+            const r = recordFor(s, id, point.id);
+            if (!r || !s.bounds[id])
+              fail("Нужны все свежие записи и пределы каждой поверхности.");
+            const a = t.surfaces.find((v) => v.id === id);
+            return {
+              ...classify(
+                r.reading,
+                instruments[r.instrument].error,
+                a.lower,
+                a.upper,
+              ),
+              surface: id,
+              point: point.id,
+            };
+          }),
+      );
+    }
+    function apply(state, a) {
+      if (state.events.length >= 360)
+        fail("Журнал заполнен. Сохраните работу.");
+      const fields = {
+        begin: ["type", "assignment"],
+        section: ["type", "value"],
+        surface: ["type", "id"],
+        instrument: ["type", "id"],
+        zero: ["type"],
+        release: ["type"],
+        contact: ["type", "point"],
+        record: ["type", "value"],
+        limits: ["type", "lower", "upper"],
+        verdict: ["type", "value"],
+        revision: ["type"],
+        hint: ["type"],
+        next: ["type", "assignment"],
+      };
+      if (!a || !Object.hasOwn(fields, a.type)) fail("Неизвестное действие.");
+      exact(a, fields[a.type]);
+      const s = copy(state),
+        t = tasks[s.current],
+        bad = (m) => {
+          s.errors[s.current]++;
+          s.feedback = m;
+        };
+      if (s.done.some((d) => d.id === t.id) && a.type !== "next")
+        fail("Условие принято.");
+      switch (a.type) {
+        case "begin":
+          if (s.events.length || !assign.matches(a.assignment, t.assignment))
+            fail("Неизвестная версия контроля.");
+          break;
+        case "section":
+          if (!["solid", "blind", "through"].includes(a.value))
+            fail("Неверный вид разреза.");
+          s.section = a.value;
+          s.contact = null;
+          if (a.value !== t.section)
+            bad("Сопоставьте светлую область разреза с её выходом к торцам.");
+          break;
+        case "surface":
+          if (!t.surfaces.some((v) => v.id === a.id))
+            fail("Неизвестная поверхность.");
+          s.surface = a.id;
+          s.contact = null;
+          s.draft = { reading: "", lower: "", upper: "" };
+          break;
+        case "instrument":
+          if (!Object.hasOwn(instruments, a.id)) fail("Неизвестный прибор.");
+          s.instrument = a.id;
+          s.contact = null;
+          break;
+        case "release":
+          s.contact = null;
+          break;
+        case "zero":
+          if (!s.instrument || s.contact)
+            fail("Проверяйте ноль выбранного прибора без детали.");
+          if (!s.zeroed.includes(s.instrument)) s.zeroed.push(s.instrument);
+          s.feedback =
+            "Установка прибора проверена по учебному эталону без контролируемой детали.";
+          break;
+        case "contact": {
+          const surface = t.surfaces.find((v) => v.id === s.surface),
+            g = instruments[s.instrument],
+            point = surface?.points.find((p) => p.id === a.point);
+          if (
+            !surface ||
+            !g ||
+            !point ||
+            s.section !== t.section ||
+            !s.zeroed.includes(s.instrument)
+          )
+            fail("Нужны верный разрез, поверхность, прибор и проверка нуля.");
+          const value = t.revised && s.revision ? 28030 : point.value;
+          if (
+            g.kind !== surface.kind ||
+            value < g.range[0] ||
+            value > g.range[1]
+          ) {
+            s.contact = null;
+            bad(
+              "Этот прибор или диапазон не подходит к выбранной поверхности.",
+            );
+            break;
+          }
+          s.contact = {
+            surface: surface.id,
+            point: point.id,
+            reading: Math.round(value / g.resolution) * g.resolution,
+            revision: s.revision,
+            instrument: s.instrument,
+          };
+          s.feedback =
+            "Контакт установлен. Прочитайте дисплей и запишите отсчёт.";
+          break;
+        }
+        case "record":
+          if (!s.contact || s.contact.revision !== s.revision)
+            fail("Нет свежего контакта с деталью.");
+          if (number(a.value) !== s.contact.reading) {
+            bad("Запись отличается от дисплея.");
+            break;
+          }
+          s.records = s.records.filter(
+            (r) =>
+              !(
+                r.surface === s.contact.surface &&
+                r.point === s.contact.point &&
+                r.revision === s.revision
+              ),
+          );
+          s.records.push(copy(s.contact));
+          s.feedback =
+            "Запись связана с поверхностью, сечением, прибором и редакцией.";
+          break;
+        case "limits": {
+          const surface = t.surfaces.find((v) => v.id === s.surface);
+          if (!surface) fail("Выберите поверхность.");
+          if (
+            number(a.lower) !== surface.lower ||
+            number(a.upper) !== surface.upper
+          ) {
+            bad("Проверьте номинал и оба отклонения.");
+            break;
+          }
+          s.bounds[surface.id] = { lower: surface.lower, upper: surface.upper };
+          s.feedback = "Пределы поверхности записаны.";
+          break;
+        }
+        case "revision":
+          if (!t.revised || s.revision || !s.initialReviewed)
+            fail("Сначала оцените исходную деталь.");
+          s.revision = 1;
+          s.contact = null;
+          s.feedback =
+            "Получена новая учебная редакция. Прежние записи остались в протоколе и устарели.";
+          break;
+        case "hint":
+          if (s.help.includes(t.id)) fail("Разбор уже открыт.");
+          s.help.push(t.id);
+          s.feedback = t.hint;
+          break;
+        case "verdict": {
+          if (s.section !== t.section) fail("Сначала исправьте тип разреза.");
+          if (!["accept", "reject", "uncertain"].includes(a.value))
+            fail("Неверный вывод.");
+          const results = verdicts(s),
+            expected = aggregate(results.map((r) => r.verdict));
+          if (a.value !== expected) {
+            bad(
+              "Сравните каждый интервал со своим допуском. Одно благополучное сечение не отменяет остальные.",
+            );
+            break;
+          }
+          if (t.refine && !s.coarseReviewed) {
+            if (
+              expected !== "uncertain" ||
+              !t.required.every((id) =>
+                t.surfaces
+                  .find((v) => v.id === id)
+                  .points.every(
+                    (p) => recordFor(s, id, p.id).instrument === "outside",
+                  ),
+              )
+            ) {
+              bad(
+                "Сначала зафиксируйте пограничный результат штангенциркуля по условию.",
+              );
+              break;
+            }
+            s.coarseReviewed = true;
+            s.feedback =
+              "Результата недостаточно. Выполните новые замеры микрометром.";
+            break;
+          }
+          if (
+            t.refine &&
+            !t.required.every((id) =>
+              t.surfaces
+                .find((v) => v.id === id)
+                .points.every(
+                  (p) => recordFor(s, id, p.id).instrument === "micrometer",
+                ),
+            )
+          ) {
+            bad("Уточните оба сечения более точным прибором.");
+            break;
+          }
+          if (t.revised && !s.revision) {
+            s.initialReviewed = true;
+            s.feedback =
+              "Исходная редакция оценена. Получите деталь после доработки.";
+            break;
+          }
+          s.done.push({
+            id: t.id,
+            assignment: copy(t.assignment),
+            independent: !s.help.includes(t.id),
+            help: s.help.includes(t.id),
+            errors: s.errors[s.current],
+            verdict: expected,
+            records: copy(s.records),
+            bounds: copy(s.bounds),
+            revision: s.revision,
+            results,
+          });
+          s.feedback =
+            "Контроль и вывод подтверждены только для размеров учебной модели.";
+          break;
+        }
+        case "next":
+          if (
+            !s.done.some((d) => d.id === t.id) ||
+            s.current === tasks.length - 1 ||
+            !assign.matches(a.assignment, tasks[s.current + 1].assignment)
+          )
+            fail("Следующее условие недоступно или его версия неизвестна.");
+          s.current++;
+          Object.assign(s, local());
+          s.feedback = "";
+          break;
+      }
+      s.events.push(copy(a));
+      return s;
+    }
+    function snapshot(s) {
+      return { version: 1, events: copy(s.events), draft: copy(s.draft) };
+    }
+    function validDraft(d) {
+      return (
+        d &&
+        typeof d === "object" &&
+        !Array.isArray(d) &&
+        Object.keys(d).sort().join(",") === "lower,reading,upper" &&
+        Object.values(d).every(
+          (v) =>
+            typeof v === "string" &&
+            v.length <= 32 &&
+            !/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/.test(
+              v,
+            ),
+        )
+      );
+    }
+    function restore(raw) {
+      try {
+        exact(raw, ["version", "events", "draft"]);
+        if (
+          raw.version !== 1 ||
+          !Array.isArray(raw.events) ||
+          !raw.events.length ||
+          raw.events.length > 360 ||
+          raw.events[0].type !== "begin" ||
+          !validDraft(raw.draft)
+        )
+          return null;
+        let s = initial();
+        for (const a of raw.events) s = apply(s, a);
+        s.draft = copy(raw.draft);
+        return s;
+      } catch {
+        return null;
+      }
+    }
+    function transition(s, a) {
+      const trusted = restore(snapshot(s));
+      if (!trusted) fail("Повреждён журнал контроля.");
+      return apply(trusted, a);
+    }
+    function review(raw, id) {
+      const trusted = restore(raw);
+      if (!trusted?.done.some((d) => d.id === id)) return null;
+      let s = initial();
+      for (const a of raw.events) {
+        s = apply(s, a);
+        if (s.done.some((d) => d.id === id)) return snapshot(s);
+      }
+      return null;
+    }
+    return freeze({
+      tasks,
+      lessons: tasks,
+      instruments,
+      create,
+      snapshot,
+      restore,
+      transition,
+      review,
+      aggregate,
+      classify,
+      recordFor,
+    });
+  },
+);
+</script><script>(function (root, factory) {
   const api = factory(
     () =>
       typeof module === "object" && module.exports
@@ -13315,6 +13950,7 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
   const startSession=typeof module!=='undefined'&&module.exports?require('./start-session-model.js'):root.CNCStartSession;
   const diagnosticCourse=typeof module!=='undefined'&&module.exports?require('./diagnostic-course-model.js'):root.CNCDiagnosticCourse;
   const millingCourse=typeof module!=='undefined'&&module.exports?require('./milling-course-model.js'):root.CNCMillingCourse;
+  const metrologyCourse=typeof module!=='undefined'&&module.exports?require('./metrology-course-model.js'):root.CNCMetrologyCourse;
   const operationCourse=typeof module!=='undefined'&&module.exports?require('./operation-course-model.js'):root.CNCOperationCourse;
   const shaftProject=typeof module!=='undefined'&&module.exports?require('./shaft-project-model.js'):root.CNCShaftProject;
   const programSetup=typeof module!=='undefined'&&module.exports?require('./program-setup-model.js'):root.CNCProgramSetup;
@@ -13379,15 +14015,16 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
     if(value.drawingSession!==undefined){const d=drawingSession.restore(value.drawingSession);if(d){path.drawingSession=drawingSession.snapshot(d);if(drawingSession.validDraft(value.drawingSessionDraft,d))path.drawingSessionDraft=JSON.parse(JSON.stringify(value.drawingSessionDraft));}}
     if(value.firstProcess!==undefined){const s=firstProcess.restore(value.firstProcess);if(s){path.firstProcess=firstProcess.snapshot(s);if(firstProcess.validDraft(value.firstProcessDraft,s))path.firstProcessDraft=JSON.parse(JSON.stringify(value.firstProcessDraft));}}
     if(value.programSetup!==undefined){const s=programSetup.restore(value.programSetup);if(s){path.programSetup=programSetup.snapshot(s);if(programSetup.validDraft(value.programSetupDraft,s))path.programSetupDraft=JSON.parse(JSON.stringify(value.programSetupDraft));}}
-    if(['course','operationCourse','millingCourse','diagnosticCourse'].includes(value.activePractice))path.activePractice=value.activePractice;
+    if(['course','operationCourse','millingCourse','diagnosticCourse','metrologyCourse'].includes(value.activePractice))path.activePractice=value.activePractice;
     if(value.diagnosticCourse!==undefined){const s=diagnosticCourse.restore(value.diagnosticCourse);if(s)path.diagnosticCourse=diagnosticCourse.snapshot(s);}
     if(value.millingCourse!==undefined){const s=millingCourse.restore(value.millingCourse);if(s)path.millingCourse=millingCourse.snapshot(s);}
+    if(value.metrologyCourse!==undefined){const s=metrologyCourse.restore(value.metrologyCourse);if(s)path.metrologyCourse=metrologyCourse.snapshot(s);}
     if(value.operationCourse!==undefined){const s=operationCourse.restore(value.operationCourse);if(s)path.operationCourse=operationCourse.snapshot(s);}
     if(value.shaftProject!==undefined){const s=shaftProject.restore(value.shaftProject);if(s){path.shaftProject=shaftProject.snapshot(s);if(shaftProject.validDraft(value.shaftProjectDraft,s))path.shaftProjectDraft=JSON.parse(JSON.stringify(value.shaftProjectDraft));}}
     return path;
   }
   function canCheck(id,path,answers){return Object.hasOwn(byId,id)&&(!discoveryIds.includes(id)||path.explored.includes(id)||Object.hasOwn(answers,id));}
-  const api={diagnosticCourse,millingCourse,operationCourse,shaftProject,programSetup,firstProcess,drawingSession,startSession,validFirstSessionDraft,lessons,evaluate,restore,restorePath,canCheck,discoveryIds,practice};root.CNCCourse=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={metrologyCourse,diagnosticCourse,millingCourse,operationCourse,shaftProject,programSetup,firstProcess,drawingSession,startSession,validFirstSessionDraft,lessons,evaluate,restore,restorePath,canCheck,discoveryIds,practice};root.CNCCourse=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);
 </script><script>(function(root){
   'use strict';
@@ -13840,6 +14477,7 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
   'use strict';
 
   const GROUPS = {
+    metrology:{id:'metrology',name:'Чертёж, прибор и решение'},
     turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
     size: { id: 'size', name: 'Размер и координаты' },
@@ -13879,6 +14517,8 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
 
   const before=(id,step)=>STEPS.splice(STEPS.findIndex(s=>s.id===id),0,step);
   STEPS.unshift({"id":"practice-firstSession","target":"firstSession","title":"Первое знакомство · действия с нуля","group":"meet","kind":"coursePractice"});
+  const metrologyTasks=typeof module==='object'&&module.exports?require('./metrology-course-model.js'):root.CNCMetrologyCourse;
+  for(const task of metrologyTasks.tasks)before('setup',{id:'metrology-'+task.id,target:'metrologyCourse',title:task.title,group:'metrology',kind:'coursePractice',subtask:task.id});
   before('control',{"id":"practice-drawingSession","target":"drawingSession","title":"Деталь, прибор и измерение","group":"measure","kind":"coursePractice"});
   before('first-cut',{"id":"practice-firstProcess","target":"firstProcess","title":"Координаты и первый процесс","group":"cut","kind":"coursePractice"});
   before('self-code',{"id":"practice-programSetup","target":"programSetup","title":"Программа и наладка · полный цикл","group":"gcode","kind":"coursePractice"});
@@ -16106,7 +16746,7 @@ return {
     if(id==='course'){
       demand(raw.version===1);recordMap(raw.answers,course.lessons.map(l=>l.id));const s=course.restore(raw);demand(Object.keys(s.answers).length===Object.keys(raw.answers).length,'В архиве есть неподтверждённый ответ урока.');return s;
     }
-    if(id==='coursePath'){if(raw.activePractice!==undefined)demand(['course','operationCourse','millingCourse','diagnosticCourse'].includes(raw.activePractice),'Неверный раздел практики.');if(raw.diagnosticCourse!==undefined)demand(course.diagnosticCourse.restore(raw.diagnosticCourse),'Повреждена диагностика.');if(raw.millingCourse!==undefined)demand(course.millingCourse.restore(raw.millingCourse),'Повреждён фрезерный практикум.');if(raw.operationCourse!==undefined)demand(course.operationCourse.restore(raw.operationCourse),'Повреждён практикум операций.');demand(raw.version===1&&object(raw.phases)&&Array.isArray(raw.explored));if(raw.shaftProject!==undefined)demand(course.shaftProject.restore(raw.shaftProject),'Повреждён проект валика.');if(raw.shaftProjectDraft!==undefined)demand(course.shaftProject.validDraft(raw.shaftProjectDraft,course.shaftProject.restore(raw.shaftProject)),'Повреждён черновик проекта валика.');if(raw.programSetup!==undefined)demand(course.programSetup.restore(raw.programSetup),'Повреждено занятие программы и наладки.');if(raw.programSetupDraft!==undefined)demand(course.programSetup.validDraft(raw.programSetupDraft,course.programSetup.restore(raw.programSetup)),'Повреждён черновик программы и наладки.');if(raw.firstProcess!==undefined)demand(course.firstProcess.restore(raw.firstProcess),'Повреждён первый процесс.');if(raw.firstProcessDraft!==undefined)demand(course.firstProcess.validDraft(raw.firstProcessDraft,course.firstProcess.restore(raw.firstProcess)),'Повреждён черновик первого процесса.');if(raw.drawingSession!==undefined)demand(course.drawingSession.restore(raw.drawingSession),'Повреждено занятие по измерениям.');if(raw.drawingSessionDraft!==undefined)demand(course.drawingSession.validDraft(raw.drawingSessionDraft,course.drawingSession.restore(raw.drawingSession)),'Повреждён черновик измерения.');if(raw.firstSession!==undefined)demand(course.startSession.restore(raw.firstSession),'Повреждено вводное занятие.');if(raw.firstSessionDraft!==undefined)demand(course.validFirstSessionDraft(raw.firstSessionDraft,course.startSession.restore(raw.firstSession)),'Повреждён черновик вводного занятия.');if(raw.practice!==undefined){recordMap(raw.practice,course.practice.ids);for(const [key,value] of Object.entries(raw.practice))demand(course.practice.restore(value,key),'Повреждена запись практики на схеме.');}return course.restorePath(raw);}
+    if(id==='coursePath'){if(raw.metrologyCourse!==undefined)demand(course.metrologyCourse.restore(raw.metrologyCourse),'Повреждён контроль размеров.');if(raw.activePractice!==undefined)demand(['course','operationCourse','millingCourse','diagnosticCourse','metrologyCourse'].includes(raw.activePractice),'Неверный раздел практики.');if(raw.diagnosticCourse!==undefined)demand(course.diagnosticCourse.restore(raw.diagnosticCourse),'Повреждена диагностика.');if(raw.millingCourse!==undefined)demand(course.millingCourse.restore(raw.millingCourse),'Повреждён фрезерный практикум.');if(raw.operationCourse!==undefined)demand(course.operationCourse.restore(raw.operationCourse),'Повреждён практикум операций.');demand(raw.version===1&&object(raw.phases)&&Array.isArray(raw.explored));if(raw.shaftProject!==undefined)demand(course.shaftProject.restore(raw.shaftProject),'Повреждён проект валика.');if(raw.shaftProjectDraft!==undefined)demand(course.shaftProject.validDraft(raw.shaftProjectDraft,course.shaftProject.restore(raw.shaftProject)),'Повреждён черновик проекта валика.');if(raw.programSetup!==undefined)demand(course.programSetup.restore(raw.programSetup),'Повреждено занятие программы и наладки.');if(raw.programSetupDraft!==undefined)demand(course.programSetup.validDraft(raw.programSetupDraft,course.programSetup.restore(raw.programSetup)),'Повреждён черновик программы и наладки.');if(raw.firstProcess!==undefined)demand(course.firstProcess.restore(raw.firstProcess),'Повреждён первый процесс.');if(raw.firstProcessDraft!==undefined)demand(course.firstProcess.validDraft(raw.firstProcessDraft,course.firstProcess.restore(raw.firstProcess)),'Повреждён черновик первого процесса.');if(raw.drawingSession!==undefined)demand(course.drawingSession.restore(raw.drawingSession),'Повреждено занятие по измерениям.');if(raw.drawingSessionDraft!==undefined)demand(course.drawingSession.validDraft(raw.drawingSessionDraft,course.drawingSession.restore(raw.drawingSession)),'Повреждён черновик измерения.');if(raw.firstSession!==undefined)demand(course.startSession.restore(raw.firstSession),'Повреждено вводное занятие.');if(raw.firstSessionDraft!==undefined)demand(course.validFirstSessionDraft(raw.firstSessionDraft,course.startSession.restore(raw.firstSession)),'Повреждён черновик вводного занятия.');if(raw.practice!==undefined){recordMap(raw.practice,course.practice.ids);for(const [key,value] of Object.entries(raw.practice))demand(course.practice.restore(value,key),'Повреждена запись практики на схеме.');}return course.restorePath(raw);}
     if(id==='library'){
       demand(raw.version===1&&Array.isArray(raw.read)&&Array.isArray(raw.bookmarks));const s=library.restore(raw);for(const k of ['read','bookmarks'])demand(raw[k].every(v=>s[k].includes(v)));return s;
     }
@@ -16141,7 +16781,7 @@ return {
   }
   function active(id,s){
     if(id==='sandbox')return sandbox.isActive(s);
-    if(id==='course')return !!Object.keys(s.answers).length;if(id==='coursePath')return !!s.diagnosticCourse?.events.length||!!s.diagnosticCourse?.draft?.program||!!s.diagnosticCourse?.draft?.route||!!s.millingCourse?.events.length||course.operationCourse.hasWork(s.operationCourse)||!!s.shaftProject?.events.length||!!s.programSetup?.events.length||!!s.firstProcess?.events.length||!!s.drawingSession?.events.length||!!s.firstSession?.events.length||s.selected!=='machine'||s.explored.length>0||Object.keys(s.phases).length>0||Object.values(s.practice||{}).some(v=>v.events.length||v.selection!==null);
+    if(id==='course')return !!Object.keys(s.answers).length;if(id==='coursePath')return !!s.metrologyCourse?.events.some(e=>e.type!=='begin')||!!s.diagnosticCourse?.events.length||!!s.diagnosticCourse?.draft?.program||!!s.diagnosticCourse?.draft?.route||!!s.millingCourse?.events.length||course.operationCourse.hasWork(s.operationCourse)||!!s.shaftProject?.events.length||!!s.programSetup?.events.length||!!s.firstProcess?.events.length||!!s.drawingSession?.events.length||!!s.firstSession?.events.length||s.selected!=='machine'||s.explored.length>0||Object.keys(s.phases).length>0||Object.values(s.practice||{}).some(v=>v.events.length||v.selection!==null);
     if(id==='base')return Object.keys(s.completed).length>0||s.history.length>0||!!s.exam||s.trainingTask!=='diameter'||s.assisted||s.hintLevel>0||canonical(s.draft)!==canonical(defaults)||Object.values(s.basicSessions).some(v=>v.finished||v.assisted||v.hintLevel||canonical(v.settings)!==canonical(defaults));
     if(id==='training')return Object.keys(s.drafts).length>0||Object.values(s.sessions).some(v=>v.actions.length)||Object.values(s.archive).some(a=>a.length);
     if(id==='gcode')return Object.keys(s.drafts).length>0||Object.values(s.predictionDrafts).some(v=>Object.values(v).some(x=>x!==''))||Object.values(s.sessions).some(v=>v.events.length)||Object.keys(s.legacy.passed).length>0||Object.keys(s.legacy.drafts).length>0||Object.values(s.legacy.helped).some(Boolean);
@@ -16173,7 +16813,7 @@ return {
     local=validate(local);incoming=validate(incoming);const result=empty();
     for(const id of ids){const a=local.sections[id],b=incoming.sections[id],keepLocal=active(id,a.current);let current=clone(keepLocal?a.current:b.current);
       if(id==='course')current=course.restore({version:1,answers:{...b.current.answers,...a.current.answers}});
-      if(id==='coursePath'){const diagOwner=a.current.diagnosticCourse?.events.length||a.current.diagnosticCourse?.draft?.program||a.current.diagnosticCourse?.draft?.route?a.current:b.current.diagnosticCourse?b.current:null;if(diagOwner)current.diagnosticCourse=diagOwner.diagnosticCourse;const millOwner=a.current.millingCourse?.events.length?a.current:b.current.millingCourse?b.current:null;if(millOwner)current.millingCourse=millOwner.millingCourse;const opOwner=course.operationCourse.hasWork(a.current.operationCourse)?a.current:b.current.operationCourse?b.current:null;if(opOwner)current.operationCourse=opOwner.operationCourse;const spOwner=a.current.shaftProject?.events.length?a.current:b.current.shaftProject?b.current:null;if(spOwner){current.shaftProject=spOwner.shaftProject;delete current.shaftProjectDraft;if(spOwner.shaftProjectDraft)current.shaftProjectDraft=spOwner.shaftProjectDraft;}const ownerPS=a.current.programSetup?.events.length?a.current:b.current.programSetup?b.current:null;if(ownerPS){current.programSetup=ownerPS.programSetup;delete current.programSetupDraft;if(ownerPS.programSetupDraft)current.programSetupDraft=ownerPS.programSetupDraft;}const po=a.current.firstProcess?.events.length?a.current:b.current.firstProcess?b.current:null;if(po){current.firstProcess=po.firstProcess;delete current.firstProcessDraft;if(po.firstProcessDraft)current.firstProcessDraft=po.firstProcessDraft;}const owner=a.current.drawingSession?.events.length?a.current:b.current.drawingSession?b.current:null;if(owner){current.drawingSession=owner.drawingSession;delete current.drawingSessionDraft;if(owner.drawingSessionDraft)current.drawingSessionDraft=owner.drawingSessionDraft;}const ownIntro=a.current.firstSession,otherIntro=b.current.firstSession;const introOwner=ownIntro?.events.length?a.current:otherIntro?b.current:null;if(introOwner){current.firstSession=introOwner.firstSession;delete current.firstSessionDraft;if(introOwner.firstSessionDraft)current.firstSessionDraft=introOwner.firstSessionDraft;}const practice={};for(const key of course.practice.ids){const own=a.current.practice?.[key],other=b.current.practice?.[key];const chosen=own&&(own.events.length||own.selection!==null)?own:other||own;if(chosen)practice[key]=chosen;}current=course.restorePath({...current,practice,phases:{...b.current.phases,...a.current.phases},explored:[...new Set([...a.current.explored,...b.current.explored])]});}
+      if(id==='coursePath'){const metrologyOwner=a.current.metrologyCourse?.events.some(e=>e.type!=='begin')||Object.values(a.current.metrologyCourse?.draft||{}).some(Boolean)?a.current:b.current.metrologyCourse?b.current:null;if(metrologyOwner)current.metrologyCourse=metrologyOwner.metrologyCourse;const diagOwner=a.current.diagnosticCourse?.events.length||a.current.diagnosticCourse?.draft?.program||a.current.diagnosticCourse?.draft?.route?a.current:b.current.diagnosticCourse?b.current:null;if(diagOwner)current.diagnosticCourse=diagOwner.diagnosticCourse;const millOwner=a.current.millingCourse?.events.length?a.current:b.current.millingCourse?b.current:null;if(millOwner)current.millingCourse=millOwner.millingCourse;const opOwner=course.operationCourse.hasWork(a.current.operationCourse)?a.current:b.current.operationCourse?b.current:null;if(opOwner)current.operationCourse=opOwner.operationCourse;const spOwner=a.current.shaftProject?.events.length?a.current:b.current.shaftProject?b.current:null;if(spOwner){current.shaftProject=spOwner.shaftProject;delete current.shaftProjectDraft;if(spOwner.shaftProjectDraft)current.shaftProjectDraft=spOwner.shaftProjectDraft;}const ownerPS=a.current.programSetup?.events.length?a.current:b.current.programSetup?b.current:null;if(ownerPS){current.programSetup=ownerPS.programSetup;delete current.programSetupDraft;if(ownerPS.programSetupDraft)current.programSetupDraft=ownerPS.programSetupDraft;}const po=a.current.firstProcess?.events.length?a.current:b.current.firstProcess?b.current:null;if(po){current.firstProcess=po.firstProcess;delete current.firstProcessDraft;if(po.firstProcessDraft)current.firstProcessDraft=po.firstProcessDraft;}const owner=a.current.drawingSession?.events.length?a.current:b.current.drawingSession?b.current:null;if(owner){current.drawingSession=owner.drawingSession;delete current.drawingSessionDraft;if(owner.drawingSessionDraft)current.drawingSessionDraft=owner.drawingSessionDraft;}const ownIntro=a.current.firstSession,otherIntro=b.current.firstSession;const introOwner=ownIntro?.events.length?a.current:otherIntro?b.current:null;if(introOwner){current.firstSession=introOwner.firstSession;delete current.firstSessionDraft;if(introOwner.firstSessionDraft)current.firstSessionDraft=introOwner.firstSessionDraft;}const practice={};for(const key of course.practice.ids){const own=a.current.practice?.[key],other=b.current.practice?.[key];const chosen=own&&(own.events.length||own.selection!==null)?own:other||own;if(chosen)practice[key]=chosen;}current=course.restorePath({...current,practice,phases:{...b.current.phases,...a.current.phases},explored:[...new Set([...a.current.explored,...b.current.explored])]});}
       if(id==='library')for(const k of ['read','bookmarks'])current[k]=[...new Set([...a.current[k],...b.current[k]])];
       if(id==='lab')current={...b.current,...a.current};
       if(id==='machinePath')current.stages={...b.current.stages,...a.current.stages};
@@ -16220,7 +16860,7 @@ return {
     const done=new Set(known),v=raw||{};
     for(const key of ['firstSession','drawingSession','firstProcess','programSetup']){const id='practice-'+key,modelKey={firstSession:'startSession',drawingSession:'drawingSession',firstProcess:'firstProcess',programSetup:'programSetup'}[key];if(!done.has(id)&&course[modelKey].restore(v[key])?.complete)done.add(id);}
     if(course.shaftProject.variants.some(t=>!done.has('project-'+t.id))){const s=course.shaftProject.restore(v.shaftProject);if(s){for(const prior of s.completedProjects||[]){const old=course.shaftProject.restore(prior);if(old?.complete)done.add('project-'+old.taskId);}if(s.complete)done.add('project-'+s.taskId);}}
-    for(const [key,definitions,prefix]of [['operationCourse',course.operationCourse.tasks,'operation-'],['millingCourse',course.millingCourse.lessons,'milling-'],['diagnosticCourse',course.diagnosticCourse.tasks,'diagnostic-']]){if(definitions.some(t=>!done.has(prefix+t.id))){const book=course[key].restore(v[key]);for(const item of book?.done||[])done.add(prefix+item.id);}}
+    for(const [key,definitions,prefix]of [['metrologyCourse',course.metrologyCourse.tasks,'metrology-'],['operationCourse',course.operationCourse.tasks,'operation-'],['millingCourse',course.millingCourse.lessons,'milling-'],['diagnosticCourse',course.diagnosticCourse.tasks,'diagnostic-']]){if(definitions.some(t=>!done.has(prefix+t.id))){const book=course[key].restore(v[key]);for(const item of book?.done||[])done.add(prefix+item.id);}}
     return [...done];
   }
   function combineEvidence(a,b){
@@ -16255,7 +16895,7 @@ return {
     const fp=course.firstProcess.restore(a.sections.coursePath.current.firstProcess),firstProcess={status:!fp?.events.length?'not-started':fp.complete?'complete':'in-progress',step:fp?.step??0,total:8,completed:!!fp?.complete,assisted:!!fp?.assisted,errors:fp?.errors.reduce((a,b)=>a+b,0)||0};
     const ps=course.programSetup.restore(a.sections.coursePath.current.programSetup),programSetup={status:!ps?.events.length?'not-started':ps.complete?'complete':'in-progress',step:ps?.step??0,total:7,completed:!!ps?.complete,assisted:!!ps?.assisted,errors:ps?.errors.reduce((a,b)=>a+b,0)||0};
     const sp=course.shaftProject.restore(a.sections.coursePath.current.shaftProject),shaftProject={evidence:sp?course.shaftProject.evidence(sp):null,taskId:sp?.taskId||'RF5-SHAFT-01',accepted:[...(sp?.completedProjects||[]),...(sp?.complete?[course.shaftProject.snapshot({...sp,completedProjects:[]})]:[])].map(raw=>({taskId:raw.taskId||'RF5-SHAFT-01',report:course.shaftProject.report(course.shaftProject.restore(raw))})),status:!sp?.events.length?'not-started':sp.complete?'complete':'in-progress',step:sp?.step??0,total:7,completed:!!sp?.complete,assisted:!!sp?.assisted,errors:sp?.errors.reduce((a,b)=>a+b,0)||0,recorded:Object.keys(sp?.records||{}).length,measurements:6,attempt:sp?.attempt||1,report:sp?.complete?course.shaftProject.report(sp):null};
-    return {routeVersion:3,progress,diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
+    return {routeVersion:4,progress,metrologyCourse:(()=>{const s=course.metrologyCourse.restore(a.sections.coursePath.current.metrologyCourse);return {done:s?.done||[],current:s?.current||0,total:6,errors:s?.errors||[],help:s?.help||[]};})(),diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
   }
   function report(a){const s=summary(a),lines=['ЧПУ Практика — общая сводка',`Обязательный путь: ${s.progress.done} / ${s.progress.total}`,`Создано: ${a.createdAt}`,'Исторические результаты отделены от текущих черновиков. Это учебная самопроверка, не допуск к реальному станку.',`Первое знакомство: ${s.introduction.status==='complete'?'завершено':s.introduction.status==='in-progress'?'действие '+(s.introduction.step+1)+' / '+s.introduction.total:'не начато'}; подсказки ${s.introduction.assisted?'открывались':'не открывались'}; неверных проверочных действий ${s.introduction.errors}`,'Вводное занятие учитывается отдельно от прежних зачётов курса.',`Проект валика: ${s.shaftProject.status}; протокол ${s.shaftProject.recorded}/6; помощь ${s.shaftProject.assisted?'да':'нет'}; ошибок ${s.shaftProject.errors}`,`Программа и наладка: ${s.programSetup.status}; помощь ${s.programSetup.assisted?'да':'нет'}; ошибок ${s.programSetup.errors}`,`Первый процесс: ${s.firstProcess.status}; помощь ${s.firstProcess.assisted?'да':'нет'}; ошибок ${s.firstProcess.errors}`,`Деталь и измерение: ${s.drawing.status}; действие ${s.drawing.step+1} / ${s.drawing.total}; помощь ${s.drawing.assisted?'да':'нет'}; ошибок ${s.drawing.errors}`,''];for(const row of s.rows)lines.push(`${row.done?'✓':'○'} ${row.title}: ${row.detail}`);lines.push('','Дополнительные разделы',`На станке: ${s.station.filter(r=>r.passed).length} / ${s.station.length}`,`Практикум: ${s.training.filter(r=>r.passed).length} / ${s.training.length}`,`G-код: ${s.gcode.filter(r=>r.passed).length} / ${s.gcode.length}`,`Навыки, подтверждённые хотя бы в одной истории: ${s.skills.filter(r=>r.status==='mastered').length} / ${s.skills.length}`,`Прочитано: ${s.library.read} / ${s.library.total}`,`Экзаменов в истории: ${s.exams.length}`,'');for(const row of [...s.training,...s.gcode])lines.push(`${row.title}: ${row.independent?'самостоятельный результат':row.passed?'с разбором / прежний зачёт':'не подтверждено'}; помощь ${row.helped||row.hints?'есть':'не отмечена'}; ошибок в одной истории до ${row.errors}`);return lines.join('\n');}
   const api={FORMAT,VERSION,MAX_BYTES,MAX_HISTORY,ids,labels,empty,normalize,active,canonical,validate,parse,stringify,fromRaw,toRaw,merge,summary,evidence,courseEvidence,combineEvidence,report,planDraft};root.CNCProgress=api;if(node)module.exports=api;
@@ -16944,6 +17584,405 @@ return {
     render();return host;
   }
   root.CNCDrawingSessionUI=Object.freeze({create});
+})(window);
+</script><script>(function (root) {
+  "use strict";
+  const m = root.CNCMetrologyCourse,
+    mm = (n) => (n / 1000).toFixed(3).replace(".", ","),
+    e = (tag, text, cls) => {
+      const el = document.createElement(tag);
+      if (text !== undefined) el.textContent = text;
+      if (cls) el.className = cls;
+      return el;
+    };
+  function create({
+    headingTag = "h3",
+    saved,
+    readOnly = false,
+    routeMode = false,
+    onChange = () => true,
+    onDone = () => {},
+  } = {}) {
+    const host = e("section", undefined, "start-session shaft-project-session");
+    let s = saved ? m.restore(saved) : m.create(),
+      view = "section",
+      notice = "";
+    if (!s) {
+      host.append(
+        e(headingTag, "Сохранённый контроль недоступен"),
+        e(
+          "p",
+          "Неизвестная версия или повреждённый журнал. Исходная работа не заменена новой.",
+        ),
+      );
+      return host;
+    }
+    function persist() {
+      if (onChange(m.snapshot(s)) === false)
+        notice = "Не удалось сохранить. Не закрывайте страницу.";
+    }
+    function run(a) {
+      try {
+        s = m.transition(s, a);
+        notice = "";
+        persist();
+      } catch (error) {
+        notice = error.message;
+      }
+      render();
+    }
+    function button(label, a) {
+      const b = e("button", label, "button secondary");
+      b.type = "button";
+      b.onclick = () => run(typeof a === "function" ? a() : a);
+      return b;
+    }
+    function field(label, key) {
+      const wrap = e("label", label, "field"),
+        input = e("input");
+      input.type = "text";
+      input.inputMode = "decimal";
+      input.maxLength = 32;
+      input.value = s.draft[key];
+      input.setAttribute("aria-label", label);
+      input.oninput = () => {
+        s.draft[key] = input.value;
+        persist();
+      };
+      wrap.append(input);
+      return wrap;
+    }
+    function form(labels, action, label) {
+      const f = e("form", undefined, "start-answer");
+      for (const [name, key] of labels) f.append(field(name, key));
+      const b = e("button", label, "button secondary");
+      b.type = "submit";
+      f.append(b);
+      f.onsubmit = (ev) => {
+        ev.preventDefault();
+        run(action());
+      };
+      return f;
+    }
+    function art(t) {
+      const section = view === "section",
+        hole = t.section !== "solid" && section,
+        blind = t.section === "blind",
+        stepped = t.surfaces.filter((v) => v.kind === "outer").length > 1;
+      const outer = t.surfaces.find((v) => v.kind === "outer"),
+        inner = t.surfaces.find((v) => v.kind === "inner"),
+        half = inner ? (65 * inner.nominal) / outer.nominal : 0,
+        holeStart = blind ? 550 - (460 * 20) / 55 : 90;
+      const outline = stepped
+        ? "M90 90H390V98H550V212H390V220H90Z"
+        : "M90 90H550V220H90Z";
+      return (
+        '<svg viewBox="0 0 660 290" role="img" aria-label="Учебная схема: ' +
+        (section ? "продольный разрез" : "вид сбоку") +
+        '"><defs><pattern id="met-hatch" width="10" height="10" patternUnits="userSpaceOnUse"><path d="M0 10L10 0" stroke="#a9bdca"/></pattern></defs><path d="' +
+        outline +
+        '" fill="' +
+        (section ? "url(#met-hatch)" : "#d7e3ed") +
+        '" stroke="#365b76" stroke-width="2"/>' +
+        (hole
+          ? '<rect x="' +
+            (holeStart - (blind ? 0 : 1)) +
+            '" y="' +
+            (155 - half) +
+            '" width="' +
+            (551 - holeStart + (blind ? 0 : 1)) +
+            '" height="' +
+            2 * half +
+            '" fill="#fff"/><path d="M' +
+            holeStart +
+            " " +
+            (155 - half) +
+            "H550M" +
+            holeStart +
+            " " +
+            (155 + half) +
+            "H550" +
+            (blind
+              ? "M" + holeStart + " " + (155 - half) + "V" + (155 + half)
+              : "") +
+            '" fill="none" stroke="#365b76" stroke-width="2"/>'
+          : "") +
+        '<path d="M60 155H590" stroke="#8299aa" stroke-dasharray="7 5"/>' +
+        (stepped
+          ? '<text x="160" y="75">B · база</text><text x="400" y="75">A · шейка</text>'
+          : '<text x="145" y="75">A · наружная поверхность</text>') +
+        (inner ? '<text x="395" y="105">B · отверстие</text>' : "") +
+        '<text x="90" y="260">Z−55</text><text x="550" y="260" text-anchor="end">Z0 · торец</text><text x="90" y="28">' +
+        (section ? "Продольный разрез" : "Вид сбоку · внутренность скрыта") +
+        "</text></svg>"
+      );
+    }
+    function render() {
+      const t = m.tasks[s.current],
+        accepted = s.done.some((r) => r.id === t.id),
+        surface = t.surfaces.find((v) => v.id === s.surface),
+        g = m.instruments[s.instrument];
+      host.replaceChildren(
+        e(
+          "p",
+          "ЧЕРТЁЖ И КОНТРОЛЬ · " + (s.current + 1) + " / " + m.tasks.length,
+          "eyebrow",
+        ),
+        e(headingTag, t.title),
+        e("p", t.goal),
+      );
+      const reading = e("details", undefined, "course-reading");
+      reading.append(e("summary", "Как рассуждать"), e("p", t.reading));
+      if (t.mode === "guided")
+        reading.append(
+          e(
+            "p",
+            "Пример на других числах: разрешено 9,80…10,20 мм; отсчёт 10,05 при границе ошибки ±0,03 даёт 10,02…10,08. Этот интервал внутри допуска. В своём задании используйте его размеры и прибор.",
+          ),
+        );
+      host.append(reading);
+      const views = e("div", undefined, "start-controls");
+      for (const [key, label] of [
+        ["side", "Вид сбоку"],
+        ["section", "Разрез"],
+      ]) {
+        const b = e("button", label, "button secondary");
+        b.type = "button";
+        b.setAttribute("aria-pressed", String(view === key));
+        b.onclick = () => {
+          view = key;
+          render();
+        };
+        views.append(b);
+      }
+      const figure = e("figure", undefined, "shaft-drawing start-board");
+      figure.innerHTML = art(t);
+      host.append(views, figure);
+      const requirements = e("ul");
+      for (const v of t.surfaces)
+        requirements.append(
+          e(
+            "li",
+            v.id +
+              " · " +
+              v.title +
+              ": Ø" +
+              mm(v.nominal) +
+              "; отклонения " +
+              mm(v.lower - v.nominal) +
+              " / +" +
+              mm(v.upper - v.nominal) +
+              " мм",
+          ),
+        );
+      host.append(requirements);
+      if (!accepted && !readOnly) {
+        host.append(
+          e("p", "Определите по разрезу внутреннее устройство детали."),
+        );
+        const kinds = e("div", undefined, "start-controls");
+        for (const [value, label] of [
+          ["solid", "Сплошная"],
+          ["blind", "Глухое отверстие"],
+          ["through", "Сквозное отверстие"],
+        ]) {
+          const b = button(label, { type: "section", value });
+          b.setAttribute("aria-pressed", String(s.section === value));
+          kinds.append(b);
+        }
+        host.append(kinds);
+        if (s.section === t.section) {
+          const choices = e("div", undefined, "start-controls");
+          for (const v of t.surfaces) {
+            const b = button(v.id + " · " + v.title, {
+              type: "surface",
+              id: v.id,
+            });
+            b.setAttribute("aria-pressed", String(s.surface === v.id));
+            choices.append(b);
+          }
+          host.append(
+            e("p", "Выберите поверхность для текущего контроля."),
+            choices,
+          );
+          if (surface) {
+            const label = e("label", "Измерительный прибор", "field"),
+              select = e("select");
+            select.setAttribute("aria-label", "Прибор контроля");
+            const empty = e("option", "Выберите прибор");
+            empty.value = "";
+            empty.disabled = true;
+            empty.selected = !g;
+            select.append(empty);
+            for (const [id, tool] of Object.entries(m.instruments)) {
+              const o = e("option", tool.title);
+              o.value = id;
+              o.selected = s.instrument === id;
+              select.append(o);
+            }
+            select.onchange = () =>
+              run({ type: "instrument", id: select.value });
+            label.append(select);
+            host.append(label);
+            if (g) {
+              host.append(
+                e(
+                  "p",
+                  "Учебный паспорт: диапазон " +
+                    mm(g.range[0]) +
+                    "…" +
+                    mm(g.range[1]) +
+                    " мм; дискретность " +
+                    mm(g.resolution) +
+                    "; заданная граница ошибки ±" +
+                    mm(g.error) +
+                    " мм.",
+                  "start-note",
+                ),
+                button("Убрать контролируемую деталь", { type: "release" }),
+                button(
+                  g.reference
+                    ? "Проверить установку по эталону " +
+                        mm(g.reference) +
+                        " мм"
+                    : "Проверить ноль без детали",
+                  { type: "zero" },
+                ),
+              );
+              if (s.zeroed.includes(s.instrument))
+                host.append(
+                  e("p", "Установка прибора проверена.", "start-value"),
+                );
+              const points = e("div", undefined, "start-controls");
+              for (const p of surface.points)
+                points.append(
+                  button(
+                    "Контакт · " +
+                      surface.id +
+                      " · сечение " +
+                      p.id +
+                      " · Z" +
+                      p.z +
+                      " мм",
+                    { type: "contact", point: p.id },
+                  ),
+                );
+              host.append(points);
+              if (s.contact)
+                host.append(
+                  e(
+                    "output",
+                    "Дисплей: " +
+                      mm(s.contact.reading) +
+                      " мм · " +
+                      s.contact.surface +
+                      " / " +
+                      s.contact.point,
+                    "start-value",
+                  ),
+                  form(
+                    [["Запишите отсчёт, мм", "reading"]],
+                    () => ({ type: "record", value: s.draft.reading }),
+                    "Записать измерение",
+                  ),
+                );
+            }
+            host.append(
+              form(
+                [
+                  ["Нижний предел, мм", "lower"],
+                  ["Верхний предел, мм", "upper"],
+                ],
+                () => ({
+                  type: "limits",
+                  lower: s.draft.lower,
+                  upper: s.draft.upper,
+                }),
+                "Записать пределы " + surface.id,
+              ),
+            );
+          }
+        }
+        if (t.revised && s.initialReviewed && !s.revision)
+          host.append(
+            button("Получить деталь после доработки", { type: "revision" }),
+          );
+      }
+      if (s.records.length) {
+        const log = e("ul");
+        for (const r of s.records)
+          log.append(
+            e(
+              "li",
+              r.surface +
+                " / сечение " +
+                r.point +
+                " · " +
+                mm(r.reading) +
+                " мм · " +
+                m.instruments[r.instrument].title +
+                " · редакция " +
+                r.revision +
+                (r.revision !== s.revision ? " · устарело" : ""),
+            ),
+          );
+        host.append(e("p", "Протокол измерений"), log);
+      }
+      if (!accepted && !readOnly) {
+        const decisions = e("div", undefined, "start-controls");
+        for (const [value, label] of [
+          ["accept", "Подтвердить по размеру"],
+          ["reject", "Отклонить по размеру"],
+          ["uncertain", "Требуется уточнение"],
+        ])
+          decisions.append(button(label, { type: "verdict", value }));
+        const hint = button(
+          s.help.includes(t.id) ? "Разбор открыт" : "Нужен разбор",
+          { type: "hint" },
+        );
+        hint.disabled = s.help.includes(t.id);
+        host.append(decisions, hint);
+        if (s.help.includes(t.id)) host.append(e("p", t.hint, "start-hint"));
+      }
+      if (accepted) {
+        const record = s.done.find((r) => r.id === t.id);
+        host.append(
+          e(
+            "p",
+            "Контроль принят · " +
+              (record.independent ? "без открытия разбора" : "с разбором"),
+            "start-value",
+          ),
+        );
+        if (!readOnly && !routeMode && s.current < m.tasks.length - 1)
+          host.append(
+            button("Следующее условие", {
+              type: "next",
+              assignment: m.tasks[s.current + 1].assignment,
+            }),
+          );
+      }
+      const status = e("p", notice || s.feedback, "start-feedback");
+      status.setAttribute("role", "status");
+      host.append(status);
+      const scope = e("details", undefined, "course-reading");
+      scope.append(
+        e("summary", "Границы учебной проверки"),
+        e(
+          "p",
+          "Здесь измеряются заданные размеры учебных редакций. Границы ошибки приборов и правило интервалов заданы моделью, не нормативной методикой ГОСТ 8.051. Температура, усилие, форма и шероховатость не моделируются. Постатейная проверка источников и предметная приёмка преподавателем ещё требуются.",
+        ),
+      );
+      host.append(scope);
+      root.CNCNormativeUI?.appendLesson(host, "control");
+      const back = e("button", "Вернуться к курсу", "course-back");
+      back.onclick = onDone;
+      host.append(back);
+    }
+    render();
+    return host;
+  }
+  root.CNCMetrologyCourseUI = Object.freeze({ create });
 })(window);
 </script><script>(function(root){
   'use strict';const model=root.CNCFirstProcess;
@@ -17724,6 +18763,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
   const lessons = Object.freeze({
     firstSession: "machine",
     drawingSession: "control",
+    metrologyCourse: "control",
     firstProcess: "axes",
     programSetup: "setup",
     shaftProject: "verification",
@@ -17804,6 +18844,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       uiName = {
         firstSession: "CNCStartSessionUI",
         drawingSession: "CNCDrawingSessionUI",
+        metrologyCourse: "CNCMetrologyCourseUI",
         firstProcess: "CNCFirstProcessUI",
         programSetup: "CNCProgramSetupUI",
         shaftProject: "CNCShaftProjectUI",
@@ -17874,7 +18915,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
               : key === "millingCourse" && s.profile === 1 && s.current === 3
                 ? "upgrade"
                 : "next",
-          ...(key === "operationCourse" && (s.version === 2 || s.current === 4)
+          ...(key === "metrologyCourse" ||
+          (key === "operationCourse" && (s.version === 2 || s.current === 4))
             ? { assignment: definitions[s.current + 1].assignment }
             : {}),
         });
@@ -17952,6 +18994,11 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     storageAvailable = false;
   }
   let view = views.restore(path);
+  if (path.activePractice === "metrologyCourse" && path.selected === "control") {
+    const saved = model.metrologyCourse.restore(path.metrologyCourse) || model.metrologyCourse.create();
+    const step = window.CNCLearningPath.get("metrology-" + model.metrologyCourse.tasks[saved.current].id);
+    view = views.create("route", step);
+  }
   const hasAnswer = (id) => Object.hasOwn(state.answers, id);
   const firstMissing = () =>
     Math.max(
@@ -18811,13 +19858,14 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
           drawingSession: "control",
           firstProcess: "axes",
           programSetup: "setup",
+          metrologyCourse: "control",
         }[step.target] || "verification";
       window.CNCWorkshop.openLesson(id, true);
       view = views.create("route", step);
       path.activePractice =
         step.target === "diagnosticCourse"
           ? "diagnosticCourse"
-          : ["operationCourse", "millingCourse"].includes(step.target)
+          : ["operationCourse", "millingCourse", "metrologyCourse"].includes(step.target)
             ? step.target
             : "course";
       save();
@@ -19529,8 +20577,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     },
     {
       title: "Обработка и контроль",
-      ids: ["measure", "cycle", "transfer"],
-      copy: "Измеряем деталь и выполняем полный цикл обработки.",
+      ids: ["measure", "metrology", "cycle", "transfer"],
+      copy: "Читаем разрезы, выбираем прибор и подтверждаем размеры детали.",
       art: "gauge",
     },
     {
@@ -19541,7 +20589,7 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     },
     {
       title: "Токарные операции",
-      ids: ["operations"],
+      ids: ["operations", "turningDeep"],
       copy: "Торец, канавки, конус и самостоятельные программы.",
       art: "part",
     },
@@ -20375,8 +21423,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     demand(object(raw)&&raw.format===FORMAT&&raw.version===1&&object(raw.review)&&Array.isArray(raw.participants)&&raw.participants.length<=16);
     const n=empty();for(const c of checks){const r=raw.review[c.id];demand(object(r)&&['pending','approved','changes'].includes(r.status)&&text(r.note));demand(r.status!=='changes'||r.note.trim(),'Для замечания нужна конкретная причина.');n.review[c.id]={status:r.status,note:r.note};}
     function shot(s){
-      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
-      const current=progress.summary(progress.empty()).rows,expected=s.rows.length===22?current.filter(r=>r.kind!=='coursePractice'):s.rows.length===51?current.filter(r=>r.group!=='turningDeep'):current;demand(expected.length===s.rows.length);demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
+      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57,63].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
+      const current=progress.summary(progress.empty()).rows,expected=s.rows.length===22?current.filter(r=>r.kind!=='coursePractice'):s.rows.length===51?current.filter(r=>r.group!=='turningDeep'&&r.group!=='metrology'):s.rows.length===57?current.filter(r=>r.group!=='metrology'):current;demand(expected.length===s.rows.length);demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
       for(const [name,ids]of [['training',practical],['gcode',program]]){demand(Array.isArray(s[name])&&s[name].length===ids.length&&s[name].every((r,i)=>object(r)&&r.id===ids[i]&&typeof r.passed==='boolean'&&typeof r.independent==='boolean'&&(!r.independent||r.passed)));demand(Array.isArray(s.seen[name])&&s.seen[name].every(id=>ids.includes(id))&&new Set(s.seen[name]).size===s.seen[name].length);demand(s[name].every(r=>!r.passed||s.seen[name].includes(r.id)));}
       return {at:s.at,sourceAt:s.sourceAt,appVersion:s.appVersion,done:s.done,rows:s.rows.map(r=>({id:r.id,title:r.title,done:r.done,detail:r.detail})),training:s.training.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),gcode:s.gcode.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),seen:{training:[...s.seen.training],gcode:[...s.seen.gcode]}};
     }
