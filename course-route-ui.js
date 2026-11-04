@@ -106,7 +106,7 @@
           type:
             key === "operationCourse" && s.version === 1 && s.current === 4
               ? "upgrade"
-              : key === "millingCourse" && s.profile === 1 && s.current === 3
+              : key === "millingCourse" && ((s.profile === 1 && s.current === 3) || (s.profile === 2 && s.current === 5))
                 ? "upgrade"
                 : "next",
           ...(key === "metrologyCourse" ||

@@ -65,6 +65,8 @@
   STEPS.push({"id":"milling-depth-layers","target":"millingCourse","title":"Глубокий паз · слои и исправление","group":"milling","kind":"coursePractice","subtask":"depth-layers"});
   STEPS.push({"id":"milling-holder-clearance","target":"millingCourse","title":"Фреза проходит · державка задевает","group":"milling","kind":"coursePractice","subtask":"holder-clearance"});
   STEPS.push({"id":"milling-machine-column","target":"millingCourse","title":"Обход корпуса станка","group":"milling","kind":"coursePractice","subtask":"machine-column"});
+  const millingTasks=typeof module==='object'&&module.exports?require('./milling-course-model.js'):root.CNCMillingCourse;
+  for(const t of millingTasks.lessons.slice(6))STEPS.push({id:'milling-'+t.id,target:'millingCourse',title:t.title,group:'milling',kind:'coursePractice',subtask:t.id});
   STEPS.push({"id":"diagnostic-diag-rapid","target":"diagnosticCourse","title":"Почему быстрый ход опасен","group":"diagnostics","kind":"coursePractice","subtask":"diag-rapid"});
   STEPS.push({"id":"diagnostic-diag-tool","target":"diagnosticCourse","title":"Верная программа · неверный резец","group":"diagnostics","kind":"coursePractice","subtask":"diag-tool"});
   STEPS.push({"id":"diagnostic-diag-blade","target":"diagnosticCourse","title":"Канавка: пластина остаётся в металле","group":"diagnostics","kind":"coursePractice","subtask":"diag-blade"});

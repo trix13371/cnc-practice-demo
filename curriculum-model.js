@@ -514,6 +514,12 @@ const mappings = [
     "В учебной модели самостоятельно составить программу с пустого редактора, распределить увеличенный припуск, изготовить изделие и подтвердить все размеры свежим контролем.",
   ],
   [
+    "milling-setup-datums","milling-setup","guided-practice",["mill-setup","mill-coordinates"],["mill-coordinates","safe-state"],"Численно задать G54 и длину фрезы, проверить рабочие и машинные координаты, повторить проверку после смены установки."
+  ],
+  ["milling-face-coverage","milling-basic","guided-practice",["mill-removal"],["mill-setup","mill-coordinates"],"Покрыть открытую полосу перекрывающимися проходами, сохранить соседний материал и измерить фактическую плоскость."],
+  ["milling-slot-open","milling-basic","guided-practice",["mill-removal"],["mill-setup","mill-coordinates"],"Изготовить открытый паз с учётом радиуса фрезы и проверить фактическое дно в трёх сечениях."],
+  ["milling-slot-wide-layers","milling-basic","guided-practice",["mill-removal","allowance"],["mill-removal","mill-setup"],"Выполнить широкий паз в два слоя, проверить перекрытие, остаток материала и свежесть контроля."],
+  [
     "milling-xyz-air",
     "milling-setup",
     "guided-practice",

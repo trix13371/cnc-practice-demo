@@ -7,11 +7,11 @@ function main(mode='self'){
 }
 const self=main();assert.equal(pilot.metrics(self).ended,0);assert.equal(pilot.metrics(self).self,1);assert.equal(pilot.outcome(self.participants[0],'main').training,true);
 const route=require('../learning-path-model.js');
-for(const size of [22,51,57,63]){
+for(const size of [22,51,57,63,64]){
   const prior=structuredClone(self);
   for(const participant of prior.participants)for(const phase of ['main','followup'])for(const slot of ['before','after']){
     const shot=participant[phase][slot];if(!shot)continue;
-    shot.rows=shot.rows.filter(r=>size===22?route.get(r.id).kind!=='coursePractice':route.get(r.id).group!=='independentProject'&&(size===63||route.get(r.id).group!=='metrology')&&(size!==51||route.get(r.id).group!=='turningDeep'));
+    shot.rows=shot.rows.filter(r=>!["milling-setup-datums","milling-face-coverage","milling-slot-open","milling-slot-wide-layers"].includes(r.id)).filter(r=>size===64?true:size===22?route.get(r.id).kind!=='coursePractice':route.get(r.id).group!=='independentProject'&&(size===63||route.get(r.id).group!=='metrology')&&(size!==51||route.get(r.id).group!=='turningDeep'));
     assert.equal(shot.rows.length,size);shot.done=shot.rows.filter(r=>r.done).length;
   }
   assert.deepEqual(pilot.validate(prior),prior,'Historic '+size+'-step observations remain readable');

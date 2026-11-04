@@ -1089,6 +1089,72 @@
       "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
     },
     {
+      "id": "milling-setup-datums",
+      "title": "Наладка XYZ · G54 и длина фрезы",
+      "family": "milling-setup",
+      "format": "guided-practice",
+      "competencies": [
+        "mill-setup",
+        "mill-coordinates"
+      ],
+      "prerequisites": [
+        "mill-coordinates",
+        "safe-state"
+      ],
+      "objective": "Численно задать G54 и длину фрезы, проверить рабочие и машинные координаты, повторить проверку после смены установки.",
+      "conditionId": "milling-setup-datums",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "milling-face-coverage",
+      "title": "Плоскость · перекрытие проходов",
+      "family": "milling-basic",
+      "format": "guided-practice",
+      "competencies": [
+        "mill-removal"
+      ],
+      "prerequisites": [
+        "mill-setup",
+        "mill-coordinates"
+      ],
+      "objective": "Покрыть открытую полосу перекрывающимися проходами, сохранить соседний материал и измерить фактическую плоскость.",
+      "conditionId": "milling-face-coverage",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "milling-slot-open",
+      "title": "Открытый паз · ширина фрезы",
+      "family": "milling-basic",
+      "format": "guided-practice",
+      "competencies": [
+        "mill-removal"
+      ],
+      "prerequisites": [
+        "mill-setup",
+        "mill-coordinates"
+      ],
+      "objective": "Изготовить открытый паз с учётом радиуса фрезы и проверить фактическое дно в трёх сечениях.",
+      "conditionId": "milling-slot-open",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "milling-slot-wide-layers",
+      "title": "Широкий паз · шаг и два слоя",
+      "family": "milling-basic",
+      "format": "guided-practice",
+      "competencies": [
+        "mill-removal",
+        "allowance"
+      ],
+      "prerequisites": [
+        "mill-removal",
+        "mill-setup"
+      ],
+      "objective": "Выполнить широкий паз в два слоя, проверить перекрытие, остаток материала и свежесть контроля.",
+      "conditionId": "milling-slot-wide-layers",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
       "id": "milling-xyz-air",
       "title": "Три оси · движения в воздухе",
       "family": "milling-setup",
