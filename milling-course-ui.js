@@ -226,6 +226,9 @@
         " · линия: фактический материал</text></g></svg>"
       );
     }
+    function failedCheck(){
+      return s.lastCheck?.ok===false&&s.incidents.at(-1)?.lesson===m.lessons[s.current].id?s.lastCheck:null;
+    }
     function board() {
       if (m.lessons[s.current].area) return materialBoard();
       const x = (n) => 70 + (n + 20) * 4,
@@ -289,7 +292,7 @@
           '" stroke="' +
           (p.cutting ? "#146c93" : "#7392ae") +
           '" stroke-width="2"/>';
-      const last = s.lastCheck;
+      const last = failedCheck();
       if (last && !last.ok) {
         svg +=
           '<line x1="' +
@@ -344,9 +347,15 @@
         el("p", t.goal),
         el("p", t.learn),
       );
-      const figure = el("figure", undefined, "shaft-drawing start-board");
-      figure.innerHTML = board();
-      host.append(figure);
+      const report = root.CNCMillingCollision.describe(s),
+        primaryReport = !!report && !report.historical && !accepted;
+      if (primaryReport)
+        host.append(root.CNCMillingCollisionUI.create({ report }));
+      else {
+        const figure = el("figure", undefined, "shaft-drawing start-board");
+        figure.innerHTML = board();
+        host.append(figure);
+      }
       if (t.area) {
         const section = el("figure", undefined, "shaft-drawing");
         section.innerHTML = sectionBoard();
@@ -428,6 +437,20 @@
       const message = el("p", notice || s.feedback, "start-feedback");
       message.setAttribute("role", "status");
       host.append(message);
+      if (report && !primaryReport) {
+        const history = el("details", undefined, "course-reading");
+        history.append(
+          el(
+            "summary",
+            "Предыдущий отказ: " +
+              report.part.title +
+              " → " +
+              report.obstacle.title,
+          ),
+          root.CNCMillingCollisionUI.create({ report }),
+        );
+        host.append(history);
+      }
       if (!accepted) {
         const setup = el("details", undefined, "course-reading");
         setup.open = !m.ready(s);
@@ -611,7 +634,7 @@
             ),
           );
       }
-      if (s.lastCheck && !s.lastCheck.ok)
+      if (failedCheck())
         host.append(
           el(
             "p",

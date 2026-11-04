@@ -34,6 +34,36 @@
     clamp: { x0: 25, x1: 35, y0: 24, y1: 32, z0: -10, z1: 8 },
     limits: { x: [-20, 80], y: [-20, 60], z: [-12, 40] },
   });
+  const geometry = freeze({
+    parts: [
+      { id: "cutter", title: "Фреза", radius: config.radius, z0: 0, z1: 15 },
+      { id: "holder", title: "Державка", ...config.holder },
+    ],
+    obstacles: [
+      { id: "fixture", title: "Крепление", ...config.clamp },
+      { ...config.body },
+      {
+        id: "stock",
+        title: "Заготовка",
+        x0: 0,
+        x1: config.stock.x,
+        y0: 0,
+        y1: config.stock.y,
+        z0: -config.stock.thickness,
+        z1: 0,
+      },
+    ],
+  });
+  function keepOut(part, obstacle) {
+    return {
+      x0: obstacle.x0 - part.radius,
+      x1: obstacle.x1 + part.radius,
+      y0: obstacle.y0 - part.radius,
+      y1: obstacle.y1 + part.radius,
+      z0: obstacle.z0 - part.z1,
+      z1: obstacle.z1 - part.z0,
+    };
+  }
   const lessons = freeze([
     {
       id: "xyz-air",
@@ -426,27 +456,9 @@
   function collision(s, a) {
     const from = s.position,
       to = { x: a.x, y: a.y, z: a.z },
-      c = config.clamp,
-      b = config.body,
       hits = [],
-      parts = [
-        { id: "cutter", title: "Фреза", radius: 3, z0: 0, z1: 15 },
-        { id: "holder", title: "Державка", ...config.holder },
-      ];
-    const obstacles = [
-      { id: "fixture", title: "Крепление", ...c },
-      { ...b },
-      {
-        id: "stock",
-        title: "Заготовка",
-        x0: 0,
-        x1: 60,
-        y0: 0,
-        y1: 40,
-        z0: -10,
-        z1: 0,
-      },
-    ];
+      parts = geometry.parts,
+      obstacles = geometry.obstacles;
     const retract =
       Math.abs(to.x - from.x) < EPS &&
       Math.abs(to.y - from.y) < EPS &&
@@ -459,19 +471,12 @@
           (a.mode !== "G0" || retract)
         )
           continue;
+        const k = keepOut(part, obstacle);
         const point = segmentBox(
           from,
           to,
-          {
-            x: obstacle.x0 - part.radius,
-            y: obstacle.y0 - part.radius,
-            z: obstacle.z0 - part.z1,
-          },
-          {
-            x: obstacle.x1 + part.radius,
-            y: obstacle.y1 + part.radius,
-            z: obstacle.z1 - part.z0,
-          },
+          { x: k.x0, y: k.y0, z: k.z0 },
+          { x: k.x1, y: k.y1, z: k.z1 },
         );
         if (!point) continue;
         const delta = { x: to.x - from.x, y: to.y - from.y, z: to.z - from.z },
@@ -995,6 +1000,8 @@
     return null;
   }
   return freeze({
+    geometry,
+    keepOut,
     advanceAction,
     prepared,
     coordinates,

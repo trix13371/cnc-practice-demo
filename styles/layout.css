@@ -3113,3 +3113,39 @@ body[data-screen="course"] .course-index {
     width: 100%;
   }
 }
+
+.milling-collision {
+  min-width: 0;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-left: 4px solid #a26514;
+  border-radius: 12px;
+  background: var(--panel, #fff);
+}
+.milling-collision-cause { font-size: 1.15rem; font-weight: 700; }
+.milling-collision-projections {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 520px), 1fr));
+  gap: 16px;
+}
+.milling-collision-figure {
+  min-width: 0;
+  max-width: 760px;
+  width: 100%;
+  margin: 0 auto;
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #f7fafc;
+}
+.milling-collision-figure svg { display: block; width: 100%; min-width: 520px; }
+.milling-collision-legend { padding-left: 22px; line-height: 1.65; }
+.milling-collision-legend li + li { margin-top: 8px; }
+.milling-collision-facts { display: grid; grid-template-columns: minmax(140px, 1fr) minmax(0, 2fr); gap: 8px 16px; }
+.milling-collision-facts dt { font-weight: 600; }
+.milling-collision-facts dd { margin: 0; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+@media(max-width:600px) {
+  .milling-collision { padding: 12px; }
+  .milling-collision-facts { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .milling-collision-facts dd { margin-bottom: 10px; }
+}
