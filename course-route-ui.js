@@ -103,9 +103,14 @@
       ) {
         s = engine.transition(s, {
           type:
-            key === "millingCourse" && s.profile === 1 && s.current === 3
+            key === "operationCourse" && s.version === 1 && s.current === 4
               ? "upgrade"
-              : "next",
+              : key === "millingCourse" && s.profile === 1 && s.current === 3
+                ? "upgrade"
+                : "next",
+          ...(key === "operationCourse" && (s.version === 2 || s.current === 4)
+            ? { assignment: definitions[s.current + 1].assignment }
+            : {}),
         });
       }
       saved = engine.snapshot(s);

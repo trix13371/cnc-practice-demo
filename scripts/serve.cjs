@@ -5,6 +5,8 @@ const root = path.resolve(__dirname, '..');
 const port = Number(process.env.PORT || 4173);
 if (!Number.isInteger(port) || port < 1024 || port > 65535) throw new Error('Invalid PORT');
 const files = {
+ '/assignment-model.js':['assignment-model.js','text/javascript; charset=utf-8'],
+ '/turning-tasks-model.js':['turning-tasks-model.js','text/javascript; charset=utf-8'],
  '/course-route-ui.js':['course-route-ui.js','text/javascript; charset=utf-8'],
  '/app.css':['app.css','text/css; charset=utf-8'],
  '/course-view-model.js':['course-view-model.js','text/javascript; charset=utf-8'],

@@ -12208,46 +12208,1015 @@ body.cloud-loading {
   function forTask(id){if(!cores.has(id))throw Error('Неизвестный чертёж.');return Object.freeze({...cores.get(id),create:()=>create(id),restore,transition,snapshot:pack,report,evidence,forTask});}
   const api=Object.freeze({...forTask(defaultId),variants:base.variants});if(typeof module==='object'&&module.exports)module.exports=api;else root.CNCShaftProject=api;
 })(typeof globalThis!=='undefined'?globalThis:this);
-</script><script>(function(root,factory){const api=factory(()=>typeof module==='object'&&module.exports?require('./real-machine-model.js'):root.CNCRealMachine);if(typeof module==='object'&&module.exports)module.exports=api;else root.CNCOperationCourse=api;})(typeof globalThis!=='undefined'?globalThis:this,function(engine){
-'use strict';const copy=x=>JSON.parse(JSON.stringify(x)),freeze=x=>{if(x&&typeof x==='object'){Object.values(x).forEach(freeze);Object.freeze(x);}return x;};
-const header='G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\n',tail='\nG0 X40 Z5\nM5\nM30';
-const tasks=freeze([
-{id:'face-first',title:'Первый торец',level:1,tool:3,depth:1,points:[[-10,32]],goal:'Снимите 1 мм с торца Ø32. Получите Z−1, сохраните наружный Ø32.',learn:'Торцевание выполняется движением по X. X — диаметр. За проход T0303 допускает 1 мм по Z. Подходите к торцу снаружи Ø32; после прохода сначала отведите Z перед торцом, затем X.',hint:'Подход X34 Z−1; рабочий ход к X0; отвод сначала к Z2. Это один торцевой проход.',starter:header+'G0 X34 Z-1\n(Добавьте рабочий ход и безопасный отвод)'+tail,reference:header+'G0 X34 Z-1\nG1 X0 F0.1\nG0 Z2'+tail},
-{id:'face-two',title:'Торец в два прохода',level:2,tool:3,depth:2,points:[[-10,32]],goal:'Снимите 2 мм с торца. Сохраните Ø32. Распределите съём по допустимым проходам.',learn:'Предельная глубина действует на каждый проход, а не на итоговый размер. Следующий торец отсчитывается от прежнего рабочего нуля: G54 после съёма сам не перемещается.',hint:'После первого торца Z−1 следующий — Z−2. Между проходами отведите Z перед торцом, затем X наружу.',starter:header+'(Составьте два прохода)'+tail,reference:header+'G0 X34 Z-1\nG1 X0 F0.1\nG0 Z2\nX34\nZ-2\nG1 X0 F0.1\nG0 Z2'+tail},
-{id:'groove-first',title:'Кольцевая канавка',level:2,tool:4,depth:0,points:[[-11,28],[-5,32]],goal:'Выполните канавку шириной 2 мм и диаметром дна Ø28. Передняя кромка T0404 на Z−10, задняя на Z−12. Остальное Ø32 сохранить.',learn:'У канавочного резца есть ширина. Перед осевым перемещением выведите всю пластину наружу. Съём на радиус равен половине разности диаметров.',hint:'При передней кромке Z−10 пластина занимает Z−12…−10. После рабочего X28 отведите X34, затем перемещайтесь по Z.',starter:header+'(Добавьте подход, врезание и отвод)'+tail,reference:header+'G0 X34 Z-10\nG1 X28 F0.08\nG0 X34'+tail},
-{id:'taper',title:'Конус вместо цилиндра',level:3,tool:1,depth:0,points:[[-5,31],[-15,29],[-30,32]],goal:'Получите прямолинейный конус: Ø32 при Z0, Ø28 при Z−20; дальше сохранить Ø32. Контроль в Z−5 и Z−15.',learn:'Конус образуется совместным изменением X и Z в одном рабочем кадре. При линейной интерполяции диаметр меняется пропорционально Z. Два отдельных осевых движения конус не создают.',hint:'Рабочий кадр должен одновременно вести к X28 и Z−20 от точки X32 Z0. В Z−5 диаметр на четверть пути между 32 и 28.',starter:header+'(Составьте подход и совместный рабочий ход X/Z)'+tail,reference:header+'G0 X32 Z2\nG1 Z0 F0.1\nX28 Z-20\nG0 X34'+tail},
-{id:'grooves-project',title:'Две канавки · самостоятельный маршрут',level:4,tool:4,depth:0,points:[[-11,30],[-21,28],[-5,32],[-30,32]],goal:'Первая канавка Z−12…−10: дно Ø30. Вторая Z−22…−20: дно Ø28. Ширина каждой 2 мм, прочие поверхности Ø32. Программу составьте полностью.',learn:'Сначала определите положение передней кромки, глубину каждого врезания и безопасные отводы. До запуска проверьте весь профиль, затем подтвердите каждую канавку и сохранённые поверхности измерениями.',hint:'Первая глубина — (32−30)/2; вторая — (32−28)/2. Осевой перенос допускается после полного выхода пластины из материала.',starter:'',reference:header+'G0 X34 Z-10\nG1 X30 F0.08\nG0 X34\nZ-20\nG1 X28 F0.08\nG0 X34'+tail}
-]);
-function exact(a,keys){if(!a||typeof a!=='object'||Array.isArray(a)||Object.keys(a).sort().join(',')!==keys.sort().join(','))throw Error('Неверная запись практикума.');}
-function text(s){if(typeof s!=='string'||s.length>4000||/[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/.test(s))throw Error('Программа: до 4000 символов без скрытых управляющих знаков.');return s;}
-function blank(t){const work=engine().newWork(t.title,{diameter:32,length:60,grip:15});return {work,machine:engine().restoreWork(work).state,source:t.starter,preview:null,approval:null,executed:false,depthReading:null,depthRecorded:false};}
-function create(){return {version:1,events:[],current:0,done:[],help:[],errors:[0,0,0,0,0],attempt:1,feedback:'',draft:tasks[0].starter,...blank(tasks[0])};}
-function signature(s){return JSON.stringify(s.work);}
-const expectedCache=new Map();
-function expected(t){if(!tasks.includes(t))throw Error('Неизвестное условие.');if(expectedCache.has(t.id))return expectedCache.get(t.id);let w=engine().newWork(t.title,{diameter:32,length:60,grip:15});for(const a of [{type:'reference'},{type:'clamp',value:true},{type:'tool',tool:t.tool},{type:'preset'},{type:'workOffset',z:100},{type:'door',value:true}])w=engine().execute(w,a).work;const p=engine().graphics(w,t.reference);if(!p.ok)throw Error(p.message);const profile=freeze(copy(p.profile));expectedCache.set(t.id,profile);return profile;}
-function shape(a,b){const norm=p=>JSON.stringify({frontZ:p.frontZ||0,bore:p.bore||0,segments:p.segments.map(s=>[s.length,s.diameter,s.endDiameter??s.diameter].map(n=>Math.round(n*1e6)/1e6))});return norm(a)===norm(b);}
-function inspected(s,t){return t.points.every(([z,d])=>s.machine.readings.some(r=>r.afterCut===s.machine.cuts.length&&Math.abs(r.z-z)<1e-6&&Math.abs(r.reading-d)<.011))&&(!t.depth||s.depthRecorded);}
-function apply(state,a){if(state.events.length>=500)throw Error('Журнал заполнен. Сохранённые действия остаются доступны.');const fields={machine:['type','action'],preview:['type','source'],start:['type','source'],run:['type'],hint:['type'],depth:['type'],recordDepth:['type','value'],confirm:['type'],next:['type'],restart:['type']};if(!a||!Object.hasOwn(fields,a.type))throw Error('Неизвестное действие.');exact(a,fields[a.type]);const s=copy(state),t=tasks[s.current],bad=m=>{s.errors[s.current]++;s.feedback=m;},act=e=>{const r=engine().execute(s.work,e);s.work=r.work;s.machine=r.state;s.feedback=r.message;if(!r.ok)s.errors[s.current]++;return r;};
-if(s.done.some(d=>d.id===t.id)&&!['next'].includes(a.type))throw Error('Задание принято. Перейдите дальше.');
-switch(a.type){
-case 'machine':{const e=a.action;const allowed=['reference','clamp','tool','preset','workOffset','door','measure','hold','reset'];if(!e||!allowed.includes(e.type))throw Error('Действие недоступно.');if(s.executed&&!['measure','door','reset','hold'].includes(e.type))throw Error('Для повторной наладки нужна новая заготовка.');if(!s.executed&&e.type==='measure')throw Error('Сначала изготовьте деталь.');act(e);if(!['measure','hold'].includes(e.type))s.approval=null;break;}
-case 'preview':{if(s.executed)throw Error('Проверка до запуска.');s.source=text(a.source);const p=engine().graphics(s.work,s.source);s.preview=p;s.approval=null;if(!p.ok)bad(p.message);else if(!shape(p.profile,expected(t)))bad('Программа исполняется, но не создаёт требуемый полный профиль. Проверьте чертёж и сохранённые поверхности.');else if(s.machine.tool!==t.tool||s.machine.workOffset.z!==100||!s.machine.doorClosed)bad('Проверьте требуемый инструмент, G54 Z100 и ограждение.');else{s.approval={source:s.source,signature:signature(s)};s.feedback='Графика подтверждена на копии. Рабочая деталь ещё не обработана.';}break;}
-case 'start':{const source=text(a.source);if(!s.approval||s.approval.source!==source||s.approval.signature!==signature(s))throw Error('Проверьте текущую программу и наладку заново.');if(!act({type:'load',source}).ok)break;act({type:'mode',value:'AUTO'});if(act({type:'start'}).ok)s.executed=true;break;}
-case 'run':if(!s.executed)throw Error('Сначала запустите программу.');{let n=0;while(s.machine.program.status==='running'&&n++<80){if(!act({type:'step'}).ok)break;}break;}
-case 'hint':if(s.help.includes(t.id))throw Error('Разбор уже открыт.');s.help.push(t.id);s.feedback=t.hint;break;
-case 'depth':if(!s.executed||s.machine.program.status!=='done'||s.machine.spindle||s.machine.coolant||s.machine.doorClosed||s.machine.position.x<34)throw Error('Нужны завершение, остановка, открытое ограждение и отвод X≥34.');s.depthReading=-(s.machine.profile.frontZ||0);s.feedback='Модельный осевой отсчёт от прежнего торца: '+s.depthReading+' мм. Физический глубиномер и погрешность не моделируются.';break;
-case 'recordDepth':if(typeof a.value!=='string'||a.value.length>32||!/^\d+(?:[.,]\d+)?$/.test(a.value.trim()))throw Error('Введите положительный осевой размер.');if(s.depthReading===null||Math.abs(Number(a.value.replace(',','.'))-s.depthReading)>1e-6)bad('Запись не соответствует свежему отсчёту.');else{s.depthRecorded=true;s.feedback='Осевой отсчёт записан.';}break;
-case 'confirm':if(!s.executed||s.machine.program.status!=='done'||s.machine.spindle||s.machine.coolant||s.machine.alarm||!shape(s.machine.profile,expected(t))||!inspected(s,t))bad('Нужны изготовление нужного профиля и все свежие замеры карты контроля.');else{s.done.push({id:t.id,source:s.source,attempt:s.attempt,help:s.help.includes(t.id),errors:s.errors[s.current],readings:copy(s.machine.readings),depth:s.depthReading});s.feedback='Операция и контроль подтверждены в учебной модели.';}break;
-case 'next':if(!s.done.some(d=>d.id===t.id)||s.current===tasks.length-1)throw Error('Следующее задание пока недоступно.');s.current++;Object.assign(s,blank(tasks[s.current]));s.attempt=1;s.draft=tasks[s.current].starter;s.feedback='';break;
-case 'restart':if(s.machine.spindle||['running','hold'].includes(s.machine.program.status))throw Error('Сначала RESET для прерывания.');Object.assign(s,blank(t));s.attempt++;s.feedback='Новая заготовка. Ошибки и открытый разбор сохранены.';break;
-}s.events.push(copy(a));return s;}
-function snapshot(s){return {version:1,events:copy(s.events),draft:s.draft};}
-let cachedKey=null,cachedValue=null;
-function restore(raw){try{const key=JSON.stringify(raw);if(key===cachedKey)return copy(cachedValue);exact(raw,['version','events','draft']);if(raw.version!==1||!Array.isArray(raw.events)||raw.events.length>500)return null;text(raw.draft);let s=create();for(const a of raw.events)s=apply(s,a);s.draft=raw.draft;cachedKey=key;cachedValue=copy(s);return s;}catch{return null;}}
-function transition(s,a){const r=restore(snapshot(s));if(!r)throw Error('Повреждён практикум.');return apply(r,a);}
-function review(raw,id){const verified=restore(raw);if(!verified||!verified.done.some(d=>d.id===id))return null;let s=create();for(const action of raw.events){s=apply(s,action);if(s.done.some(d=>d.id===id))return snapshot(s);}return null;}
-return freeze({review,tasks,create,snapshot,restore,transition,shape,expected,inspected});
+</script><script>(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.CNCAssignment = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const keys = [
+    "id",
+    "contentVersion",
+    "criteriaVersion",
+    "profileId",
+    "profileVersion",
+    "seed",
+  ];
+  function valid(value) {
+    return (
+      value &&
+      typeof value === "object" &&
+      !Array.isArray(value) &&
+      Object.keys(value).length === keys.length &&
+      keys.every((key) => Object.hasOwn(value, key)) &&
+      ["id", "profileId", "seed"].every(
+        (key) =>
+          typeof value[key] === "string" &&
+          /^[a-zA-Z0-9_-]{1,100}$/.test(value[key]),
+      ) &&
+      ["contentVersion", "criteriaVersion", "profileVersion"].every(
+        (key) => Number.isSafeInteger(value[key]) && value[key] > 0,
+      )
+    );
+  }
+  function matches(value, expected) {
+    return !!(
+      valid(value) &&
+      valid(expected) &&
+      keys.every((key) => value[key] === expected[key])
+    );
+  }
+  // Checks must be computed by the owning replay engine. No API accepts them as learner evidence.
+  function evaluate(value, expected, checks, assisted) {
+    const validChecks =
+      Array.isArray(checks) &&
+      checks.length > 0 &&
+      checks.length <= 64 &&
+      checks.every(
+        (check) =>
+          check &&
+          typeof check.id === "string" &&
+          typeof check.title === "string" &&
+          typeof check.passed === "boolean",
+      ) &&
+      new Set(checks.map((check) => check.id)).size === checks.length;
+    const valid =
+      matches(value, expected) && validChecks && typeof assisted === "boolean";
+    const passed = !!(valid && checks.every((check) => check.passed));
+    return {
+      valid: !!valid,
+      passed,
+      independent: passed && !assisted,
+      checks: valid
+        ? checks.map(({ id, title, passed }) => ({ id, title, passed }))
+        : [],
+    };
+  }
+  return Object.freeze({ matches, evaluate });
 });
+</script><script>(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.CNCTurningTasks = api;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+  const header = "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\n";
+  const tail = "\nG0 X40 Z5\nM5\nM30";
+  const cylinder = (id, title, z0, z1, diameter, role, positions) => ({
+    id,
+    title,
+    z0,
+    z1,
+    diameter,
+    endDiameter: diameter,
+    role,
+    control: positions.map((z) => ({ z, value: diameter })),
+  });
+  const land = (diameter) => ({
+    segments: [
+      { length: 40, diameter: 32 },
+      { length: 20, diameter },
+    ],
+    bore: 0,
+  });
+  const tasks = [
+    {
+      id: "shoulder-control",
+      title: "Уступ: обработать шейку, сохранить базу",
+      level: 4,
+      tool: 1,
+      depth: 0,
+      goal: "Из Ø32 получите шейку A Ø28 на Z0…−20. Поверхность B на Z−20…−60 должна остаться Ø32. Проверьте шейку в двух сечениях и сохранённую базу.",
+      learn:
+        "Один удачный замер не доказывает правильность всего участка. По чертежу найдите границу прохода и поверхность, на которую нельзя переносить съём. Радиальный припуск равен половине разности диаметров.",
+      hint: "Для A радиальный съём (32−28)/2 = 2 мм. Подводите резец перед торцом, ведите до Z−20, затем выводите по X. B нельзя продолжать точить. Контроль A: Z−5 и −15; B: Z−35.",
+      forecast: {
+        prompt: "Какой суммарный припуск нужно снять с A на радиус, мм?",
+        value: 2,
+      },
+      surfaces: [
+        cylinder("A", "Шейка", 0, -20, 28, "cut", [-5, -15]),
+        cylinder("B", "База", -20, -60, 32, "preserve", [-35]),
+      ],
+      targetProfile: land(28),
+      starter: header + "(Задайте подход, рабочий ход и отвод)" + tail,
+      reference: header + "G0 X28 Z2\nG1 Z-20 F0.1\nG0 X34" + tail,
+    },
+    {
+      id: "allowance-plan",
+      title: "Припуск: один проход не подходит",
+      level: 4,
+      tool: 1,
+      depth: 0,
+      goal: "Получите A Ø24 на Z0…−20, сохранив B Ø32 на остальной длине. У T0101 новый съём за проход ограничен 2 мм на радиус в этой модели.",
+      learn:
+        "Конечная координата задаёт итоговую форму, но не допустимую нагрузку отдельного прохода. Сравните радиальный припуск с пределом инструмента. Графика должна проверять все промежуточные проходы.",
+      hint: "Радиальный припуск 4 мм требует минимум двух проходов. Один вариант: сначала X28 до Z−20, выйти наружу, вернуться перед торцом, затем X24 до Z−20. Возможны другие допустимые промежуточные диаметры.",
+      forecast: {
+        prompt:
+          "Сколько минимум проходов T0101 нужно при пределе 2 мм на радиус?",
+        value: 2,
+      },
+      surfaces: [
+        cylinder("A", "Глубокая шейка", 0, -20, 24, "cut", [-5, -15]),
+        cylinder("B", "База", -20, -60, 32, "preserve", [-35]),
+      ],
+      targetProfile: land(24),
+      starter: "",
+      reference:
+        header +
+        "G0 X28 Z2\nG1 Z-20 F0.1\nG0 X34\nZ2\nX24\nG1 Z-20 F0.1\nG0 X34" +
+        tail,
+    },
+    {
+      id: "relief-band",
+      title: "Проточка между двумя буртиками",
+      level: 5,
+      tool: 4,
+      depth: 0,
+      goal: "Канавочным T0404 шириной 2 мм выполните проточку B шириной 6 мм: Z−16…−10, дно Ø28. Передний буртик A Z0…−10 и задний C Z−16…−60 сохранить Ø32.",
+      learn:
+        "Продольный резец в этой модели не умеет радиально входить в середину сплошного участка. Здесь нужен канавочный инструмент и несколько положений пластины. Перед осевым переносом вся пластина должна выйти из материала.",
+      hint: "Минимум три положения пластины: передняя кромка на Z−10, −12, −14. В каждом врезайтесь до X28 и выходите до X34 перед переносом по Z. Проверяйте дно в трёх сечениях и оба сохранённых буртика.",
+      forecast: {
+        prompt:
+          "Сколько минимум положений пластины шириной 2 мм нужно для проточки шириной 6 мм?",
+        value: 3,
+      },
+      surfaces: [
+        cylinder("A", "Передний буртик", 0, -10, 32, "preserve", [-5]),
+        cylinder("B", "Проточка", -10, -16, 28, "cut", [-11, -13, -15]),
+        cylinder("C", "Задний буртик", -16, -60, 32, "preserve", [-25]),
+      ],
+      targetProfile: {
+        segments: [
+          { length: 44, diameter: 32 },
+          { length: 6, diameter: 28 },
+          { length: 10, diameter: 32 },
+        ],
+        bore: 0,
+      },
+      starter: "",
+      reference:
+        header +
+        "G0 X34 Z-10\nG1 X28 F0.08\nG0 X34\nZ-12\nG1 X28 F0.08\nG0 X34\nZ-14\nG1 X28 F0.08\nG0 X34" +
+        tail,
+    },
+    {
+      id: "finish-limit",
+      title: "Чистовой резец: другой предел съёма",
+      level: 5,
+      tool: 2,
+      depth: 0,
+      goal: "Только резцом T0202 получите A Ø30 на Z0…−20 из Ø32. B оставить Ø32. У этого резца новый съём за проход не более 0,5 мм на радиус в учебном профиле.",
+      learn:
+        "Одинаковую форму можно получить разными инструментами, но здесь проверяется работа с ограниченным съёмом чистового резца. Не переносите допустимую глубину T0101 на T0202. Шероховатость и силы резания модель не рассчитывает.",
+      hint: "Суммарно нужно снять 1 мм на радиус, поэтому T0202 требует минимум двух проходов. Например, сначала X31, затем X30, каждый до Z−20. Подача F0.1 допустима в заданном учебном профиле.",
+      forecast: {
+        prompt:
+          "Сколько минимум проходов T0202 требуется при пределе 0,5 мм на радиус?",
+        value: 2,
+      },
+      surfaces: [
+        cylinder("A", "Чистовая шейка", 0, -20, 30, "cut", [-5, -15]),
+        cylinder("B", "База", -20, -60, 32, "preserve", [-35]),
+      ],
+      targetProfile: land(30),
+      starter: "",
+      reference:
+        header +
+        "G0 X31 Z2\nG1 Z-20 F0.1\nG0 X34\nZ2\nX30\nG1 Z-20 F0.1\nG0 X34" +
+        tail,
+    },
+    {
+      id: "taper-land",
+      title: "Конус переходит в цилиндр",
+      level: 6,
+      tool: 1,
+      depth: 0,
+      goal: "Поверхность A — линейный конус от Ø32/Z0 до Ø28/Z−16. Далее B Ø28 до Z−28. Поверхность C дальше Z−28 оставить Ø32. Контролируйте конус, цилиндр и базу отдельно.",
+      learn:
+        "У составного профиля есть граница, где совместное изменение X/Z сменяется продольным движением при постоянном X. Контроль только конечного диаметра не отличит конус от цилиндра. Для контрольного сечения используйте линейную зависимость диаметра от Z.",
+      hint: "В Z−8 конус пройден наполовину, диаметр 30. Один маршрут: X32/Z0 → X28/Z−16 → X28/Z−28; затем выход по X. В Z−22 требуется Ø28, в Z−40 остаётся Ø32.",
+      forecast: {
+        prompt: "Какой диаметр должен быть на конусе A в сечении Z−8, мм?",
+        value: 30,
+      },
+      surfaces: [
+        {
+          id: "A",
+          title: "Конус",
+          z0: 0,
+          z1: -16,
+          diameter: 32,
+          endDiameter: 28,
+          role: "cut",
+          control: [{ z: -8, value: 30 }],
+        },
+        cylinder("B", "Цилиндр", -16, -28, 28, "cut", [-22]),
+        cylinder("C", "База", -28, -60, 32, "preserve", [-40]),
+      ],
+      targetProfile: {
+        segments: [
+          { length: 32, diameter: 32 },
+          { length: 12, diameter: 28 },
+          { length: 16, diameter: 28, endDiameter: 32 },
+        ],
+        bore: 0,
+      },
+      starter: "",
+      reference:
+        header + "G0 X32 Z2\nG1 Z0 F0.1\nX28 Z-16\nZ-28\nG0 X34" + tail,
+    },
+    {
+      id: "transfer-two-lands",
+      title: "Две шейки: свой порядок проходов",
+      level: 6,
+      tool: 1,
+      depth: 0,
+      goal: "Самостоятельно изготовьте A Ø28 на Z0…−14 и B Ø30 на Z−14…−30. C на Z−30…−60 сохранить Ø32. Допустимы разные порядки обработки, если соблюдены геометрия, предел съёма и полный контроль.",
+      learn:
+        "Здесь нет готового начала программы. Используйте условие и карту поверхностей, выберите порядок самостоятельно. Проверка принимает результат и реальные действия, а не совпадение текста с образцом.",
+      hint: "Один вариант — длинный участок сначала до Ø30/Z−30, затем передняя шейка до Ø28/Z−14. Другой — сначала передняя Ø28, затем длинная Ø30: движок сохраняет уже снятый меньший диаметр. В обоих случаях нужен выход по X перед возвратом.",
+      forecast: {
+        prompt:
+          "Если сначала получить Ø30, сколько затем снять на радиус для передней шейки Ø28, мм?",
+        value: 1,
+      },
+      surfaces: [
+        cylinder("A", "Передняя шейка", 0, -14, 28, "cut", [-7]),
+        cylinder("B", "Вторая шейка", -14, -30, 30, "cut", [-22]),
+        cylinder("C", "База", -30, -60, 32, "preserve", [-40]),
+      ],
+      targetProfile: {
+        segments: [
+          { length: 30, diameter: 32 },
+          { length: 16, diameter: 30 },
+          { length: 14, diameter: 28 },
+        ],
+        bore: 0,
+      },
+      starter: "",
+      reference:
+        header +
+        "G0 X30 Z2\nG1 Z-30 F0.1\nG0 X34\nZ2\nX28\nG1 Z-14 F0.1\nG0 X34" +
+        tail,
+    },
+  ];
+  function freeze(value) {
+    if (value && typeof value === "object") {
+      Object.values(value).forEach(freeze);
+      Object.freeze(value);
+    }
+    return value;
+  }
+  return freeze({
+    tasks: tasks.map((task) => ({
+      ...task,
+      points: task.surfaces.flatMap((surface) =>
+        surface.control.map(({ z, value }) => [z, value]),
+      ),
+    })),
+  });
+});
+</script><script>(function (root, factory) {
+  const api = factory(
+    () =>
+      typeof module === "object" && module.exports
+        ? require("./real-machine-model.js")
+        : root.CNCRealMachine,
+    typeof module === "object" && module.exports
+      ? require("./assignment-model.js")
+      : root.CNCAssignment,
+    typeof module === "object" && module.exports
+      ? require("./turning-tasks-model.js")
+      : root.CNCTurningTasks,
+  );
+  if (typeof module === "object" && module.exports) module.exports = api;
+  else root.CNCOperationCourse = api;
+})(
+  typeof globalThis !== "undefined" ? globalThis : this,
+  function (engine, assignment, turning) {
+    "use strict";
+    const copy = (x) => JSON.parse(JSON.stringify(x)),
+      freeze = (x) => {
+        if (x && typeof x === "object") {
+          Object.values(x).forEach(freeze);
+          Object.freeze(x);
+        }
+        return x;
+      };
+    const header = "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\n",
+      tail = "\nG0 X40 Z5\nM5\nM30";
+    const tasks = freeze(
+      [
+        {
+          id: "face-first",
+          title: "Первый торец",
+          level: 1,
+          tool: 3,
+          depth: 1,
+          points: [[-10, 32]],
+          goal: "Снимите 1 мм с торца Ø32. Получите Z−1, сохраните наружный Ø32.",
+          learn:
+            "Торцевание выполняется движением по X. X — диаметр. За проход T0303 допускает 1 мм по Z. Подходите к торцу снаружи Ø32; после прохода сначала отведите Z перед торцом, затем X.",
+          hint: "Подход X34 Z−1; рабочий ход к X0; отвод сначала к Z2. Это один торцевой проход.",
+          starter:
+            header +
+            "G0 X34 Z-1\n(Добавьте рабочий ход и безопасный отвод)" +
+            tail,
+          reference: header + "G0 X34 Z-1\nG1 X0 F0.1\nG0 Z2" + tail,
+        },
+        {
+          id: "face-two",
+          title: "Торец в два прохода",
+          level: 2,
+          tool: 3,
+          depth: 2,
+          points: [[-10, 32]],
+          goal: "Снимите 2 мм с торца. Сохраните Ø32. Распределите съём по допустимым проходам.",
+          learn:
+            "Предельная глубина действует на каждый проход, а не на итоговый размер. Следующий торец отсчитывается от прежнего рабочего нуля: G54 после съёма сам не перемещается.",
+          hint: "После первого торца Z−1 следующий — Z−2. Между проходами отведите Z перед торцом, затем X наружу.",
+          starter: header + "(Составьте два прохода)" + tail,
+          reference:
+            header +
+            "G0 X34 Z-1\nG1 X0 F0.1\nG0 Z2\nX34\nZ-2\nG1 X0 F0.1\nG0 Z2" +
+            tail,
+        },
+        {
+          id: "groove-first",
+          title: "Кольцевая канавка",
+          level: 2,
+          tool: 4,
+          depth: 0,
+          points: [
+            [-11, 28],
+            [-5, 32],
+          ],
+          goal: "Выполните канавку шириной 2 мм и диаметром дна Ø28. Передняя кромка T0404 на Z−10, задняя на Z−12. Остальное Ø32 сохранить.",
+          learn:
+            "У канавочного резца есть ширина. Перед осевым перемещением выведите всю пластину наружу. Съём на радиус равен половине разности диаметров.",
+          hint: "При передней кромке Z−10 пластина занимает Z−12…−10. После рабочего X28 отведите X34, затем перемещайтесь по Z.",
+          starter: header + "(Добавьте подход, врезание и отвод)" + tail,
+          reference: header + "G0 X34 Z-10\nG1 X28 F0.08\nG0 X34" + tail,
+        },
+        {
+          id: "taper",
+          title: "Конус вместо цилиндра",
+          level: 3,
+          tool: 1,
+          depth: 0,
+          points: [
+            [-5, 31],
+            [-15, 29],
+            [-30, 32],
+          ],
+          goal: "Получите прямолинейный конус: Ø32 при Z0, Ø28 при Z−20; дальше сохранить Ø32. Контроль в Z−5 и Z−15.",
+          learn:
+            "Конус образуется совместным изменением X и Z в одном рабочем кадре. При линейной интерполяции диаметр меняется пропорционально Z. Два отдельных осевых движения конус не создают.",
+          hint: "Рабочий кадр должен одновременно вести к X28 и Z−20 от точки X32 Z0. В Z−5 диаметр на четверть пути между 32 и 28.",
+          starter:
+            header + "(Составьте подход и совместный рабочий ход X/Z)" + tail,
+          reference: header + "G0 X32 Z2\nG1 Z0 F0.1\nX28 Z-20\nG0 X34" + tail,
+        },
+        {
+          id: "grooves-project",
+          title: "Две канавки · самостоятельный маршрут",
+          level: 4,
+          tool: 4,
+          depth: 0,
+          points: [
+            [-11, 30],
+            [-21, 28],
+            [-5, 32],
+            [-30, 32],
+          ],
+          goal: "Первая канавка Z−12…−10: дно Ø30. Вторая Z−22…−20: дно Ø28. Ширина каждой 2 мм, прочие поверхности Ø32. Программу составьте полностью.",
+          learn:
+            "Сначала определите положение передней кромки, глубину каждого врезания и безопасные отводы. До запуска проверьте весь профиль, затем подтвердите каждую канавку и сохранённые поверхности измерениями.",
+          hint: "Первая глубина — (32−30)/2; вторая — (32−28)/2. Осевой перенос допускается после полного выхода пластины из материала.",
+          starter: "",
+          reference:
+            header +
+            "G0 X34 Z-10\nG1 X30 F0.08\nG0 X34\nZ-20\nG1 X28 F0.08\nG0 X34" +
+            tail,
+        },
+        ...turning.tasks,
+      ].map((task) => ({
+        ...task,
+        assignment: {
+          id: "operation-" + task.id,
+          contentVersion: 1,
+          criteriaVersion: 1,
+          profileId: "lathe-xz",
+          profileVersion: 1,
+          seed: "fixed-01",
+        },
+      })),
+    );
+    function exact(a, keys) {
+      if (
+        !a ||
+        typeof a !== "object" ||
+        Array.isArray(a) ||
+        Object.keys(a).sort().join(",") !== keys.sort().join(",")
+      )
+        throw Error("Неверная запись практикума.");
+    }
+    function text(s) {
+      if (
+        typeof s !== "string" ||
+        s.length > 4000 ||
+        /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f-\u009f\u200b-\u200f\u202a-\u202e\u2060-\u206f\ufeff]/.test(
+          s,
+        )
+      )
+        throw Error(
+          "Программа: до 4000 символов без скрытых управляющих знаков.",
+        );
+      return s;
+    }
+    function blank(t) {
+      const work = engine().newWork(t.title, {
+        diameter: 32,
+        length: 60,
+        grip: 15,
+      });
+      return {
+        work,
+        machine: engine().restoreWork(work).state,
+        source: t.starter,
+        preview: null,
+        approval: null,
+        executed: false,
+        depthReading: null,
+        depthRecorded: false,
+        selectedSurfaces: [],
+        prediction: null,
+        predictionInput: "",
+      };
+    }
+    function initial(version) {
+      return {
+        version,
+        originVersion: version,
+        currentAssignment: null,
+        events: [],
+        current: 0,
+        done: [],
+        help: [],
+        errors: tasks.map(() => 0),
+        attempt: 1,
+        feedback: "",
+        draft: tasks[0].starter,
+        ...blank(tasks[0]),
+      };
+    }
+    function create() {
+      return apply(initial(2), {
+        type: "begin",
+        assignment: copy(tasks[0].assignment),
+      });
+    }
+    function taskCount(s) {
+      return s.version === 1 ? 5 : tasks.length;
+    }
+    function hasWork(raw) {
+      return !!(
+        raw &&
+        (raw.events?.some((event) => event.type !== "begin") ||
+          (typeof raw.draft === "string" && raw.draft !== tasks[0].starter))
+      );
+    }
+    function signature(s) {
+      return JSON.stringify(s.work);
+    }
+    const expectedCache = new Map();
+    function expected(t) {
+      if (!tasks.includes(t)) throw Error("Неизвестное условие.");
+      if (t.targetProfile) return t.targetProfile;
+      if (expectedCache.has(t.id)) return expectedCache.get(t.id);
+      let w = engine().newWork(t.title, { diameter: 32, length: 60, grip: 15 });
+      for (const a of [
+        { type: "reference" },
+        { type: "clamp", value: true },
+        { type: "tool", tool: t.tool },
+        { type: "preset" },
+        { type: "workOffset", z: 100 },
+        { type: "door", value: true },
+      ])
+        w = engine().execute(w, a).work;
+      const p = engine().graphics(w, t.reference);
+      if (!p.ok) throw Error(p.message);
+      const profile = freeze(copy(p.profile));
+      expectedCache.set(t.id, profile);
+      return profile;
+    }
+    function shape(a, b) {
+      const norm = (p) =>
+        JSON.stringify({
+          frontZ: p.frontZ || 0,
+          bore: p.bore || 0,
+          segments: p.segments.map((s) =>
+            [s.length, s.diameter, s.endDiameter ?? s.diameter].map(
+              (n) => Math.round(n * 1e6) / 1e6,
+            ),
+          ),
+        });
+      return norm(a) === norm(b);
+    }
+    function inspected(s, t) {
+      return (
+        t.points.every(([z, d]) =>
+          s.machine.readings.some(
+            (r) =>
+              r.afterCut === s.machine.cuts.length &&
+              Math.abs(r.z - z) < 1e-6 &&
+              Math.abs(r.reading - d) < 0.011,
+          ),
+        ) &&
+        (!t.depth || s.depthRecorded)
+      );
+    }
+    function planned(s, t) {
+      if (!t.surfaces) return true;
+      const protectedIds = t.surfaces
+        .filter((surface) => surface.role === "preserve")
+        .map((surface) => surface.id)
+        .sort();
+      return (
+        JSON.stringify([...s.selectedSurfaces].sort()) ===
+          JSON.stringify(protectedIds) && s.prediction !== null
+      );
+    }
+    function assessment(s) {
+      const t = tasks[s.current];
+      if (s.version === 1) return null;
+      const checks = [
+        {
+          id: "execution",
+          title:
+            "Реальная обработка модели завершена без аварии, вращение и СОЖ выключены",
+          passed: !!(
+            s.executed &&
+            s.machine.program.status === "done" &&
+            !s.machine.spindle &&
+            !s.machine.coolant &&
+            !s.machine.alarm
+          ),
+        },
+        {
+          id: "profile",
+          title:
+            "Весь профиль соответствует чертежу, сохранённые участки не повреждены",
+          passed: shape(s.machine.profile, expected(t)),
+        },
+        {
+          id: "tool",
+          title: "Применён инструмент учебного условия",
+          passed: s.machine.tool === t.tool,
+        },
+      ];
+      if (t.surfaces) {
+        checks.push({
+          id: "plan",
+          title: "Выбраны сохраняемые поверхности и проверен прогноз",
+          passed: planned(s, t),
+        });
+        for (const surface of t.surfaces)
+          checks.push({
+            id: "control:" + surface.id,
+            title:
+              "Свежий контроль поверхности " +
+              surface.id +
+              " · " +
+              surface.title,
+            passed: surface.control.every((point) =>
+              s.machine.readings.some(
+                (r) =>
+                  r.instrument === "micrometer" &&
+                  r.afterCut === s.machine.cuts.length &&
+                  Math.abs(r.z - point.z) < 1e-6 &&
+                  Math.abs(r.reading - point.value) < 0.011,
+              ),
+            ),
+          });
+      } else
+        checks.push({
+          id: "control",
+          title: "Получены все свежие замеры карты контроля",
+          passed: inspected(s, t),
+        });
+      return assignment.evaluate(
+        s.currentAssignment,
+        t.assignment,
+        checks,
+        s.help.includes(t.id),
+      );
+    }
+    function apply(state, a) {
+      if (state.events.length >= 500)
+        throw Error("Журнал заполнен. Сохранённые действия остаются доступны.");
+      const fields = {
+        begin: ["type", "assignment"],
+        upgrade: ["type", "assignment"],
+        surface: ["type", "id"],
+        predict: ["type", "value"],
+        machine: ["type", "action"],
+        preview: ["type", "source"],
+        start: ["type", "source"],
+        run: ["type"],
+        hint: ["type"],
+        depth: ["type"],
+        recordDepth: ["type", "value"],
+        confirm: ["type"],
+        next: state.version === 1 ? ["type"] : ["type", "assignment"],
+        restart: ["type"],
+      };
+      if (!a || !Object.hasOwn(fields, a.type))
+        throw Error("Неизвестное действие.");
+      exact(a, fields[a.type]);
+      const s = copy(state),
+        t = tasks[s.current],
+        bad = (m) => {
+          s.errors[s.current]++;
+          s.feedback = m;
+        },
+        act = (e) => {
+          const r = engine().execute(s.work, e);
+          s.work = r.work;
+          s.machine = r.state;
+          s.feedback = r.message;
+          if (!r.ok) s.errors[s.current]++;
+          return r;
+        };
+      if (
+        s.done.some((d) => d.id === t.id) &&
+        !["next", "upgrade"].includes(a.type)
+      )
+        throw Error("Задание принято. Перейдите дальше.");
+      switch (a.type) {
+        case "begin":
+          if (
+            s.version !== 2 ||
+            s.originVersion !== 2 ||
+            s.events.length ||
+            !assignment.matches(a.assignment, t.assignment)
+          )
+            throw Error("Неизвестная версия задания или профиля.");
+          s.currentAssignment = copy(t.assignment);
+          break;
+        case "upgrade":
+          if (
+            s.version !== 1 ||
+            s.current !== 4 ||
+            !s.done.some((r) => r.id === t.id) ||
+            !assignment.matches(a.assignment, tasks[5].assignment)
+          )
+            throw Error(
+              "Сначала завершите сохранённые операции прежней версии.",
+            );
+          s.version = 2;
+          s.current = 5;
+          s.currentAssignment = copy(tasks[5].assignment);
+          Object.assign(s, blank(tasks[5]));
+          s.attempt = 1;
+          s.draft = tasks[5].starter;
+          s.feedback =
+            "Прежние пять результатов сохранены. Новые условия начаты отдельно.";
+          break;
+        case "surface":
+          if (
+            s.version !== 2 ||
+            !t.surfaces ||
+            s.executed ||
+            !t.surfaces.some((surface) => surface.id === a.id)
+          )
+            throw Error("Поверхность недоступна для планирования.");
+          s.selectedSurfaces = s.selectedSurfaces.includes(a.id)
+            ? s.selectedSurfaces.filter((id) => id !== a.id)
+            : [...s.selectedSurfaces, a.id];
+          s.prediction = null;
+          s.approval = null;
+          break;
+        case "predict": {
+          if (
+            s.version !== 2 ||
+            !t.forecast ||
+            s.executed ||
+            typeof a.value !== "string" ||
+            a.value.length > 32 ||
+            !/^-?\d+(?:[.,]\d+)?$/.test(a.value.trim())
+          )
+            throw Error("Введите число для прогноза.");
+          s.predictionInput = a.value;
+          s.prediction = null;
+          s.approval = null;
+          const required = t.surfaces
+            .filter((surface) => surface.role === "preserve")
+            .map((surface) => surface.id)
+            .sort();
+          if (
+            JSON.stringify([...s.selectedSurfaces].sort()) !==
+            JSON.stringify(required)
+          )
+            bad(
+              "Проверьте по чертежу, какие поверхности нужно сохранить без съёма.",
+            );
+          else if (
+            Math.abs(Number(a.value.replace(",", ".")) - t.forecast.value) >
+            1e-6
+          )
+            bad(
+              "Прогноз не согласуется с размерами и пределом инструмента. Вернитесь к схеме и расчёту.",
+            );
+          else {
+            s.prediction = { value: t.forecast.value };
+            s.feedback =
+              "Поверхности и прогноз согласованы. Теперь проверьте это программой и обработкой.";
+          }
+          break;
+        }
+        case "machine": {
+          const e = a.action;
+          const allowed = [
+            "reference",
+            "clamp",
+            "tool",
+            "preset",
+            "workOffset",
+            "door",
+            "measure",
+            "hold",
+            "reset",
+          ];
+          if (!e || !allowed.includes(e.type))
+            throw Error("Действие недоступно.");
+          if (
+            s.executed &&
+            !["measure", "door", "reset", "hold"].includes(e.type)
+          )
+            throw Error("Для повторной наладки нужна новая заготовка.");
+          if (!s.executed && e.type === "measure")
+            throw Error("Сначала изготовьте деталь.");
+          act(e);
+          if (!["measure", "hold"].includes(e.type)) s.approval = null;
+          break;
+        }
+        case "preview": {
+          if (s.executed) throw Error("Проверка до запуска.");
+          if (!planned(s, t)) {
+            bad(
+              "Сначала выберите сохраняемые поверхности и проверьте прогноз.",
+            );
+            break;
+          }
+          s.source = text(a.source);
+          const p = engine().graphics(s.work, s.source);
+          s.preview = p;
+          s.approval = null;
+          if (!p.ok) bad(p.message);
+          else if (!shape(p.profile, expected(t)))
+            bad(
+              "Программа исполняется, но не создаёт требуемый полный профиль. Проверьте чертёж и сохранённые поверхности.",
+            );
+          else if (
+            s.machine.tool !== t.tool ||
+            s.machine.workOffset.z !== 100 ||
+            !s.machine.doorClosed
+          )
+            bad("Проверьте требуемый инструмент, G54 Z100 и ограждение.");
+          else {
+            s.approval = { source: s.source, signature: signature(s) };
+            s.feedback =
+              "Графика подтверждена на копии. Рабочая деталь ещё не обработана.";
+          }
+          break;
+        }
+        case "start": {
+          const source = text(a.source);
+          if (
+            !s.approval ||
+            s.approval.source !== source ||
+            s.approval.signature !== signature(s)
+          )
+            throw Error("Проверьте текущую программу и наладку заново.");
+          if (!act({ type: "load", source }).ok) break;
+          act({ type: "mode", value: "AUTO" });
+          if (act({ type: "start" }).ok) s.executed = true;
+          break;
+        }
+        case "run":
+          if (!s.executed) throw Error("Сначала запустите программу.");
+          {
+            let n = 0;
+            while (s.machine.program.status === "running" && n++ < 80) {
+              if (!act({ type: "step" }).ok) break;
+            }
+            break;
+          }
+        case "hint":
+          if (s.help.includes(t.id)) throw Error("Разбор уже открыт.");
+          s.help.push(t.id);
+          s.feedback = t.hint;
+          break;
+        case "depth":
+          if (
+            !s.executed ||
+            s.machine.program.status !== "done" ||
+            s.machine.spindle ||
+            s.machine.coolant ||
+            s.machine.doorClosed ||
+            s.machine.position.x < 34
+          )
+            throw Error(
+              "Нужны завершение, остановка, открытое ограждение и отвод X≥34.",
+            );
+          s.depthReading = -(s.machine.profile.frontZ || 0);
+          s.feedback =
+            "Модельный осевой отсчёт от прежнего торца: " +
+            s.depthReading +
+            " мм. Физический глубиномер и погрешность не моделируются.";
+          break;
+        case "recordDepth":
+          if (
+            typeof a.value !== "string" ||
+            a.value.length > 32 ||
+            !/^\d+(?:[.,]\d+)?$/.test(a.value.trim())
+          )
+            throw Error("Введите положительный осевой размер.");
+          if (
+            s.depthReading === null ||
+            Math.abs(Number(a.value.replace(",", ".")) - s.depthReading) > 1e-6
+          )
+            bad("Запись не соответствует свежему отсчёту.");
+          else {
+            s.depthRecorded = true;
+            s.feedback = "Осевой отсчёт записан.";
+          }
+          break;
+        case "confirm":
+          if (
+            (s.version === 2 && !assessment(s).passed) ||
+            !s.executed ||
+            s.machine.program.status !== "done" ||
+            s.machine.spindle ||
+            s.machine.coolant ||
+            s.machine.alarm ||
+            !shape(s.machine.profile, expected(t)) ||
+            !inspected(s, t)
+          )
+            bad(
+              "Нужны изготовление нужного профиля и все свежие замеры карты контроля.",
+            );
+          else {
+            s.done.push({
+              id: t.id,
+              source: s.source,
+              attempt: s.attempt,
+              help: s.help.includes(t.id),
+              errors: s.errors[s.current],
+              readings: copy(s.machine.readings),
+              depth: s.depthReading,
+              ...(s.version === 2
+                ? {
+                    assignment: copy(t.assignment),
+                    independent: assessment(s).independent,
+                    criteria: assessment(s).checks,
+                  }
+                : { legacy: true, independent: null }),
+            });
+            s.feedback = "Операция и контроль подтверждены в учебной модели.";
+          }
+          break;
+        case "next":
+          if (
+            !s.done.some((d) => d.id === t.id) ||
+            s.current === taskCount(s) - 1
+          )
+            throw Error("Следующее задание пока недоступно.");
+          if (
+            s.version === 2 &&
+            !assignment.matches(a.assignment, tasks[s.current + 1].assignment)
+          )
+            throw Error("Неизвестная версия следующего задания.");
+          s.current++;
+          s.currentAssignment =
+            s.version === 2 ? copy(tasks[s.current].assignment) : null;
+          Object.assign(s, blank(tasks[s.current]));
+          s.attempt = 1;
+          s.draft = tasks[s.current].starter;
+          s.feedback = "";
+          break;
+        case "restart":
+          if (
+            s.machine.spindle ||
+            ["running", "hold"].includes(s.machine.program.status)
+          )
+            throw Error("Сначала RESET для прерывания.");
+          Object.assign(s, blank(t));
+          s.attempt++;
+          s.feedback = "Новая заготовка. Ошибки и открытый разбор сохранены.";
+          break;
+      }
+      s.events.push(copy(a));
+      return s;
+    }
+    function snapshot(s) {
+      return {
+        version: s.version,
+        ...(s.version === 2 ? { originVersion: s.originVersion } : {}),
+        events: copy(s.events),
+        draft: s.draft,
+      };
+    }
+    let cachedKey = null,
+      cachedValue = null;
+    function restore(raw) {
+      try {
+        const key = JSON.stringify(raw);
+        if (key === cachedKey) return copy(cachedValue);
+        exact(
+          raw,
+          raw?.version === 2
+            ? ["version", "originVersion", "events", "draft"]
+            : ["version", "events", "draft"],
+        );
+        if (
+          ![1, 2].includes(raw.version) ||
+          (raw.version === 2 && ![1, 2].includes(raw.originVersion)) ||
+          !Array.isArray(raw.events) ||
+          raw.events.length > 500
+        )
+          return null;
+        text(raw.draft);
+        let s = initial(raw.version === 1 ? 1 : raw.originVersion);
+        for (const a of raw.events) s = apply(s, a);
+        if (
+          s.version !== raw.version ||
+          (raw.version === 2 && !s.currentAssignment)
+        )
+          return null;
+        s.draft = raw.draft;
+        cachedKey = key;
+        cachedValue = copy(s);
+        return s;
+      } catch {
+        return null;
+      }
+    }
+    function transition(s, a) {
+      const r = restore(snapshot(s));
+      if (!r) throw Error("Повреждён практикум.");
+      return apply(r, a);
+    }
+    function review(raw, id) {
+      const verified = restore(raw);
+      if (!verified || !verified.done.some((d) => d.id === id)) return null;
+      let s = initial(raw.version === 1 ? 1 : raw.originVersion);
+      for (const action of raw.events) {
+        s = apply(s, action);
+        if (s.done.some((d) => d.id === id)) return snapshot(s);
+      }
+      return null;
+    }
+    return freeze({
+      review,
+      tasks,
+      create,
+      snapshot,
+      restore,
+      transition,
+      shape,
+      expected,
+      inspected,
+      assessment,
+      taskCount,
+      hasWork,
+    });
+  },
+);
 </script><script>(function(root,factory){const api=factory();if(typeof module==='object'&&module.exports)module.exports=api;else root.CNCMillingCourse=api;})(typeof globalThis!=='undefined'?globalThis:this,function(){
 'use strict';const copy=x=>JSON.parse(JSON.stringify(x)),freeze=x=>{if(x&&typeof x==='object'){Object.values(x).forEach(freeze);Object.freeze(x);}return x;},EPS=1e-8;
 const config=freeze({holder:{radius:12,z0:8,z1:28},body:{id:'column',title:'Колонна корпуса',x0:54,x1:62,y0:-18,y1:-8,z0:-10,z1:35},radius:3,cell:2,nx:30,ny:20,maxDepth:1,stock:{x:60,y:40,thickness:10},clamp:{x0:25,x1:35,y0:24,y1:32,z0:-10,z1:8},limits:{x:[-20,80],y:[-20,60],z:[-12,40]}});
@@ -12871,6 +13840,7 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
   'use strict';
 
   const GROUPS = {
+    turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
     size: { id: 'size', name: 'Размер и координаты' },
     cut: { id: 'cut', name: 'Первый проход' },
@@ -12917,6 +13887,8 @@ return freeze({review,tasks,causes,create,validDraft,snapshot,restore,transition
   STEPS.push({"id":"operation-groove-first","target":"operationCourse","title":"Кольцевая канавка","group":"operations","kind":"coursePractice","subtask":"groove-first"});
   STEPS.push({"id":"operation-taper","target":"operationCourse","title":"Конус вместо цилиндра","group":"operations","kind":"coursePractice","subtask":"taper"});
   STEPS.push({"id":"operation-grooves-project","target":"operationCourse","title":"Две канавки · самостоятельный маршрут","group":"operations","kind":"coursePractice","subtask":"grooves-project"});
+  const turningTasks = typeof module === 'object' && module.exports ? require('./turning-tasks-model.js') : root.CNCTurningTasks;
+  for (const task of turningTasks.tasks) STEPS.push({id:'operation-'+task.id,target:'operationCourse',title:task.title,group:'turningDeep',kind:'coursePractice',subtask:task.id});
   STEPS.push({"id":"project-RF5-SHAFT-01","target":"shaftProject","title":"Ступенчатый валик · базовый","group":"projects","kind":"coursePractice","subtask":"RF5-SHAFT-01"});
   STEPS.push({"id":"project-RF5-SHAFT-02","target":"shaftProject","title":"Короткий валик","group":"projects","kind":"coursePractice","subtask":"RF5-SHAFT-02"});
   STEPS.push({"id":"project-RF5-SHAFT-03","target":"shaftProject","title":"Валик с длинной шейкой","group":"projects","kind":"coursePractice","subtask":"RF5-SHAFT-03"});
@@ -15169,7 +16141,7 @@ return {
   }
   function active(id,s){
     if(id==='sandbox')return sandbox.isActive(s);
-    if(id==='course')return !!Object.keys(s.answers).length;if(id==='coursePath')return !!s.diagnosticCourse?.events.length||!!s.diagnosticCourse?.draft?.program||!!s.diagnosticCourse?.draft?.route||!!s.millingCourse?.events.length||!!s.operationCourse?.events.length||!!s.operationCourse?.draft||!!s.shaftProject?.events.length||!!s.programSetup?.events.length||!!s.firstProcess?.events.length||!!s.drawingSession?.events.length||!!s.firstSession?.events.length||s.selected!=='machine'||s.explored.length>0||Object.keys(s.phases).length>0||Object.values(s.practice||{}).some(v=>v.events.length||v.selection!==null);
+    if(id==='course')return !!Object.keys(s.answers).length;if(id==='coursePath')return !!s.diagnosticCourse?.events.length||!!s.diagnosticCourse?.draft?.program||!!s.diagnosticCourse?.draft?.route||!!s.millingCourse?.events.length||course.operationCourse.hasWork(s.operationCourse)||!!s.shaftProject?.events.length||!!s.programSetup?.events.length||!!s.firstProcess?.events.length||!!s.drawingSession?.events.length||!!s.firstSession?.events.length||s.selected!=='machine'||s.explored.length>0||Object.keys(s.phases).length>0||Object.values(s.practice||{}).some(v=>v.events.length||v.selection!==null);
     if(id==='base')return Object.keys(s.completed).length>0||s.history.length>0||!!s.exam||s.trainingTask!=='diameter'||s.assisted||s.hintLevel>0||canonical(s.draft)!==canonical(defaults)||Object.values(s.basicSessions).some(v=>v.finished||v.assisted||v.hintLevel||canonical(v.settings)!==canonical(defaults));
     if(id==='training')return Object.keys(s.drafts).length>0||Object.values(s.sessions).some(v=>v.actions.length)||Object.values(s.archive).some(a=>a.length);
     if(id==='gcode')return Object.keys(s.drafts).length>0||Object.values(s.predictionDrafts).some(v=>Object.values(v).some(x=>x!==''))||Object.values(s.sessions).some(v=>v.events.length)||Object.keys(s.legacy.passed).length>0||Object.keys(s.legacy.drafts).length>0||Object.values(s.legacy.helped).some(Boolean);
@@ -15201,7 +16173,7 @@ return {
     local=validate(local);incoming=validate(incoming);const result=empty();
     for(const id of ids){const a=local.sections[id],b=incoming.sections[id],keepLocal=active(id,a.current);let current=clone(keepLocal?a.current:b.current);
       if(id==='course')current=course.restore({version:1,answers:{...b.current.answers,...a.current.answers}});
-      if(id==='coursePath'){const diagOwner=a.current.diagnosticCourse?.events.length||a.current.diagnosticCourse?.draft?.program||a.current.diagnosticCourse?.draft?.route?a.current:b.current.diagnosticCourse?b.current:null;if(diagOwner)current.diagnosticCourse=diagOwner.diagnosticCourse;const millOwner=a.current.millingCourse?.events.length?a.current:b.current.millingCourse?b.current:null;if(millOwner)current.millingCourse=millOwner.millingCourse;const opOwner=a.current.operationCourse?.events.length||a.current.operationCourse?.draft?a.current:b.current.operationCourse?b.current:null;if(opOwner)current.operationCourse=opOwner.operationCourse;const spOwner=a.current.shaftProject?.events.length?a.current:b.current.shaftProject?b.current:null;if(spOwner){current.shaftProject=spOwner.shaftProject;delete current.shaftProjectDraft;if(spOwner.shaftProjectDraft)current.shaftProjectDraft=spOwner.shaftProjectDraft;}const ownerPS=a.current.programSetup?.events.length?a.current:b.current.programSetup?b.current:null;if(ownerPS){current.programSetup=ownerPS.programSetup;delete current.programSetupDraft;if(ownerPS.programSetupDraft)current.programSetupDraft=ownerPS.programSetupDraft;}const po=a.current.firstProcess?.events.length?a.current:b.current.firstProcess?b.current:null;if(po){current.firstProcess=po.firstProcess;delete current.firstProcessDraft;if(po.firstProcessDraft)current.firstProcessDraft=po.firstProcessDraft;}const owner=a.current.drawingSession?.events.length?a.current:b.current.drawingSession?b.current:null;if(owner){current.drawingSession=owner.drawingSession;delete current.drawingSessionDraft;if(owner.drawingSessionDraft)current.drawingSessionDraft=owner.drawingSessionDraft;}const ownIntro=a.current.firstSession,otherIntro=b.current.firstSession;const introOwner=ownIntro?.events.length?a.current:otherIntro?b.current:null;if(introOwner){current.firstSession=introOwner.firstSession;delete current.firstSessionDraft;if(introOwner.firstSessionDraft)current.firstSessionDraft=introOwner.firstSessionDraft;}const practice={};for(const key of course.practice.ids){const own=a.current.practice?.[key],other=b.current.practice?.[key];const chosen=own&&(own.events.length||own.selection!==null)?own:other||own;if(chosen)practice[key]=chosen;}current=course.restorePath({...current,practice,phases:{...b.current.phases,...a.current.phases},explored:[...new Set([...a.current.explored,...b.current.explored])]});}
+      if(id==='coursePath'){const diagOwner=a.current.diagnosticCourse?.events.length||a.current.diagnosticCourse?.draft?.program||a.current.diagnosticCourse?.draft?.route?a.current:b.current.diagnosticCourse?b.current:null;if(diagOwner)current.diagnosticCourse=diagOwner.diagnosticCourse;const millOwner=a.current.millingCourse?.events.length?a.current:b.current.millingCourse?b.current:null;if(millOwner)current.millingCourse=millOwner.millingCourse;const opOwner=course.operationCourse.hasWork(a.current.operationCourse)?a.current:b.current.operationCourse?b.current:null;if(opOwner)current.operationCourse=opOwner.operationCourse;const spOwner=a.current.shaftProject?.events.length?a.current:b.current.shaftProject?b.current:null;if(spOwner){current.shaftProject=spOwner.shaftProject;delete current.shaftProjectDraft;if(spOwner.shaftProjectDraft)current.shaftProjectDraft=spOwner.shaftProjectDraft;}const ownerPS=a.current.programSetup?.events.length?a.current:b.current.programSetup?b.current:null;if(ownerPS){current.programSetup=ownerPS.programSetup;delete current.programSetupDraft;if(ownerPS.programSetupDraft)current.programSetupDraft=ownerPS.programSetupDraft;}const po=a.current.firstProcess?.events.length?a.current:b.current.firstProcess?b.current:null;if(po){current.firstProcess=po.firstProcess;delete current.firstProcessDraft;if(po.firstProcessDraft)current.firstProcessDraft=po.firstProcessDraft;}const owner=a.current.drawingSession?.events.length?a.current:b.current.drawingSession?b.current:null;if(owner){current.drawingSession=owner.drawingSession;delete current.drawingSessionDraft;if(owner.drawingSessionDraft)current.drawingSessionDraft=owner.drawingSessionDraft;}const ownIntro=a.current.firstSession,otherIntro=b.current.firstSession;const introOwner=ownIntro?.events.length?a.current:otherIntro?b.current:null;if(introOwner){current.firstSession=introOwner.firstSession;delete current.firstSessionDraft;if(introOwner.firstSessionDraft)current.firstSessionDraft=introOwner.firstSessionDraft;}const practice={};for(const key of course.practice.ids){const own=a.current.practice?.[key],other=b.current.practice?.[key];const chosen=own&&(own.events.length||own.selection!==null)?own:other||own;if(chosen)practice[key]=chosen;}current=course.restorePath({...current,practice,phases:{...b.current.phases,...a.current.phases},explored:[...new Set([...a.current.explored,...b.current.explored])]});}
       if(id==='library')for(const k of ['read','bookmarks'])current[k]=[...new Set([...a.current[k],...b.current[k]])];
       if(id==='lab')current={...b.current,...a.current};
       if(id==='machinePath')current.stages={...b.current.stages,...a.current.stages};
@@ -15271,8 +16243,10 @@ return {
     const stationRows=taskIds.map(id=>{let currentControlled=false,independent=false,legacy=false,historical=false;for(const s of states(a,'base')){const rec=s.completed[id];if(rec){historical||=rec.controlVersion===1;legacy||=rec.controlVersion!==1;independent||=rec.controlVersion===1&&!rec.assisted;}if(basic.tasks.some(t=>t.id===id)){const saved=session.restore(s.basicSessions[id],basic.tasks.find(t=>t.id===id));currentControlled||=!!saved?.inspection?.passed;}}
       const t=lab.tasks.find(t=>t.id===id);if(t)for(const s of states(a,'lab')){const v=s[id];if(!v||!lab.validate(t,v.plan))continue;let total;try{total=process.timeline(t,v.plan).length;}catch{continue;}currentControlled||=v.simulation.reached===total&&total>0&&lab.evaluate(t,v.plan).success&&process.control(t,v.plan,v.simulation.logs).passed;}
       return {id,title:[...basic.tasks,...lab.tasks].find(t=>t.id===id).title,passed:historical||currentControlled,independent,historical,legacy};});
+    const operationProofs=new Map();for(const raw of states(a,'coursePath'))for(const row of course.operationCourse.restore(raw.operationCourse)?.done||[]){const prior=operationProofs.get(row.id);if(!prior||row.independent===true||prior.legacy&&!row.legacy)operationProofs.set(row.id,row);}
     const rows=progress.items.map(s=>{let detail='Нужно пройти',assisted=null;
       if(s.done){if(s.kind==='coursePractice')detail='Подтверждено журналом практики';else if(s.kind==='lesson')detail='Ответ подтверждён';else if(s.id==='self-cycle'||s.id==='self-code'){detail='Другое условие без помощи';assisted=false;}else if(s.id==='full-cycle'){const row=trainingRows.find(t=>t.id==='cycle-0');assisted=!row.independent;detail=assisted?'Выполнено с разбором':'Есть самостоятельная попытка';}else if(s.kind==='gcode'){const row=gcodeRows.find(t=>t.id===s.target);assisted=!row.independent;detail=row.legacy?'Сохранён прежний зачёт':assisted?'Выполнено с разбором или исправлениями':'Прогноз и программа без помощи';}else{const rec=ev.records?.diameter;assisted=rec?rec.assisted:true;detail=rec?'Сохранён зачёт контроля':'Состояние детали проверено моделью';}}
+      if(s.done&&s.target==='operationCourse'){const proof=operationProofs.get(s.subtask);if(proof){assisted=proof.legacy?null:!proof.independent;detail=proof.legacy?'Прежний зачёт · самостоятельность не оценена':proof.independent?'Изготовлено и измерено без разбора':'Изготовлено и измерено с разбором';}}
       return {...s,detail,assisted};});
     const start=course.startSession.restore(a.sections.coursePath.current.firstSession),historicalCompleted=states(a,'coursePath').some(v=>course.startSession.restore(v.firstSession)?.complete);
     const checks=[2,4,6,8],attempts=start?checks.reduce((n,i)=>n+start.attempts[i],0):0,successes=start?checks.filter(i=>start.step>i||start.step===i&&start.correct).length:0;
@@ -15281,7 +16255,7 @@ return {
     const fp=course.firstProcess.restore(a.sections.coursePath.current.firstProcess),firstProcess={status:!fp?.events.length?'not-started':fp.complete?'complete':'in-progress',step:fp?.step??0,total:8,completed:!!fp?.complete,assisted:!!fp?.assisted,errors:fp?.errors.reduce((a,b)=>a+b,0)||0};
     const ps=course.programSetup.restore(a.sections.coursePath.current.programSetup),programSetup={status:!ps?.events.length?'not-started':ps.complete?'complete':'in-progress',step:ps?.step??0,total:7,completed:!!ps?.complete,assisted:!!ps?.assisted,errors:ps?.errors.reduce((a,b)=>a+b,0)||0};
     const sp=course.shaftProject.restore(a.sections.coursePath.current.shaftProject),shaftProject={evidence:sp?course.shaftProject.evidence(sp):null,taskId:sp?.taskId||'RF5-SHAFT-01',accepted:[...(sp?.completedProjects||[]),...(sp?.complete?[course.shaftProject.snapshot({...sp,completedProjects:[]})]:[])].map(raw=>({taskId:raw.taskId||'RF5-SHAFT-01',report:course.shaftProject.report(course.shaftProject.restore(raw))})),status:!sp?.events.length?'not-started':sp.complete?'complete':'in-progress',step:sp?.step??0,total:7,completed:!!sp?.complete,assisted:!!sp?.assisted,errors:sp?.errors.reduce((a,b)=>a+b,0)||0,recorded:Object.keys(sp?.records||{}).length,measurements:6,attempt:sp?.attempt||1,report:sp?.complete?course.shaftProject.report(sp):null};
-    return {routeVersion:2,progress,diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
+    return {routeVersion:3,progress,diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
   }
   function report(a){const s=summary(a),lines=['ЧПУ Практика — общая сводка',`Обязательный путь: ${s.progress.done} / ${s.progress.total}`,`Создано: ${a.createdAt}`,'Исторические результаты отделены от текущих черновиков. Это учебная самопроверка, не допуск к реальному станку.',`Первое знакомство: ${s.introduction.status==='complete'?'завершено':s.introduction.status==='in-progress'?'действие '+(s.introduction.step+1)+' / '+s.introduction.total:'не начато'}; подсказки ${s.introduction.assisted?'открывались':'не открывались'}; неверных проверочных действий ${s.introduction.errors}`,'Вводное занятие учитывается отдельно от прежних зачётов курса.',`Проект валика: ${s.shaftProject.status}; протокол ${s.shaftProject.recorded}/6; помощь ${s.shaftProject.assisted?'да':'нет'}; ошибок ${s.shaftProject.errors}`,`Программа и наладка: ${s.programSetup.status}; помощь ${s.programSetup.assisted?'да':'нет'}; ошибок ${s.programSetup.errors}`,`Первый процесс: ${s.firstProcess.status}; помощь ${s.firstProcess.assisted?'да':'нет'}; ошибок ${s.firstProcess.errors}`,`Деталь и измерение: ${s.drawing.status}; действие ${s.drawing.step+1} / ${s.drawing.total}; помощь ${s.drawing.assisted?'да':'нет'}; ошибок ${s.drawing.errors}`,''];for(const row of s.rows)lines.push(`${row.done?'✓':'○'} ${row.title}: ${row.detail}`);lines.push('','Дополнительные разделы',`На станке: ${s.station.filter(r=>r.passed).length} / ${s.station.length}`,`Практикум: ${s.training.filter(r=>r.passed).length} / ${s.training.length}`,`G-код: ${s.gcode.filter(r=>r.passed).length} / ${s.gcode.length}`,`Навыки, подтверждённые хотя бы в одной истории: ${s.skills.filter(r=>r.status==='mastered').length} / ${s.skills.length}`,`Прочитано: ${s.library.read} / ${s.library.total}`,`Экзаменов в истории: ${s.exams.length}`,'');for(const row of [...s.training,...s.gcode])lines.push(`${row.title}: ${row.independent?'самостоятельный результат':row.passed?'с разбором / прежний зачёт':'не подтверждено'}; помощь ${row.helped||row.hints?'есть':'не отмечена'}; ошибок в одной истории до ${row.errors}`);return lines.join('\n');}
   const api={FORMAT,VERSION,MAX_BYTES,MAX_HISTORY,ids,labels,empty,normalize,active,canonical,validate,parse,stringify,fromRaw,toRaw,merge,summary,evidence,courseEvidence,combineEvidence,report,planDraft};root.CNCProgress=api;if(node)module.exports=api;
@@ -16117,18 +17091,601 @@ return {
   return mount(options);}
   root.CNCShaftProjectUI=Object.freeze({create});
 })(window);
-</script><script>(function(root){'use strict';const m=root.CNCOperationCourse,e=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({headingTag='h3',saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),view='target',notice='';const host=e('section',undefined,'start-session shaft-project-session');
-function persist(){if(onChange(m.snapshot(s))===false)notice='Сохранение недоступно. Не закрывайте страницу.';}
-function run(a){try{s=m.transition(s,a);notice='';persist();}catch(err){notice=err.message;}render();}
-function b(label,action){const n=e('button',label,'button secondary');n.type='button';n.onclick=()=>run(typeof action==='function'?action():action);return n;}
-function input(parent,label,value,submit,button){const form=e('form',undefined,'start-answer'),wrap=e('label',label,'field'),i=e('input');i.type='text';i.inputMode='decimal';i.maxLength=32;i.value=value;i.setAttribute('aria-label',label);wrap.append(i);const n=e('button',button,'button secondary');n.type='submit';form.append(wrap,n);form.onsubmit=ev=>{ev.preventDefault();run(submit(i.value));};parent.append(form);}
-function draw(profile){let u=0,upper='',lower=[];const x=u=>50+u*8,y=d=>130-d*2.5;for(const p of profile.segments){const a=x(u),bb=x(u+p.length);upper+='L'+a+' '+y(p.diameter)+'L'+bb+' '+y(p.endDiameter??p.diameter);lower.unshift('L'+bb+' '+(260-y(p.endDiameter??p.diameter))+'L'+a+' '+(260-y(p.diameter)));u+=p.length;}return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 290" role="img" aria-label="'+(view==='target'?'Требуемый профиль':'Фактический профиль')+'"><g fill="#24465f" font-family="Arial,sans-serif"><path d="M50 130'+upper+lower.join('')+'Z" fill="#cadce8" stroke="#45677e" stroke-width="2"/><path d="M30 130H570" stroke="#8199ab" stroke-dasharray="6 5"/><text x="50" y="245">Z−60</text><text x="500" y="245">Z0 · прежний торец</text><text x="35" y="25">'+(view==='target'?'Целевой профиль':'Снятый металл сохраняется')+'</text><text x="35" y="278">Размеры — в условии; вид сбоку, не 3D-модель</text></g></svg>';}
-function render(){const t=m.tasks[s.current],st=s.machine,accepted=s.done.some(d=>d.id===t.id);host.replaceChildren(e('p','ПРАКТИКУМ ОПЕРАЦИЙ · ТОКАРНЫЙ СТАНОК','eyebrow'),e(headingTag,t.title),e('p','Задание '+(s.current+1)+' из '+m.tasks.length+' · уровень '+t.level+' · принято '+s.done.length,'start-value'));const list=e('ol');m.tasks.forEach((task,i)=>list.append(e('li',(i<s.current?'✓ ':i===s.current?'Сейчас: ':'Далее: ')+task.title)));host.append(list,e('p',t.goal),e('p',t.learn),e('p','Заготовка Ø32, вылет 60 мм; зажатые 15 мм отдельно. G54: известный машинный Z торца 100. Требуется T0'+t.tool+'0'+t.tool+'. S800, F0.1 / F0.08 — условия упражнения, не рекомендации для материала.','start-note'));
-const views=e('div',undefined,'start-controls');for(const [key,label]of [['target','Чертёж задания'],['actual','Моя деталь']]){const n=e('button',label,'button secondary');n.type='button';n.setAttribute('aria-pressed',String(view===key));n.onclick=()=>{view=key;render();};views.append(n);}host.append(views);const figure=e('figure',undefined,'shaft-drawing start-board');figure.innerHTML=draw(view==='target'?m.expected(t):st.profile);host.append(figure);
-if(!accepted){if(!s.executed){host.append(e(headingTag==='h1'?'h2':'h4','1. Подготовьте установку'));const setup=e('div',undefined,'start-controls');setup.append(b('Референс',{type:'machine',action:{type:'reference'}}),b('Закрепить',{type:'machine',action:{type:'clamp',value:true}}));for(const tool of [1,3,4])setup.append(b('Выбрать T0'+tool+'0'+tool,{type:'machine',action:{type:'tool',tool}}));setup.append(b('Измерить инструмент щупом',{type:'machine',action:{type:'preset'}}),b('Закрыть ограждение',{type:'machine',action:{type:'door',value:true}}));host.append(setup);input(host,'G54 · машинный Z торца, мм',String(st.workOffset.z),v=>({type:'machine',action:{type:'workOffset',z:Number(v.replace(',','.'))}}),'Подтвердить G54');host.append(e('p','Референс '+(st.referenced?'✓':'—')+' · заготовка '+(st.clamped?'✓':'—')+' · T'+st.tool+' · инструмент '+(st.offsets[String(st.tool)]?.calibrated?'измерен':'не измерен')+' · G54 '+st.workOffset.z+' · ограждение '+(st.doorClosed?'закрыто':'открыто'),'start-value'));host.append(e(headingTag==='h1'?'h2':'h4','2. Составьте программу'));const label=e('label','Программа задания','field'),code=e('textarea');code.rows=12;code.maxLength=4000;code.spellcheck=false;code.value=s.draft;code.setAttribute('aria-label','Программа задания');code.oninput=()=>{s.draft=code.value;persist();const start=host.querySelector('[data-op-start]');if(start)start.disabled=!s.approval||code.value!==s.source;};label.append(code);host.append(label,b('Проверить на копии',()=>({type:'preview',source:s.draft})));const start=b('Запустить проверенную программу',()=>({type:'start',source:s.draft}));start.dataset.opStart='';start.disabled=!s.approval||s.draft!==s.source;host.append(start);}else{host.append(e(headingTag==='h1'?'h2':'h4','3. Выполните и проконтролируйте'));host.append(e('p','Программа: '+st.program.status+' · проходов '+st.cuts.length+' · шпиндель '+(st.spindle?'включён':'выключен')));if(st.program.status==='running')host.append(b('Выполнить до остановки',{type:'run'}));host.append(b('RESET · прервать цикл',{type:'machine',action:{type:'reset'}}));if(st.program.status==='done'){if(st.doorClosed)host.append(b('Открыть ограждение',{type:'machine',action:{type:'door',value:false}}));host.append(e('p','Карта контроля: '+t.points.map(([z,d])=>'Z'+z+': Ø'+d).join('; ')));input(host,'Сечение Z для микрометра, мм','',v=>({type:'machine',action:{type:'measure',z:Number(v.replace(',','.')),instrument:'micrometer'}}),'Измерить');const readings=e('ul');for(const r of st.readings)readings.append(e('li','Z'+r.z+' · Ø'+r.reading+' · '+(r.afterCut===st.cuts.length?'свежий замер':'устарел')));host.append(readings);if(t.depth){host.append(b('Получить осевой отсчёт торца',{type:'depth'}));if(s.depthReading!==null)host.append(e('output','Отсчёт от прежнего торца: '+s.depthReading+' мм'));input(host,'Запишите осевой съём, мм','',v=>({type:'recordDepth',value:v}),'Записать отсчёт');}host.append(b('Принять операцию по контролю',{type:'confirm'}));}if(!st.spindle&&!['running','hold'].includes(st.program.status))host.append(b('Новая заготовка · ошибки сохраняются',{type:'restart'}));}
-const hint=b(s.help.includes(t.id)?'Разбор открыт':'Нужен разбор',{type:'hint'});hint.disabled=s.help.includes(t.id);host.append(hint);if(s.help.includes(t.id))host.append(e('p',t.hint,'start-hint'));}else{host.append(e('p','Изготовление и контроль приняты. Разбор '+(s.help.includes(t.id)?'открывался':'не открывался')+'; ошибок '+s.errors[s.current]+'.','start-value'));if(!readOnly&&!routeMode&&s.current<m.tasks.length-1)host.append(b('Следующая операция',{type:'next'}));else if(s.current===m.tasks.length-1)host.append(e('p','Все пять операций пройдены. Следующий блок — самостоятельный перенос на другие условия.'));}
-const feedback=e('p',notice||s.feedback,'start-feedback');feedback.setAttribute('role','status');host.append(feedback);const limits=e('details',undefined,'course-reading');limits.append(e('summary','Ограничения проверки'),e('p','Общий токарный движок: T0303 торцевание, T0404 канавка 2 мм, T0101 линейный конус. Щуп автоматический. Контроль конуса идеальный; угловая погрешность, шероховатость, усилия и выбег не моделируются. Осевой отсчёт вычислен по геометрии. Это учебная геометрическая проверка, не подтверждение ГОСТ или допуска к оборудованию.'));host.append(limits);const back=e('button','Вернуться к курсу','course-back');back.onclick=onDone;host.append(back);}
-render();return host;}root.CNCOperationCourseUI=Object.freeze({create});})(window);
+</script><script>(function (root) {
+  "use strict";
+  const m = root.CNCOperationCourse,
+    e = (tag, text, cls) => {
+      const n = document.createElement(tag);
+      if (text !== undefined) n.textContent = text;
+      if (cls) n.className = cls;
+      return n;
+    };
+  function create({
+    headingTag = "h3",
+    saved,
+    readOnly = false,
+    routeMode = false,
+    onChange = () => true,
+    onDone = () => {},
+  } = {}) {
+    let s = m.restore(saved) || m.create(),
+      view = "target",
+      notice = "";
+    const host = e("section", undefined, "start-session shaft-project-session");
+    if (saved && !m.restore(saved)) {
+      host.append(
+        e(headingTag, "Сохранённое условие недоступно"),
+        e(
+          "p",
+          "Версия задания не поддерживается или журнал повреждён. Сохранённая работа не заменена новой. Экспортируйте её через раздел прогресса.",
+        ),
+      );
+      const back = e("button", "Вернуться к курсу", "course-back");
+      back.onclick = onDone;
+      host.append(back);
+      return host;
+    }
+    function persist() {
+      if (onChange(m.snapshot(s)) === false)
+        notice = "Сохранение недоступно. Не закрывайте страницу.";
+    }
+    function run(a) {
+      try {
+        s = m.transition(s, a);
+        notice = "";
+        persist();
+      } catch (err) {
+        notice = err.message;
+      }
+      render();
+    }
+    function b(label, action) {
+      const n = e("button", label, "button secondary");
+      n.type = "button";
+      n.onclick = () => run(typeof action === "function" ? action() : action);
+      return n;
+    }
+    function input(parent, label, value, submit, button) {
+      const form = e("form", undefined, "start-answer"),
+        wrap = e("label", label, "field"),
+        i = e("input");
+      i.type = "text";
+      i.inputMode = "decimal";
+      i.maxLength = 32;
+      i.value = value;
+      i.setAttribute("aria-label", label);
+      wrap.append(i);
+      const n = e("button", button, "button secondary");
+      n.type = "submit";
+      form.append(wrap, n);
+      form.onsubmit = (ev) => {
+        ev.preventDefault();
+        run(submit(i.value));
+      };
+      parent.append(form);
+    }
+    function draw(profile, task) {
+      let u = 0,
+        upper = "",
+        lower = [];
+      const x = (u) => 50 + u * 8,
+        y = (d) => 130 - d * 2.5;
+      for (const p of profile.segments) {
+        const a = x(u),
+          bb = x(u + p.length);
+        upper +=
+          "L" +
+          a +
+          " " +
+          y(p.diameter) +
+          "L" +
+          bb +
+          " " +
+          y(p.endDiameter ?? p.diameter);
+        lower.unshift(
+          "L" +
+            bb +
+            " " +
+            (260 - y(p.endDiameter ?? p.diameter)) +
+            "L" +
+            a +
+            " " +
+            (260 - y(p.diameter)),
+        );
+        u += p.length;
+      }
+      const marks = (task.surfaces || [])
+        .map(
+          (surface) =>
+            '<text x="' +
+            x(60 + (surface.z0 + surface.z1) / 2) +
+            '" y="218" text-anchor="middle">' +
+            surface.id +
+            '</text><path d="M' +
+            x(60 + surface.z1) +
+            ' 35V202" stroke="#8199ab" stroke-dasharray="3 4"/>',
+        )
+        .join("");
+      return (
+        '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 290" role="img" aria-label="' +
+        (view === "target" ? "Требуемый профиль" : "Фактический профиль") +
+        '"><g fill="#24465f" font-family="Arial,sans-serif"><path d="M50 130' +
+        upper +
+        lower.join("") +
+        'Z" fill="#cadce8" stroke="#45677e" stroke-width="2"/><path d="M30 130H570" stroke="#8199ab" stroke-dasharray="6 5"/><text x="50" y="245">Z−60</text><text x="550" y="245" text-anchor="end">Z0 · прежний торец</text><text x="35" y="25">' +
+        (view === "target" ? "Целевой профиль" : "Снятый металл сохраняется") +
+        "</text>" +
+        marks +
+        '<text x="35" y="278">Размеры — в условии; вид сбоку, не 3D-модель</text></g></svg>'
+      );
+    }
+    function render() {
+      const t = m.tasks[s.current],
+        st = s.machine,
+        accepted = s.done.some((d) => d.id === t.id);
+      host.replaceChildren(
+        e("p", "ПРАКТИКУМ ОПЕРАЦИЙ · ТОКАРНЫЙ СТАНОК", "eyebrow"),
+        e(headingTag, t.title),
+        e(
+          "p",
+          "Задание " +
+            (s.current + 1) +
+            " из " +
+            m.taskCount(s) +
+            " · уровень " +
+            t.level +
+            " · принято " +
+            s.done.length,
+          "start-value",
+        ),
+      );
+      const list = e("ol");
+      m.tasks
+        .slice(0, m.taskCount(s))
+        .forEach((task, i) =>
+          list.append(
+            e(
+              "li",
+              (i < s.current
+                ? "✓ "
+                : i === s.current
+                  ? "Сейчас: "
+                  : "Далее: ") + task.title,
+            ),
+          ),
+        );
+      const route = e("details", undefined, "course-reading");
+      route.append(e("summary", "Темы практикума"), list);
+      host.append(
+        route,
+        e("p", t.goal),
+        e("p", t.learn),
+        e(
+          "p",
+          "Заготовка Ø32, вылет 60 мм; зажатые 15 мм отдельно. G54: известный машинный Z торца 100. Требуется T0" +
+            t.tool +
+            "0" +
+            t.tool +
+            ". S800, F0.1 / F0.08 — условия упражнения, не рекомендации для материала.",
+          "start-note",
+        ),
+      );
+      const views = e("div", undefined, "start-controls");
+      for (const [key, label] of [
+        ["target", "Чертёж задания"],
+        ["actual", "Моя деталь"],
+      ]) {
+        const n = e("button", label, "button secondary");
+        n.type = "button";
+        n.setAttribute("aria-pressed", String(view === key));
+        n.onclick = () => {
+          view = key;
+          render();
+        };
+        views.append(n);
+      }
+      host.append(views);
+      const figure = e("figure", undefined, "shaft-drawing start-board");
+      figure.innerHTML = draw(
+        view === "target" ? m.expected(t) : st.profile,
+        t,
+      );
+      host.append(figure);
+      if (t.surfaces) {
+        const surfaceList = e("ul");
+        for (const surface of t.surfaces)
+          surfaceList.append(
+            e(
+              "li",
+              surface.id +
+                " · " +
+                surface.title +
+                ": Z" +
+                surface.z0 +
+                "…" +
+                surface.z1 +
+                ", Ø" +
+                surface.diameter +
+                (surface.endDiameter !== surface.diameter
+                  ? " → Ø" + surface.endDiameter
+                  : ""),
+            ),
+          );
+        host.append(surfaceList);
+      }
+      if (!accepted) {
+        if (!s.executed) {
+          if (t.forecast) {
+            const plan = e("section");
+            plan.append(
+              e(
+                headingTag === "h1" ? "h2" : "h4",
+                "1. Разберите чертёж и спрогнозируйте",
+              ),
+              e(
+                "p",
+                "Выберите ниже поверхности, обозначенные на схеме, которые должны сохранить исходный диаметр Ø32.",
+              ),
+            );
+            const surfaces = e("div", undefined, "start-controls");
+            surfaces.setAttribute("role", "group");
+            surfaces.setAttribute("aria-label", "Сохраняемые поверхности");
+            for (const surface of t.surfaces) {
+              const choice = b(surface.id + " · " + surface.title, {
+                type: "surface",
+                id: surface.id,
+              });
+              choice.setAttribute(
+                "aria-pressed",
+                String(s.selectedSurfaces.includes(surface.id)),
+              );
+              surfaces.append(choice);
+            }
+            plan.append(surfaces);
+            input(
+              plan,
+              t.forecast.prompt,
+              s.predictionInput,
+              (value) => ({ type: "predict", value }),
+              "Проверить план",
+            );
+            if (s.prediction)
+              plan.append(
+                e(
+                  "p",
+                  "План согласован. Подтвердите его реальной обработкой модели.",
+                  "start-value",
+                ),
+              );
+            if (s.prediction) {
+              const completed = e("details", undefined, "course-reading");
+              completed.append(
+                e("summary", "План согласован · посмотреть или изменить"),
+                plan,
+              );
+              host.append(completed);
+            } else host.append(plan);
+          }
+          if (!t.forecast || s.prediction) {
+            const prepared =
+              st.referenced &&
+              st.clamped &&
+              st.tool === t.tool &&
+              st.offsets[String(st.tool)]?.calibrated &&
+              st.workOffset.confirmed &&
+              st.workOffset.z === 100 &&
+              st.doorClosed;
+            const setupPanel = e("section");
+            setupPanel.append(
+              e(
+                headingTag === "h1" ? "h2" : "h4",
+                (t.forecast ? "2" : "1") + ". Подготовьте установку",
+              ),
+            );
+            const setup = e("div", undefined, "start-controls");
+            setup.append(
+              b("Референс", { type: "machine", action: { type: "reference" } }),
+              b("Закрепить", {
+                type: "machine",
+                action: { type: "clamp", value: true },
+              }),
+            );
+            const toolLabel = e("label", "Инструмент", "field"),
+              toolSelect = e("select");
+            toolSelect.setAttribute("aria-label", "Инструмент практикума");
+            const placeholder = e("option", "Выберите инструмент");
+            placeholder.value = "0";
+            placeholder.disabled = true;
+            placeholder.selected = st.tool === 0;
+            toolSelect.append(placeholder);
+            for (const [tool, title] of [
+              [1, "T0101 · Продольный"],
+              [2, "T0202 · Чистовой"],
+              [3, "T0303 · Торцевой"],
+              [4, "T0404 · Канавочный 2 мм"],
+            ]) {
+              const option = e("option", title);
+              option.value = String(tool);
+              option.selected = st.tool === tool;
+              toolSelect.append(option);
+            }
+            toolSelect.onchange = () =>
+              run({
+                type: "machine",
+                action: { type: "tool", tool: Number(toolSelect.value) },
+              });
+            toolLabel.append(toolSelect);
+            setupPanel.append(toolLabel);
+            setup.append(
+              b("Измерить инструмент щупом", {
+                type: "machine",
+                action: { type: "preset" },
+              }),
+              b("Закрыть ограждение", {
+                type: "machine",
+                action: { type: "door", value: true },
+              }),
+            );
+            setupPanel.append(setup);
+            input(
+              setupPanel,
+              "G54 · машинный Z торца, мм",
+              String(st.workOffset.z),
+              (v) => ({
+                type: "machine",
+                action: { type: "workOffset", z: Number(v.replace(",", ".")) },
+              }),
+              "Подтвердить G54",
+            );
+            setupPanel.append(
+              e(
+                "p",
+                "Референс " +
+                  (st.referenced ? "✓" : "—") +
+                  " · заготовка " +
+                  (st.clamped ? "✓" : "—") +
+                  " · T" +
+                  st.tool +
+                  " · инструмент " +
+                  (st.offsets[String(st.tool)]?.calibrated
+                    ? "измерен"
+                    : "не измерен") +
+                  " · G54 " +
+                  st.workOffset.z +
+                  " · ограждение " +
+                  (st.doorClosed ? "закрыто" : "открыто"),
+                "start-value",
+              ),
+            );
+            if (t.forecast && prepared) {
+              const completed = e("details", undefined, "course-reading");
+              completed.append(
+                e(
+                  "summary",
+                  "Установка подготовлена · посмотреть или изменить",
+                ),
+                setupPanel,
+              );
+              host.append(completed);
+            } else host.append(setupPanel);
+            if (!t.forecast || prepared) {
+              host.append(
+                e(
+                  headingTag === "h1" ? "h2" : "h4",
+                  (t.forecast ? "3" : "2") + ". Составьте программу",
+                ),
+              );
+              const label = e("label", "Программа задания", "field"),
+                code = e("textarea");
+              code.rows = 12;
+              code.maxLength = 4000;
+              code.spellcheck = false;
+              code.value = s.draft;
+              code.setAttribute("aria-label", "Программа задания");
+              code.oninput = () => {
+                s.draft = code.value;
+                persist();
+                const start = host.querySelector("[data-op-start]");
+                if (start)
+                  start.disabled = !s.approval || code.value !== s.source;
+              };
+              label.append(code);
+              host.append(
+                label,
+                b("Проверить на копии", () => ({
+                  type: "preview",
+                  source: s.draft,
+                })),
+              );
+              const start = b("Запустить проверенную программу", () => ({
+                type: "start",
+                source: s.draft,
+              }));
+              start.dataset.opStart = "";
+              start.disabled = !s.approval || s.draft !== s.source;
+              host.append(start);
+            }
+          }
+        } else {
+          host.append(
+            e(
+              headingTag === "h1" ? "h2" : "h4",
+              (t.forecast ? "4" : "3") + ". Выполните и проконтролируйте",
+            ),
+          );
+          host.append(
+            e(
+              "p",
+              "Программа: " +
+                st.program.status +
+                " · проходов " +
+                st.cuts.length +
+                " · шпиндель " +
+                (st.spindle ? "включён" : "выключен"),
+            ),
+          );
+          if (st.program.status === "running")
+            host.append(b("Выполнить до остановки", { type: "run" }));
+          host.append(
+            b("RESET · прервать цикл", {
+              type: "machine",
+              action: { type: "reset" },
+            }),
+          );
+          if (st.program.status === "done") {
+            if (st.doorClosed)
+              host.append(
+                b("Открыть ограждение", {
+                  type: "machine",
+                  action: { type: "door", value: false },
+                }),
+              );
+            host.append(
+              e(
+                "p",
+                "Карта контроля: " +
+                  t.points.map(([z, d]) => "Z" + z + ": Ø" + d).join("; "),
+              ),
+            );
+            input(
+              host,
+              "Сечение Z для микрометра, мм",
+              "",
+              (v) => ({
+                type: "machine",
+                action: {
+                  type: "measure",
+                  z: Number(v.replace(",", ".")),
+                  instrument: "micrometer",
+                },
+              }),
+              "Измерить",
+            );
+            const readings = e("ul");
+            for (const r of st.readings)
+              readings.append(
+                e(
+                  "li",
+                  "Z" +
+                    r.z +
+                    " · Ø" +
+                    r.reading +
+                    " · " +
+                    (r.afterCut === st.cuts.length
+                      ? "свежий замер"
+                      : "устарел"),
+                ),
+              );
+            host.append(readings);
+            if (t.depth) {
+              host.append(b("Получить осевой отсчёт торца", { type: "depth" }));
+              if (s.depthReading !== null)
+                host.append(
+                  e(
+                    "output",
+                    "Отсчёт от прежнего торца: " + s.depthReading + " мм",
+                  ),
+                );
+              input(
+                host,
+                "Запишите осевой съём, мм",
+                "",
+                (v) => ({ type: "recordDepth", value: v }),
+                "Записать отсчёт",
+              );
+            }
+            host.append(b("Принять операцию по контролю", { type: "confirm" }));
+          }
+          if (!st.spindle && !["running", "hold"].includes(st.program.status))
+            host.append(
+              b("Новая заготовка · ошибки сохраняются", { type: "restart" }),
+            );
+        }
+        const hint = b(
+          s.help.includes(t.id) ? "Разбор открыт" : "Нужен разбор",
+          { type: "hint" },
+        );
+        hint.disabled = s.help.includes(t.id);
+        host.append(hint);
+        if (s.help.includes(t.id)) host.append(e("p", t.hint, "start-hint"));
+      } else {
+        host.append(
+          e(
+            "p",
+            "Изготовление и контроль приняты. Разбор " +
+              (s.help.includes(t.id) ? "открывался" : "не открывался") +
+              "; ошибок " +
+              s.errors[s.current] +
+              ".",
+            "start-value",
+          ),
+        );
+        const record = s.done.find((row) => row.id === t.id);
+        host.append(
+          e(
+            "p",
+            record.legacy
+              ? "Зачёт прежней версии. Самостоятельность по новым критериям не присваивается."
+              : record.independent
+                ? "По действующим критериям · без открытия разбора."
+                : "По действующим критериям · с разбором.",
+          ),
+        );
+        if (!readOnly && !routeMode && s.version === 1 && s.current === 4)
+          host.append(
+            b("Продолжить · шесть новых условий", {
+              type: "upgrade",
+              assignment: m.tasks[5].assignment,
+            }),
+          );
+        else if (!readOnly && !routeMode && s.current < m.taskCount(s) - 1)
+          host.append(
+            b("Следующая операция", {
+              type: "next",
+              ...(s.version === 2
+                ? { assignment: m.tasks[s.current + 1].assignment }
+                : {}),
+            }),
+          );
+        else if (s.current === m.taskCount(s) - 1)
+          host.append(
+            e(
+              "p",
+              "Условия этого выпуска пройдены. Результаты и использование разбора сохранены.",
+            ),
+          );
+      }
+      const assessment = m.assessment(s);
+      if (assessment) {
+        const criteria = e("details", undefined, "course-reading"),
+          checks = e("ul");
+        criteria.append(e("summary", "Что требуется для зачёта"));
+        for (const check of assessment.checks)
+          checks.append(e("li", (check.passed ? "✓ " : "○ ") + check.title));
+        criteria.append(checks);
+        host.append(criteria);
+      }
+      const feedback = e("p", notice || s.feedback, "start-feedback");
+      feedback.setAttribute("role", "status");
+      host.append(feedback);
+      const limits = e("details", undefined, "course-reading");
+      limits.append(
+        e("summary", "Ограничения проверки"),
+        e(
+          "p",
+          "Общий токарный движок: T0303 торцевание, T0404 канавка 2 мм, T0101 линейный конус. Щуп автоматический. Контроль конуса идеальный; угловая погрешность, шероховатость, усилия и выбег не моделируются. Осевой отсчёт вычислен по геометрии. Это учебная геометрическая проверка, не подтверждение ГОСТ или допуска к оборудованию.",
+        ),
+      );
+      host.append(limits);
+      const back = e("button", "Вернуться к курсу", "course-back");
+      back.onclick = onDone;
+      host.append(back);
+    }
+    render();
+    return host;
+  }
+  root.CNCOperationCourseUI = Object.freeze({ create });
+})(window);
 </script><script>(function(root){'use strict';const m=root.CNCMillingCourse,el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};function create({headingTag='h3',saved,readOnly=false,routeMode=false,onChange=()=>true,onDone=()=>{}}={}){let s=m.restore(saved)||m.create(),notice='';const host=el('section',undefined,'start-session shaft-project-session milling-course');
 function run(a){try{s=m.transition(s,a);notice='';if(onChange(m.snapshot(s))===false)notice='Не удалось сохранить. Не закрывайте страницу.';}catch(e){notice=e.message;}render();}
 function button(text,a){const b=el('button',text,'button secondary');b.type='button';b.setAttribute('aria-label',text);b.onclick=()=>run(typeof a==='function'?a():a);return b;}
@@ -16312,9 +17869,14 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
       ) {
         s = engine.transition(s, {
           type:
-            key === "millingCourse" && s.profile === 1 && s.current === 3
+            key === "operationCourse" && s.version === 1 && s.current === 4
               ? "upgrade"
-              : "next",
+              : key === "millingCourse" && s.profile === 1 && s.current === 3
+                ? "upgrade"
+                : "next",
+          ...(key === "operationCourse" && (s.version === 2 || s.current === 4)
+            ? { assignment: definitions[s.current + 1].assignment }
+            : {}),
         });
       }
       saved = engine.snapshot(s);
@@ -18813,8 +20375,8 @@ render();return host;}root.CNCDiagnosticCourseUI=Object.freeze({create});})(wind
     demand(object(raw)&&raw.format===FORMAT&&raw.version===1&&object(raw.review)&&Array.isArray(raw.participants)&&raw.participants.length<=16);
     const n=empty();for(const c of checks){const r=raw.review[c.id];demand(object(r)&&['pending','approved','changes'].includes(r.status)&&text(r.note));demand(r.status!=='changes'||r.note.trim(),'Для замечания нужна конкретная причина.');n.review[c.id]={status:r.status,note:r.note};}
     function shot(s){
-      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
-      const expected=progress.summary(progress.empty()).rows;demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
+      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
+      const current=progress.summary(progress.empty()).rows,expected=s.rows.length===22?current.filter(r=>r.kind!=='coursePractice'):s.rows.length===51?current.filter(r=>r.group!=='turningDeep'):current;demand(expected.length===s.rows.length);demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
       for(const [name,ids]of [['training',practical],['gcode',program]]){demand(Array.isArray(s[name])&&s[name].length===ids.length&&s[name].every((r,i)=>object(r)&&r.id===ids[i]&&typeof r.passed==='boolean'&&typeof r.independent==='boolean'&&(!r.independent||r.passed)));demand(Array.isArray(s.seen[name])&&s.seen[name].every(id=>ids.includes(id))&&new Set(s.seen[name]).size===s.seen[name].length);demand(s[name].every(r=>!r.passed||s.seen[name].includes(r.id)));}
       return {at:s.at,sourceAt:s.sourceAt,appVersion:s.appVersion,done:s.done,rows:s.rows.map(r=>({id:r.id,title:r.title,done:r.done,detail:r.detail})),training:s.training.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),gcode:s.gcode.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),seen:{training:[...s.seen.training],gcode:[...s.seen.gcode]}};
     }

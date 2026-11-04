@@ -1,0 +1,448 @@
+{
+  "version": 1,
+  "events": [
+    {
+      "type": "machine",
+      "action": {
+        "type": "reference"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "clamp",
+        "value": true
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "tool",
+        "tool": 3
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "preset"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "workOffset",
+        "z": 100
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": true
+      }
+    },
+    {
+      "type": "preview",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-1\nG1 X0 F0.1\nG0 Z2\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "start",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-1\nG1 X0 F0.1\nG0 Z2\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "run"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": false
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -10,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "recordDepth",
+      "value": "1"
+    },
+    {
+      "type": "depth"
+    },
+    {
+      "type": "recordDepth",
+      "value": "1"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "next"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "reference"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "clamp",
+        "value": true
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "tool",
+        "tool": 3
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "preset"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "workOffset",
+        "z": 100
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": true
+      }
+    },
+    {
+      "type": "preview",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-1\nG1 X0 F0.1\nG0 Z2\nX34\nZ-2\nG1 X0 F0.1\nG0 Z2\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "start",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-1\nG1 X0 F0.1\nG0 Z2\nX34\nZ-2\nG1 X0 F0.1\nG0 Z2\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "run"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": false
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -10,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "recordDepth",
+      "value": "2"
+    },
+    {
+      "type": "depth"
+    },
+    {
+      "type": "recordDepth",
+      "value": "2"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "next"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "reference"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "clamp",
+        "value": true
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "tool",
+        "tool": 4
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "preset"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "workOffset",
+        "z": 100
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": true
+      }
+    },
+    {
+      "type": "preview",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-10\nG1 X28 F0.08\nG0 X34\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "start",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-10\nG1 X28 F0.08\nG0 X34\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "run"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": false
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -11,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -5,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "next"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "reference"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "clamp",
+        "value": true
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "tool",
+        "tool": 1
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "preset"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "workOffset",
+        "z": 100
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": true
+      }
+    },
+    {
+      "type": "preview",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X32 Z2\nG1 Z0 F0.1\nX28 Z-20\nG0 X34\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "start",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X32 Z2\nG1 Z0 F0.1\nX28 Z-20\nG0 X34\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "run"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": false
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -5,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -15,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -30,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "next"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "reference"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "clamp",
+        "value": true
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "tool",
+        "tool": 4
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "preset"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "workOffset",
+        "z": 100
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": true
+      }
+    },
+    {
+      "type": "preview",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-10\nG1 X30 F0.08\nG0 X34\nZ-20\nG1 X28 F0.08\nG0 X34\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "start",
+      "source": "G21 G18 G40 G54 G99\nG50 S1200\nG97 S800 M3\nG0 X34 Z-10\nG1 X30 F0.08\nG0 X34\nZ-20\nG1 X28 F0.08\nG0 X34\nG0 X40 Z5\nM5\nM30"
+    },
+    {
+      "type": "run"
+    },
+    {
+      "type": "confirm"
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "door",
+        "value": false
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -11,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -21,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -5,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "machine",
+      "action": {
+        "type": "measure",
+        "z": -30,
+        "instrument": "micrometer"
+      }
+    },
+    {
+      "type": "confirm"
+    }
+  ],
+  "draft": ""
+}

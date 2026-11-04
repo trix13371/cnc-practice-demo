@@ -1,5 +1,56 @@
-const assert=require('node:assert/strict'),m=require('../operation-course-model.js'),p=require('../progress-model.js'),c=require('../course-model.js');const s=require('./operation-course-fixtures.cjs').complete();
-assert.equal(s.done.length,5);assert.deepEqual(m.restore(m.snapshot(s)),s);const forged=m.snapshot(s);forged.complete=true;assert.equal(m.restore(forged),null);assert.throws(()=>m.transition(m.create(),{type:'next'}));const a=p.empty();a.sections.coursePath.current=c.restorePath({version:1,selected:'verification',phases:{},explored:[],operationCourse:m.snapshot(s)});const restored=p.parse(p.stringify(a));assert.equal(p.summary(restored).operationCourse.done.length,5);assert.equal(p.summary(restored).progress.done,5);console.log('Operation course: five actual geometry cycles, tool distinctions, preview isolation, strict source binding, fresh control, prerequisites, replay and cloud passed.');
+const assert = require("node:assert/strict"),
+  m = require("../operation-course-model.js"),
+  p = require("../progress-model.js"),
+  c = require("../course-model.js");
+const s = require("./operation-course-fixtures.cjs").complete();
+assert.equal(s.done.length, 11);
+assert.deepEqual(m.restore(m.snapshot(s)), s);
+const forged = m.snapshot(s);
+forged.complete = true;
+assert.equal(m.restore(forged), null);
+assert.throws(() => m.transition(m.create(), { type: "next" }));
+const a = p.empty();
+a.sections.coursePath.current = c.restorePath({
+  version: 1,
+  selected: "verification",
+  phases: {},
+  explored: [],
+  operationCourse: m.snapshot(s),
+});
+const restored = p.parse(p.stringify(a));
+assert.equal(p.summary(restored).operationCourse.done.length, 11);
+assert.equal(p.summary(restored).progress.done, 11);
+console.log(
+  "Operation course: eleven actual geometry cycles, tool distinctions, preview isolation, strict source binding, fresh control, prerequisites, replay and cloud passed.",
+);
 
-let bad=m.create();for(const action of [{type:'reference'},{type:'clamp',value:true},{type:'tool',tool:3},{type:'preset'},{type:'workOffset',z:100},{type:'door',value:true}])bad=m.transition(bad,{type:'machine',action});bad=m.transition(bad,{type:'preview',source:m.tasks[1].reference.replace('Z-1','Z-2')});assert(!bad.approval);assert.equal(bad.machine.cuts.length,0);assert(bad.errors[0]>0);bad=m.transition(bad,{type:'hint'});bad=m.transition(bad,{type:'restart'});assert(bad.help.includes('face-first'));assert(bad.errors[0]>0);assert(m.restore(m.snapshot(bad)));
-const cachedRaw=m.snapshot(s),cached=m.restore(cachedRaw);cached.done.length=0;assert.equal(m.restore(cachedRaw).done.length,5,'Cached replay results must be isolated from callers');
+let bad = m.create();
+for (const action of [
+  { type: "reference" },
+  { type: "clamp", value: true },
+  { type: "tool", tool: 3 },
+  { type: "preset" },
+  { type: "workOffset", z: 100 },
+  { type: "door", value: true },
+])
+  bad = m.transition(bad, { type: "machine", action });
+bad = m.transition(bad, {
+  type: "preview",
+  source: m.tasks[1].reference.replace("Z-1", "Z-2"),
+});
+assert(!bad.approval);
+assert.equal(bad.machine.cuts.length, 0);
+assert(bad.errors[0] > 0);
+bad = m.transition(bad, { type: "hint" });
+bad = m.transition(bad, { type: "restart" });
+assert(bad.help.includes("face-first"));
+assert(bad.errors[0] > 0);
+assert(m.restore(m.snapshot(bad)));
+const cachedRaw = m.snapshot(s),
+  cached = m.restore(cachedRaw);
+cached.done.length = 0;
+assert.equal(
+  m.restore(cachedRaw).done.length,
+  11,
+  "Cached replay results must be isolated from callers",
+);

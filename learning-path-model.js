@@ -2,6 +2,7 @@
   'use strict';
 
   const GROUPS = {
+    turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
     size: { id: 'size', name: 'Размер и координаты' },
     cut: { id: 'cut', name: 'Первый проход' },
@@ -48,6 +49,8 @@
   STEPS.push({"id":"operation-groove-first","target":"operationCourse","title":"Кольцевая канавка","group":"operations","kind":"coursePractice","subtask":"groove-first"});
   STEPS.push({"id":"operation-taper","target":"operationCourse","title":"Конус вместо цилиндра","group":"operations","kind":"coursePractice","subtask":"taper"});
   STEPS.push({"id":"operation-grooves-project","target":"operationCourse","title":"Две канавки · самостоятельный маршрут","group":"operations","kind":"coursePractice","subtask":"grooves-project"});
+  const turningTasks = typeof module === 'object' && module.exports ? require('./turning-tasks-model.js') : root.CNCTurningTasks;
+  for (const task of turningTasks.tasks) STEPS.push({id:'operation-'+task.id,target:'operationCourse',title:task.title,group:'turningDeep',kind:'coursePractice',subtask:task.id});
   STEPS.push({"id":"project-RF5-SHAFT-01","target":"shaftProject","title":"Ступенчатый валик · базовый","group":"projects","kind":"coursePractice","subtask":"RF5-SHAFT-01"});
   STEPS.push({"id":"project-RF5-SHAFT-02","target":"shaftProject","title":"Короткий валик","group":"projects","kind":"coursePractice","subtask":"RF5-SHAFT-02"});
   STEPS.push({"id":"project-RF5-SHAFT-03","target":"shaftProject","title":"Валик с длинной шейкой","group":"projects","kind":"coursePractice","subtask":"RF5-SHAFT-03"});

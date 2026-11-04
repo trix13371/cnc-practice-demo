@@ -275,12 +275,29 @@
             s.operationCourse.total,
         ),
         table(
-          ["Операция", "Попытка", "Разбор", "Ошибки"],
+          ["Операция", "Попытка", "Разбор", "Ошибки", "Зачёт и версия"],
           s.operationCourse.done.map((d) => [
             d.title || "Токарная операция",
             d.attempt,
             d.help ? "Открывался" : "Не открывался",
             d.errors,
+            (d.legacy
+              ? "Прежний зачёт · самостоятельность не оценивалась"
+              : d.independent
+                ? "Без открытия разбора"
+                : "С разбором") +
+              (d.assignment
+                ? " · условие " +
+                  d.assignment.contentVersion +
+                  ", критерии " +
+                  d.assignment.criteriaVersion +
+                  ", профиль " +
+                  d.assignment.profileVersion +
+                  " · проверок " +
+                  d.criteria.filter((c) => c.passed).length +
+                  "/" +
+                  d.criteria.length
+                : ""),
           ]),
         ),
       );

@@ -6,6 +6,18 @@ function main(mode='self'){
   let s=pilot.add(pilot.empty(),'P01',mode);s=pilot.capture(s,'P01','main','before',archive(p.empty()),time());s=pilot.start(s,'P01','main',time(0,1));s=pilot.observe(s,'P01','main','navigation','all','нашёл путь',time(0,2));s=pilot.capture(s,'P01','main','after',archive(f.full(),0,30),time(0,31));return pilot.finish(s,'P01','main',time(0,32));
 }
 const self=main();assert.equal(pilot.metrics(self).ended,0);assert.equal(pilot.metrics(self).self,1);assert.equal(pilot.outcome(self.participants[0],'main').training,true);
+const route=require('../learning-path-model.js');
+for(const size of [22,51]){
+  const prior=structuredClone(self);
+  for(const participant of prior.participants)for(const phase of ['main','followup'])for(const slot of ['before','after']){
+    const shot=participant[phase][slot];if(!shot)continue;
+    shot.rows=shot.rows.filter(r=>size===22?route.get(r.id).kind!=='coursePractice':route.get(r.id).group!=='turningDeep');
+    assert.equal(shot.rows.length,size);shot.done=shot.rows.filter(r=>r.done).length;
+  }
+  assert.deepEqual(pilot.validate(prior),prior,'Historic '+size+'-step observations remain readable');
+  const invalid=structuredClone(prior);invalid.participants[0].main.before.rows[0].id='operation-shoulder-control';
+  assert.throws(()=>pilot.validate(invalid),'New units cannot be injected into an old route schema');
+}
 let s=main('novice');assert.deepEqual(pilot.metrics(s),{novices:1,self:0,started:1,ended:1,pending:0,navigation:1,firstCut:1,training:1,gcode:1,followup:0,delayed:0});
 s=pilot.assign(s,'P01');const a=s.participants[0].assignment;assert.equal(a.training,'cycle-4');assert.equal(a.gcode,'transfer-a');assert.equal(a.from,time(3,32));assert.throws(()=>pilot.assign(s,'P01'),/уже/);
 // An opened condition, including a no-action session, draft or archived branch, is familiar.

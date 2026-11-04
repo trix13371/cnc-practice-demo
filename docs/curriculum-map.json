@@ -780,6 +780,120 @@
       "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
     },
     {
+      "id": "operation-shoulder-control",
+      "title": "Уступ: обработать шейку, сохранить базу",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "lathe-profile",
+        "planning",
+        "metrology"
+      ],
+      "prerequisites": [
+        "gcode",
+        "lathe-profile",
+        "metrology"
+      ],
+      "objective": "В учебной модели выбрать сохраняемую базу, изготовить шейку до уступа и подтвердить оба сечения шейки и нетронутую поверхность.",
+      "conditionId": "operation-shoulder-control",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-allowance-plan",
+      "title": "Припуск: один проход не подходит",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "allowance",
+        "planning",
+        "lathe-profile"
+      ],
+      "prerequisites": [
+        "gcode",
+        "allowance",
+        "lathe-profile"
+      ],
+      "objective": "В учебной модели распределить большой припуск на допустимые проходы и проверить весь обработанный участок и сохранённую базу.",
+      "conditionId": "operation-allowance-plan",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-relief-band",
+      "title": "Проточка между двумя буртиками",
+      "family": "faces-grooves",
+      "format": "guided-practice",
+      "competencies": [
+        "groove",
+        "planning",
+        "metrology"
+      ],
+      "prerequisites": [
+        "gcode",
+        "groove",
+        "metrology"
+      ],
+      "objective": "В учебной модели обработать широкую проточку несколькими положениями пластины, сохранить два буртика и измерить все участки дна.",
+      "conditionId": "operation-relief-band",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-finish-limit",
+      "title": "Чистовой резец: другой предел съёма",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "tools",
+        "allowance",
+        "lathe-profile"
+      ],
+      "prerequisites": [
+        "gcode",
+        "tools",
+        "allowance"
+      ],
+      "objective": "В учебной модели спланировать проходы чистового резца по его собственному пределу глубины, выполнить обработку и свежий контроль.",
+      "conditionId": "operation-finish-limit",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-taper-land",
+      "title": "Конус переходит в цилиндр",
+      "family": "external-turning",
+      "format": "guided-practice",
+      "competencies": [
+        "taper",
+        "planning",
+        "metrology"
+      ],
+      "prerequisites": [
+        "gcode",
+        "taper",
+        "metrology"
+      ],
+      "objective": "В учебной модели спрогнозировать диаметр промежуточного сечения конуса, изготовить переход к цилиндру и проверить обе поверхности и базу.",
+      "conditionId": "operation-taper-land",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "operation-transfer-two-lands",
+      "title": "Две шейки: свой порядок проходов",
+      "family": "external-turning",
+      "format": "transfer",
+      "competencies": [
+        "planning",
+        "lathe-profile",
+        "metrology"
+      ],
+      "prerequisites": [
+        "gcode",
+        "planning",
+        "metrology"
+      ],
+      "objective": "В учебной модели самостоятельно выбрать порядок обработки двух шеек, сохранить базу и подтвердить каждую поверхность свежими измерениями.",
+      "conditionId": "operation-transfer-two-lands",
+      "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
+    },
+    {
       "id": "project-RF5-SHAFT-01",
       "title": "Ступенчатый валик · базовый",
       "family": "projects",
