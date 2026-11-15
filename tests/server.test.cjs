@@ -59,6 +59,26 @@ const cli=require('../server/cli.cjs'),{create,config}=require('../server/app.cj
     const savedPractice=(await request('/api/progress',practiceUser)).data;assert.equal(savedPractice.archive.sections.coursePath.current.practice.machine.selection,'stock');assert.equal(savedPractice.summary.progress.done,0);
     assert.equal(savedPractice.archive.sections.coursePath.current.practice.diameter.selection,'18,');
     const forgedPractice=structuredClone(practiceArchive);forgedPractice.sections.coursePath.current.practice.machine.events=[{type:'next'}];assert.equal((await request('/api/progress',{...practiceUser,method:'PUT',body:{expectedRevision:1,mutationId:crypto.randomUUID(),archive:forgedPractice}})).status,400);assert.equal((await request('/api/progress',practiceUser)).data.revision,1);
+    const transferUser=await login('beta04');
+    const source=require('./validation-course-fixtures.cjs').withHistories(0);
+    const branch=structuredClone(source.sections.coursePath.current);
+    branch.mountingPlate=require('../mounting-plate-model.js').snapshot(require('./mounting-plate-fixture.cjs').complete(true));
+    branch.millingPlateDraft='Альтернативный план';
+    source.sections.coursePath.history.push(branch);
+    let transferArchive=progress.empty();
+    for(const key of ['millingPlate','mountingPlate']){
+      const file=progress.stringifyMillingWork(source,key);
+      transferArchive=progress.mergeMillingWork(transferArchive,progress.parseTransfer(file).milling);
+    }
+    const transferSave=await request('/api/progress',{...transferUser,method:'PUT',body:{expectedRevision:0,mutationId:crypto.randomUUID(),archive:transferArchive}});
+    assert.equal(transferSave.status,200,transferSave.data.error);
+    const transferRead=(await request('/api/progress',transferUser)).data;
+    assert.equal(transferRead.summary.progress.done,2);
+    for(const key of ['millingPlate','mountingPlate']){
+      const restoredWork=progress.getMillingWork(transferRead.archive,key);
+      assert.deepEqual(restoredWork,progress.getMillingWork(transferArchive,key));
+      assert.equal(restoredWork.history.length,1);
+    }
     const wrong=await request('/api/login',{method:'POST',body:{username:'unknown',password:'wrong'}}),wrongKnown=await request('/api/login',{method:'POST',body:{username:'beta06',password:'wrong'}});assert.equal(wrong.status,wrongKnown.status);assert.equal(wrong.data.error,wrongKnown.data.error);
     for(let i=0;i<4;i++)assert.equal((await request('/api/login',{method:'POST',headers:{'X-CNC-Client-IP':'1.2.3.'+i},body:{username:'beta06',password:'wrong'}})).status,401);
     assert.equal((await request('/api/login',{method:'POST',body:{username:'beta06',password:accounts[6].password}})).status,429);

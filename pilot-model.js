@@ -1,6 +1,7 @@
 (function(root){
   'use strict';
   const progress=typeof module!=='undefined'&&module.exports?require('./progress-model.js'):root.CNCProgress;
+  const route=typeof module!=='undefined'&&module.exports?require('./learning-path-model.js'):root.CNCLearningPath;
   const FORMAT='cnc-pilot',KEY='cnc-pilot-v1',MAX_BYTES=2*1024*1024,DAY=86400000;
   const practical=['cycle-3','cycle-4','cycle-5'],program=['transfer-a','transfer-b','transfer-c'];
   const checks=[
@@ -94,8 +95,20 @@
     demand(object(raw)&&raw.format===FORMAT&&raw.version===1&&object(raw.review)&&Array.isArray(raw.participants)&&raw.participants.length<=16);
     const n=empty();for(const c of checks){const r=raw.review[c.id];demand(object(r)&&['pending','approved','changes'].includes(r.status)&&text(r.note));demand(r.status!=='changes'||r.note.trim(),'Для замечания нужна конкретная причина.');n.review[c.id]={status:r.status,note:r.note};}
     function shot(s){
-      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57,63,64,68].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
-      const all=progress.summary(progress.empty()).rows,current=s.rows.length===68?all:all.filter(r=>!['milling-setup-datums','milling-face-coverage','milling-slot-open','milling-slot-wide-layers'].includes(r.id)),expected=s.rows.length===22?current.filter(r=>r.kind!=='coursePractice'):s.rows.length===51?current.filter(r=>r.group!=='turningDeep'&&r.group!=='metrology'&&r.group!=='independentProject'):s.rows.length===57?current.filter(r=>r.group!=='metrology'&&r.group!=='independentProject'):s.rows.length===63?current.filter(r=>r.group!=='independentProject'):current;demand(expected.length===s.rows.length);demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
+      if(s===null)return null;demand(object(s)&&date(s.at)&&date(s.sourceAt)&&text(s.appVersion,32)&&Number.isInteger(s.done)&&s.done>=0&&Array.isArray(s.rows)&&[22,51,57,63,64,68,69,75,76].includes(s.rows.length)&&s.done<=s.rows.length&&object(s.seen));
+      const total=s.rows.length;
+      const previous75=route.steps.filter(r=>r.target!=='mountingPlate');
+      const previous69=previous75.filter(r=>r.target!=='holeCourse');
+      const previous=previous69.filter(r=>r.id!=='milling-plate-two-depths');
+      const beforeMilling=previous.filter(r=>!['milling-setup-datums','milling-face-coverage','milling-slot-open','milling-slot-wide-layers'].includes(r.id));
+      const expected=total===76?route.steps:total===75?previous75:total===69?previous69:total===68?previous:beforeMilling.filter(r=>{
+        if(total===22)return r.kind!=='coursePractice';
+        if(total<=63&&r.group==='independentProject')return false;
+        if(total<=57&&r.group==='metrology')return false;
+        return total!==51||r.group!=='turningDeep';
+      });
+      demand(expected.length===total);
+      demand(s.rows.every((r,i)=>object(r)&&r.id===expected[i].id&&text(r.title,200)&&typeof r.done==='boolean'&&text(r.detail,1000))&&s.done===s.rows.filter(r=>r.done).length);
       for(const [name,ids]of [['training',practical],['gcode',program]]){demand(Array.isArray(s[name])&&s[name].length===ids.length&&s[name].every((r,i)=>object(r)&&r.id===ids[i]&&typeof r.passed==='boolean'&&typeof r.independent==='boolean'&&(!r.independent||r.passed)));demand(Array.isArray(s.seen[name])&&s.seen[name].every(id=>ids.includes(id))&&new Set(s.seen[name]).size===s.seen[name].length);demand(s[name].every(r=>!r.passed||s.seen[name].includes(r.id)));}
       return {at:s.at,sourceAt:s.sourceAt,appVersion:s.appVersion,done:s.done,rows:s.rows.map(r=>({id:r.id,title:r.title,done:r.done,detail:r.detail})),training:s.training.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),gcode:s.gcode.map(r=>({id:r.id,passed:r.passed,independent:r.independent})),seen:{training:[...s.seen.training],gcode:[...s.seen.gcode]}};
     }

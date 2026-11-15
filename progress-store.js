@@ -18,8 +18,11 @@
     function pending(){if(get(journalKey)!==null)throw Error('Сначала нужно восстановить незавершённый перенос.');}
     function read(){pending();return current();}
     function clear(){storage.removeItem(journalKey);if(get(journalKey)!==null)throw Error('Журнал переноса пока не освобождён.');}
-    function commit(after){
-      pending();after=validate(after);const before=current(),raw=JSON.stringify({version:1,before,after});
+    function commit(after,expected){
+      pending();after=validate(after);const before=current();
+      if(expected!==undefined && !matches(validate(expected)))
+        throw Error('Сохранения изменились перед переносом. Проверьте работу ещё раз.');
+      const raw=JSON.stringify({version:1,before,after});
       if(new TextEncoder().encode(raw).length>MAX_BYTES)throw Error('Недостаточно места для безопасного переноса: архив слишком большой.');
       storage.setItem(journalKey,raw);if(get(journalKey)!==raw)throw Error('Резервная запись не сохранена. Перенос отменён.');
       try{apply(after);}catch(error){

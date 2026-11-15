@@ -5,9 +5,11 @@ const assert = require("node:assert/strict"),
   { Element } = require("./helpers/dom.cjs");
 const course = require("../course-model.js"),
   route = require("../learning-path-model.js");
+const storage = new Map();
 const context = {
   window: { CNCCourse: course, CNCWorkshop: { home() {} } },
   document: { createElement: (t) => new Element(t) },
+  localStorage: { getItem: (key) => storage.get(key), setItem: (key, value) => storage.set(key, value) },
 };
 let rendered;
 for (const name of [
@@ -15,6 +17,8 @@ for (const name of [
   "CNCOperationCourseUI",
   "CNCMetrologyCourseUI",
   "CNCDiagnosticCourseUI",
+  "CNCStartSessionUI",
+  "CNCShaftProjectUI",
 ])
   context.window[name] = {
     create: (options) => {
@@ -106,6 +110,39 @@ ui.render({
 });
 assert.equal(mill.restore(rendered.saved).current, 0);
 assert.match(article.textContent, /Завершите/);
+for (const target of ["millingCourse", "operationCourse", "metrologyCourse", "diagnosticCourse"]) {
+  const step = route.steps.filter((item) => item.target === target).at(-1);
+  const engine = course[target];
+  const start = engine.snapshot(engine.create());
+  const path = { [target]: start };
+  const render = () => ui.render({
+    article: new Element("article"), step, path, direct: true, histories: [],
+    save: () => assert.fail("Free practice must never overwrite the guided journal"),
+  });
+  render();
+  const scoped = rendered.model;
+  const opened = scoped.restore(rendered.saved);
+  assert.equal((engine.tasks || engine.lessons)[opened.current].id, step.subtask);
+  assert.equal(opened.done.length, 0);
+  assert.equal(rendered.onChange(scoped.snapshot(scoped.transition(opened, { type: "hint" }))), true);
+  render();
+  assert.deepEqual(rendered.model.restore(rendered.saved).help, [step.subtask]);
+  assert.equal(path[target], start);
+}
+const introPath = { firstSession: course.startSession.snapshot(course.startSession.create()) };
+ui.render({
+  article: new Element("article"),
+  step: { ...route.get("practice-firstSession"), id: "scale-learn", subtask: "scale-learn" },
+  path: introPath, direct: true, histories: [],
+  save: () => assert.fail("An isolated introductory exercise must never count as the whole block"),
+});
+const intro = rendered.model;
+let session = intro.restore(rendered.saved);
+assert.equal(session.step, 5);
+session = intro.transition(session, { type: "scale", value: 12 });
+session = intro.transition(session, { type: "next" });
+assert.equal(session.complete, true);
+assert.equal(course.startSession.restore(intro.snapshot(session)), null);
 assert.equal(
   course.operationCourse.restore({ version: 3, events: [], draft: "" }),
   null,

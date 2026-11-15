@@ -13,6 +13,9 @@
     shaftProject: "verification",
     operationCourse: "verification",
     millingCourse: "verification",
+    millingPlate: "verification",
+    mountingPlate: "verification",
+    holeCourse: "verification",
     diagnosticCourse: "verification",
   });
   function create(kind = "lesson", step = null) {

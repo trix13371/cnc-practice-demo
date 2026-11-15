@@ -31,6 +31,15 @@ assert.match(root.textContent, /2 из 9/);
 primary().click();
 assert.equal(starts, 1, "Continue still follows the main route");
 const cards = root.querySelectorAll(".home-route-card");
+const outline = root.querySelector(".course-outline");
+const outlineSteps = outline.querySelectorAll("button");
+assert.equal(outlineSteps.length, require("../learning-path-model.js").steps.length);
+assert(outlineSteps.every((button) => !button.disabled));
+assert.match(outlineSteps[0].textContent, /Первое знакомство/);
+let direct;
+window.CNCLearningUI.openDirect = (id) => (direct = id);
+outlineSteps.find((button) => /Обход корпуса станка/.test(button.textContent)).click();
+assert.equal(direct, "milling-machine-column");
 assert.equal(
   cards.reduce(
     (n, c) => n + Number(c.attributes["aria-label"].match(/из (\d+) шагов/)[1]),

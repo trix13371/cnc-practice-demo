@@ -284,11 +284,11 @@
       initialReviewed: false,
       draft: { reading: "", lower: "", upper: "" },
     });
-    function initial() {
+    function initial(current = 0) {
       return {
         version: 1,
         events: [],
-        current: 0,
+        current,
         done: [],
         help: [],
         errors: Array(6).fill(0),
@@ -587,7 +587,7 @@
         )
       );
     }
-    function restore(raw) {
+    function replay(raw, current = 0) {
       try {
         exact(raw, ["version", "events", "draft"]);
         if (
@@ -599,13 +599,24 @@
           !validDraft(raw.draft)
         )
           return null;
-        let s = initial();
+        let s = initial(current);
         for (const a of raw.events) s = apply(s, a);
         s.draft = copy(raw.draft);
         return s;
       } catch {
         return null;
       }
+    }
+    const restore = (raw) => replay(raw);
+    function exercise(current) {
+      return {
+        create: () => apply(initial(current), {
+          type: "begin",
+          assignment: tasks[current].assignment,
+        }),
+        restore: (raw) => replay(raw, current),
+        transition: (state, action) => apply(state, action),
+      };
     }
     function transition(s, a) {
       const trusted = restore(snapshot(s));
@@ -627,6 +638,7 @@
       lessons: tasks,
       instruments,
       create,
+      exercise,
       snapshot,
       restore,
       transition,

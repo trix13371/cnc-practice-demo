@@ -272,6 +272,18 @@
       if (mill.fault)
         detail.append(node("p", "Текущая ошибка: " + mill.fault.title));
     }
+    if (s.millingPlate) {
+      const { result, attempt } = s.millingPlate;
+      detail.append(
+        node("h3", "Самостоятельная плита"),
+        node("p", "Попытка " + attempt + " · " + (!result ? "В работе" :
+          result.independent ? "Принято самостоятельно" : "Принято с разбором")),
+      );
+      if (result) detail.append(table(
+        ["X, мм", "Y, мм", "Поверхность Z, мм"],
+        Object.values(result.measurements).map(({ x, y, value }) => [x, y, value]),
+      ));
+    }
     if (s.metrologyCourse) {
       detail.append(
         node("h3", "Чертёж и контроль размеров"),

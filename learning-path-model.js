@@ -3,6 +3,7 @@
 
   const GROUPS = {
     independentProject:{id:'independentProject',name:'Самостоятельное итоговое изделие'},
+    holes:{id:'holes',name:'Отверстия · сверление и расточка'},
     metrology:{id:'metrology',name:'Чертёж, прибор и решение'},
     turningDeep: { id: 'turningDeep', name: 'Наружное точение · план и контроль' },
     meet: { id: 'meet', name: 'Знакомство со станком' },
@@ -67,6 +68,7 @@
   STEPS.push({"id":"milling-machine-column","target":"millingCourse","title":"Обход корпуса станка","group":"milling","kind":"coursePractice","subtask":"machine-column"});
   const millingTasks=typeof module==='object'&&module.exports?require('./milling-course-model.js'):root.CNCMillingCourse;
   for(const t of millingTasks.lessons.slice(6))STEPS.push({id:'milling-'+t.id,target:'millingCourse',title:t.title,group:'milling',kind:'coursePractice',subtask:t.id});
+  STEPS.push({id:'milling-'+millingTasks.plate.task.id,target:'millingPlate',title:millingTasks.plate.task.title,group:'milling',kind:'coursePractice'});
   STEPS.push({"id":"diagnostic-diag-rapid","target":"diagnosticCourse","title":"Почему быстрый ход опасен","group":"diagnostics","kind":"coursePractice","subtask":"diag-rapid"});
   STEPS.push({"id":"diagnostic-diag-tool","target":"diagnosticCourse","title":"Верная программа · неверный резец","group":"diagnostics","kind":"coursePractice","subtask":"diag-tool"});
   STEPS.push({"id":"diagnostic-diag-blade","target":"diagnosticCourse","title":"Канавка: пластина остаётся в металле","group":"diagnostics","kind":"coursePractice","subtask":"diag-blade"});
@@ -78,6 +80,12 @@
   STEPS.push({"id":"diagnostic-diag-travel","target":"diagnosticCourse","title":"Опечатка в конечной координате","group":"diagnostics","kind":"coursePractice","subtask":"diag-travel"});
   STEPS.push({"id":"diagnostic-diag-spindle","target":"diagnosticCourse","title":"Рабочая подача без вращения","group":"diagnostics","kind":"coursePractice","subtask":"diag-spindle"});
   STEPS.push({id:'project-RF5-SHAFT-05',target:'shaftProject',title:'Самостоятельное изделие · без шаблона',group:'independentProject',kind:'coursePractice',subtask:'RF5-SHAFT-05'});
+
+  const holes=typeof module==='object'&&module.exports?require('./hole-course-model.js'):root.CNCHoleCourse;
+  for(const task of holes.tasks)STEPS.push({id:'hole-'+task.id,target:'holeCourse',title:task.title,group:'holes',kind:'coursePractice',subtask:task.id});
+
+  const mounting=typeof module==='object'&&module.exports?require('./mounting-plate-model.js'):root.CNCMountingPlate;
+  STEPS.push({id:mounting.id,target:'mountingPlate',title:mounting.task.title,group:'milling',kind:'coursePractice'});
 
   const STEP_BY_ID = Object.fromEntries(STEPS.map(s => [s.id, s]));
 

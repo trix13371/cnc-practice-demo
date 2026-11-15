@@ -1,6 +1,6 @@
 (function (root) {
   "use strict";
-  const m = root.CNCOperationCourse,
+  const engine = root.CNCOperationCourse,
     e = (tag, text, cls) => {
       const n = document.createElement(tag);
       if (text !== undefined) n.textContent = text;
@@ -8,6 +8,7 @@
       return n;
     };
   function create({
+    model: m = engine,
     headingTag = "h3",
     saved,
     readOnly = false,

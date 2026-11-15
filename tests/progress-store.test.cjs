@@ -3,6 +3,12 @@ const assert=require('node:assert/strict'),model=require('../progress-store.js')
 function fake(){const data=new Map([['a','old-a'],['b','old-b'],['other','untouched']]);return {data,fail:null,getItem(k){return data.get(k)??null;},setItem(k,v){if(this.fail?.('set',k,v))throw Error('injected write failure');data.set(k,String(v));},removeItem(k){if(this.fail?.('remove',k))throw Error('injected remove failure');data.delete(k);}};}
 const options={keys:['a','b'],journalKey:'journal'},after={a:'new-a',b:null};
 let storage=fake(),store=model.create(storage,options);assert.deepEqual(store.recover(),{status:'none'});assert.deepEqual(store.read(),{a:'old-a',b:'old-b'});store.commit(after);assert.deepEqual(store.read(),after);assert.equal(storage.getItem('other'),'untouched');assert.equal(storage.getItem('journal'),null);
+storage=fake();store=model.create(storage,options);
+const stale=store.read();storage.setItem('b','concurrent');
+assert.throws(()=>store.commit(after,stale),/Сохранения изменились/);
+assert.deepEqual(store.read(),{a:'old-a',b:'concurrent'});
+assert.equal(storage.getItem('journal'),null);
+store.commit(after,store.read());assert.deepEqual(store.read(),after);
 storage=fake();store=model.create(storage,options);storage.fail=(op,k)=>k==='journal';assert.throws(()=>store.commit(after));assert.equal(storage.getItem('a'),'old-a');assert.equal(storage.getItem('b'),'old-b');assert.equal(storage.getItem('journal'),null);
 storage=fake();store=model.create(storage,options);let calls=0;storage.fail=(op,k)=>k==='b'&&calls++===0;assert.throws(()=>store.commit(after),/Прежние данные восстановлены/);assert.deepEqual(store.read(),{a:'old-a',b:'old-b'});assert.equal(storage.getItem('journal'),null);
 storage=fake();store=model.create(storage,options);storage.fail=(op,k)=>k==='b';assert.throws(()=>store.commit(after),/Журнал сохранён/);assert.ok(storage.getItem('journal'));assert.throws(()=>store.read());assert.throws(()=>store.commit(after));storage.fail=null;assert.equal(model.create(storage,options).recover().status,'rolledBack');assert.deepEqual(store.read(),{a:'old-a',b:'old-b'});

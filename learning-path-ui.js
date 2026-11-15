@@ -1,9 +1,12 @@
 (function () {
   "use strict";
   const model = window.CNCLearningPath,
-    key = "cnc-learning-path-v1";
+    key = "cnc-learning-path-v1",
+    directKey = "cnc-course-direct-v1";
   let state = model.restore(null),
     banner,
+    direct = false,
+    introExercise = null,
     available = true;
   try {
     state = model.restore(JSON.parse(localStorage.getItem(key) || "null"));
@@ -19,6 +22,8 @@
   function save() {
     try {
       localStorage.setItem(key, JSON.stringify(state));
+      if (state.active && direct) localStorage.setItem(directKey, introExercise?.id || state.selected);
+      else localStorage.removeItem(directKey);
       available = true;
     } catch {
       available = false;
@@ -41,16 +46,18 @@
     );
   }
   const progress = () => model.status(evidence());
-  function open(id) {
+  function navigate(id, requested) {
     let step = model.get(id);
     if (!step) return;
     const p = progress(),
       index = model.steps.findIndex((s) => s.id === id);
-    if (!p.items[index].done && p.items.slice(0, index).some((s) => !s.done))
+    if (!requested && !p.items[index].done && p.items.slice(0, index).some((s) => !s.done))
       step = p.next;
+    direct = requested;
+    introExercise = null;
     state = { version: 1, active: true, selected: step.id };
     save();
-    if (step.kind === "coursePractice") window.CNCCourseUI.openRouteStep(step);
+    if (step.kind === "coursePractice") window.CNCCourseUI.openRouteStep(step, direct);
     else if (step.kind === "lesson")
       window.CNCWorkshop.openLesson(step.target, true);
     else if (step.kind === "training")
@@ -67,7 +74,21 @@
           : step.target,
         true,
       );
-    else window.CNCWorkshop.openPractice(step.target, step.stage, true);
+    else window.CNCWorkshop.openPractice(step.target, step.stage, true, direct);
+    render();
+  }
+  const open = (id) => navigate(id, false);
+  const openDirect = (id) => navigate(id, true);
+  const follow = (id) => navigate(id, direct);
+  function openIntroExercise(id) {
+    const exercise = window.CNCStartSession.steps.find((step) => step.id === id);
+    if (!exercise) return;
+    const parent = model.get("practice-firstSession");
+    introExercise = { ...parent, id, title: exercise.title, subtask: id };
+    direct = true;
+    state = { version: 1, active: true, selected: parent.id };
+    save();
+    window.CNCCourseUI.openRouteStep(introExercise, true);
     render();
   }
   function start() {
@@ -99,7 +120,7 @@
       label: next
         ? "Далее: " + next.title[0].toLowerCase() + next.title.slice(1)
         : "К итогам модуля",
-      run: () => (next ? open(next.id) : finish()),
+      run: () => (next ? follow(next.id) : finish()),
     };
   }
   function guided() {
@@ -124,10 +145,13 @@
       data.finished &&
       data.result.success
     ) {
-      return { text: "Далее: зачем нужен замер", run: () => open("control") };
+      return { text: "Далее: зачем нужен замер", run: () => follow("control") };
     }
-    if (state.selected === "first-control" && stage === 3 && data.controlPassed)
-      return { text: "Далее: подготовка станка", run: () => open("setup") };
+    if (state.selected === "first-control" && stage === 3 && data.controlPassed) {
+      if (window.CNCDemo.controlPracticeActive())
+        return { text: "Все задания курса", run: showOutline };
+      return { text: "Далее: подготовка станка", run: () => follow("setup") };
+    }
     return null;
   }
   function render() {
@@ -166,27 +190,33 @@
     if (nextButton) {
       const done = p.items.find((i) => i.id === step.id)?.done,
         next = model.following(step.id);
-      nextButton.hidden = step.kind !== "coursePractice" || !done;
+      nextButton.hidden = step.kind !== "coursePractice" || !done || !!introExercise;
       nextButton.textContent = next ? "Далее: " + next.title : "К итогам курса";
-      nextButton.onclick = () => (next ? open(next.id) : finish());
+      nextButton.onclick = () => (next ? follow(next.id) : finish());
     }
     banner.querySelector("strong").textContent =
       "Учебный путь · шаг " +
       (model.steps.findIndex((s) => s.id === step.id) + 1) +
       " из " +
       model.steps.length;
+    const prepared = screen === "work" && window.CNCDemo.controlPracticeActive();
     banner.querySelector("p").textContent = available
-      ? step.title + " · выполнено " + p.done + " из " + p.total
+      ? (introExercise?.title || step.title) +
+        (prepared ? " · пробный контроль на готовой детали" : " · выполнено " + p.done + " из " + p.total)
       : "Маршрут не сохранится после закрытия: хранилище недоступно.";
+  }
+  function showOutline() {
+    window.CNCWorkshop.home();
+    window.CNCHomeUI.openOutline();
   }
   function mount(main) {
     banner = node("aside", undefined, "learning-path-banner");
     banner.hidden = true;
     const copy = node("div");
     copy.append(node("strong"), node("p"));
-    const back = node("button", "К маршруту", "course-back");
+    const back = node("button", "Все задания курса", "course-back");
     back.type = "button";
-    back.addEventListener("click", () => window.CNCWorkshop.home());
+    back.addEventListener("click", showOutline);
     const nextButton = node("button", "Продолжить курс", "button primary");
     nextButton.type = "button";
     nextButton.dataset.courseNext = "";
@@ -211,9 +241,9 @@
       : null;
   }
   function continueTraining() {
-    if (state.selected === "full-cycle") open("self-cycle");
+    if (state.selected === "full-cycle") follow("self-cycle");
     else if (progress().items.find((s) => s.id === "self-cycle").done)
-      open("code-coordinates");
+      follow("code-coordinates");
     else {
       const next = window.CNCTrainingUI.nextIndependent();
       if (next) window.CNCWorkshop.openTraining(next, true);
@@ -236,7 +266,7 @@
       if (progress().items.find((s) => s.id === "self-code").done)
         return {
           label: "Далее: " + model.following(step.id).title,
-          run: () => open(model.following(step.id).id),
+          run: () => follow(model.following(step.id).id),
         };
       const next = window.CNCGCodeUI.nextFinal();
       return next && next !== id
@@ -252,7 +282,7 @@
     const next = model.following(step.id);
     return {
       label: "Далее: " + next.title[0].toLowerCase() + next.title.slice(1),
-      run: () => open(next.id),
+      run: () => follow(next.id),
     };
   }
   window.CNCLearningUI = {
@@ -261,6 +291,8 @@
     progress,
     start,
     open,
+    openDirect,
+    openIntroExercise,
     finish,
     deactivate,
     lesson,
@@ -273,13 +305,17 @@
     codeContinuation,
     capStage: (stage) =>
       guided() && state.selected === "first-cut" ? Math.min(2, stage) : stage,
-    restoreCourse() {
+    restoreSelection(screen) {
       const step = model.get(state.selected);
-      if (state.active && step?.kind === "coursePractice") {
-        open(step.id);
-        return true;
-      }
-      return false;
+      if (!state.active || !step) return;
+      const targetScreen = { coursePractice: "course", lesson: "course", practice: "work", training: "training", gcode: "gcode" }[step.kind];
+      if (screen !== targetScreen) return;
+      let remembered;
+      try { remembered = localStorage.getItem(directKey); } catch {}
+      if (step.id === "practice-firstSession" && remembered && remembered !== step.id)
+        openIntroExercise(remembered);
+      else if (remembered === step.id) openDirect(step.id);
+      else if (step.kind === "coursePractice") open(step.id);
     },
     progressSnapshot: () => state,
     goFurther() {

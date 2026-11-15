@@ -51,8 +51,7 @@
       z1: p.z + part.z1,
     };
   }
-  function describe(state) {
-    const lesson = state && base.lessons[state.current];
+  function describe(state, lesson = state && base.lessons[state.current]) {
     if (!lesson) return null;
     const log = (state.incidents || []).filter((i) => i.lesson === lesson.id),
       latest = log.at(-1),

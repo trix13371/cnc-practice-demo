@@ -59,6 +59,15 @@ const readonly = ui.create({
   readOnly: true,
 });
 assert(!readonly.querySelectorAll("input").length);
+const plate = ui.create({
+  model: m.plate,
+  routeMode: true,
+  savedDraft: "План первой полосы",
+});
+assert.match(plate.textContent, /Самостоятельная плита · две глубины/);
+assert.match(plate.textContent, /Покрыто: 0%/);
+assert.equal(plate.querySelector("textarea").value, "План первой полосы");
+assert(plate.querySelectorAll("button").some((b) => b.textContent === "Закрыть ограждение"));
 console.log(
   "Milling UI: datum fields, coverage and actual section, corrupt-save guard and read-only review passed.",
 );

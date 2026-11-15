@@ -2,6 +2,8 @@
   'use strict';
   const startSession=typeof module!=='undefined'&&module.exports?require('./start-session-model.js'):root.CNCStartSession;
   const diagnosticCourse=typeof module!=='undefined'&&module.exports?require('./diagnostic-course-model.js'):root.CNCDiagnosticCourse;
+  const mountingPlate=typeof module!=='undefined'&&module.exports?require('./mounting-plate-model.js'):root.CNCMountingPlate;
+  const holeCourse=typeof module!=='undefined'&&module.exports?require('./hole-course-model.js'):root.CNCHoleCourse;
   const millingCourse=typeof module!=='undefined'&&module.exports?require('./milling-course-model.js'):root.CNCMillingCourse;
   const metrologyCourse=typeof module!=='undefined'&&module.exports?require('./metrology-course-model.js'):root.CNCMetrologyCourse;
   const operationCourse=typeof module!=='undefined'&&module.exports?require('./operation-course-model.js'):root.CNCOperationCourse;
@@ -70,12 +72,21 @@
     if(value.programSetup!==undefined){const s=programSetup.restore(value.programSetup);if(s){path.programSetup=programSetup.snapshot(s);if(programSetup.validDraft(value.programSetupDraft,s))path.programSetupDraft=JSON.parse(JSON.stringify(value.programSetupDraft));}}
     if(['course','operationCourse','millingCourse','diagnosticCourse','metrologyCourse'].includes(value.activePractice))path.activePractice=value.activePractice;
     if(value.diagnosticCourse!==undefined){const s=diagnosticCourse.restore(value.diagnosticCourse);if(s)path.diagnosticCourse=diagnosticCourse.snapshot(s);}
+    if(value.holeCourse!==undefined){const book=holeCourse.restoreBook(value.holeCourse);if(book&&Object.keys(book.works).length)path.holeCourse=book;}
     if(value.millingCourse!==undefined){const s=millingCourse.restore(value.millingCourse);if(s)path.millingCourse=millingCourse.snapshot(s);}
+    if(value.mountingPlate!==undefined){const plate=mountingPlate.restore(value.mountingPlate);if(plate)path.mountingPlate=mountingPlate.snapshot(plate);}
+    if(value.millingPlate!==undefined){
+      const plate=millingCourse.plate.restore(value.millingPlate);
+      if(plate){
+        path.millingPlate=millingCourse.plate.snapshot(plate);
+        if(millingCourse.plate.validDraft(value.millingPlateDraft))path.millingPlateDraft=value.millingPlateDraft;
+      }
+    }
     if(value.metrologyCourse!==undefined){const s=metrologyCourse.restore(value.metrologyCourse);if(s)path.metrologyCourse=metrologyCourse.snapshot(s);}
     if(value.operationCourse!==undefined){const s=operationCourse.restore(value.operationCourse);if(s)path.operationCourse=operationCourse.snapshot(s);}
     if(value.shaftProject!==undefined){const s=shaftProject.restore(value.shaftProject);if(s){path.shaftProject=shaftProject.snapshot(s);if(shaftProject.validDraft(value.shaftProjectDraft,s))path.shaftProjectDraft=JSON.parse(JSON.stringify(value.shaftProjectDraft));}}
     return path;
   }
   function canCheck(id,path,answers){return Object.hasOwn(byId,id)&&(!discoveryIds.includes(id)||path.explored.includes(id)||Object.hasOwn(answers,id));}
-  const api={metrologyCourse,diagnosticCourse,millingCourse,operationCourse,shaftProject,programSetup,firstProcess,drawingSession,startSession,validFirstSessionDraft,lessons,evaluate,restore,restorePath,canCheck,discoveryIds,practice};root.CNCCourse=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
+  const api={mountingPlate,holeCourse,metrologyCourse,diagnosticCourse,millingCourse,millingPlate:millingCourse.plate,operationCourse,shaftProject,programSetup,firstProcess,drawingSession,startSession,validFirstSessionDraft,lessons,evaluate,restore,restorePath,canCheck,discoveryIds,practice};root.CNCCourse=api;if(typeof module!=='undefined'&&module.exports)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

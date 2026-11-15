@@ -1,8 +1,13 @@
 (function (root, factory) {
-  const api = factory();
+  const node = typeof module === "object" && module.exports;
+  const api = factory(
+    node ? require("./assignment-model.js") : root.CNCAssignment,
+    node ? require("./replay-cache-model.js") : root.CNCReplayCache,
+    node ? require("./milling-route-model.js") : root.CNCMillingRoute,
+  );
   if (typeof module === "object" && module.exports) module.exports = api;
   else root.CNCMillingCourse = api;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (assignment, replayCache, routeEngine) {
   "use strict";
   const copy = (x) => JSON.parse(JSON.stringify(x)),
     freeze = (x) => {
@@ -231,6 +236,28 @@
       hint: "В каждом слое используйте оси проходов Y5 и Y9: шаг 4 мм, перекрытие 2 мм. Сначала обе полосы на Z−1, затем обе на Z−2. Для смены полосы отводитесь к Z12, возвращайтесь снаружи к X−4 и отдельно заглубляйтесь.",
     },
   ]);
+  const plateTask = freeze({
+    id: "plate-two-depths",
+    title: "Самостоятельная плита · две глубины",
+    level: 4,
+    numerical: true,
+    originY: 5,
+    points: [],
+    zones: [
+      { area: { x0: 0, x1: 22, y0: 2, y1: 8 }, allow: { x0: 0, x1: 26, y0: 2, y1: 8 }, depth: 1 },
+      { area: { x0: 36, x1: 60, y0: 6, y1: 12 }, allow: { x0: 32, x1: 60, y0: 6, y1: 12 }, depth: 2 },
+    ],
+    checks: [[5, 3], [21, 7], [37, 7], [55, 11]],
+    goal: "На плите 60 × 40 × 10 мм обработайте две открытые полосы фрезой Ø6. Слева X0–22, Y2–8, дно Z−1. Справа X36–60, Y6–12, дно Z−2. Округлый выход допустим слева до X26 и справа до X32. Сохраните перемычку и остальную поверхность.",
+    learn: "Выберите порядок обработки и координаты проходов. За проход снимайте до 1 мм. После резания измерьте обе полосы в четырёх заданных точках. Глубину и остаток модель проверяет по сетке 2 мм.",
+    hint: "Сначала найдите середину каждой полосы по Y и сторону, открытую у края плиты. Перед переходом между полосами поднимите фрезу на безопасную высоту. Для второй полосы спланируйте два слоя.",
+    assignment: {
+      id: "plate-two-depths", contentVersion: 1, criteriaVersion: 1,
+      profileId: "milling-xyz", profileVersion: 3, seed: "plate-two-depths-a",
+    },
+  });
+  const plateIndex = lessons.length, conditions = [...lessons, plateTask];
+  const plateEventLimit = 240;
   const faults = freeze({
     HOLDER_FIXTURE: [
       "Державка пересекает крепление",
@@ -340,9 +367,15 @@
       y = Math.floor(i / 30) * 2 + 1;
     return x >= box.x0 && x <= box.x1 && y >= box.y0 && y <= box.y1;
   }
+  function zones(task) {
+    return task.zones || (task.area ? [task] : []);
+  }
+  function depthAt(i, areas, boundary = "area") {
+    return areas.find((zone) => inside(i, zone[boundary]))?.depth || 0;
+  }
   function prepared(s) {
     return (
-      !lessons[s.current].numerical ||
+      !conditions[s.current].numerical ||
       (s.verifiedRevision === s.setupRevision &&
         s.setup.reference &&
         s.setup.clamped &&
@@ -358,7 +391,7 @@
     s.measurements = {};
   }
   function coordinates(s) {
-    if (!lessons[s.current].numerical)
+    if (!conditions[s.current].numerical)
       return { work: copy(s.position), machine: null };
     const v = s.settings;
     return {
@@ -375,19 +408,21 @@
     };
   }
   function coverage(s) {
-    const t = lessons[s.current];
-    if (!t.area) return null;
+    const t = conditions[s.current];
+    const areas = zones(t);
+    if (!areas.length) return null;
     let total = 0,
       complete = 0,
       remaining = 0,
       overcut = 0;
     for (let i = 0; i < 600; i++) {
-      if (inside(i, t.area)) {
+      const depth = depthAt(i, areas);
+      if (depth) {
         total++;
-        if (Math.abs(s.grid[i] + t.depth) < EPS) complete++;
-        else if (s.grid[i] > -t.depth + EPS) remaining++;
+        if (Math.abs(s.grid[i] + depth) < EPS) complete++;
+        else if (s.grid[i] > -depth + EPS) remaining++;
         else overcut++;
-      } else if (s.grid[i] < (inside(i, t.allow) ? -t.depth : 0) - EPS)
+      } else if (s.grid[i] < -depthAt(i, areas, "allow") - EPS)
         overcut++;
     }
     return {
@@ -400,7 +435,7 @@
   }
   function initial(i) {
     return {
-      ...(lessons[i].numerical
+      ...(conditions[i].numerical
         ? {
             mountTop: 50,
             settings: { zero: { x: 0, y: 0, z: 0 }, length: 0, diameter: 6 },
@@ -409,9 +444,9 @@
           }
         : {}),
       position: {
-        x: lessons[i].originX ?? -10,
-        y: lessons[i].originY,
-        z: lessons[i].originZ ?? (i === 1 ? 5 : 20),
+        x: conditions[i].originX ?? -10,
+        y: conditions[i].originY,
+        z: conditions[i].originZ ?? (i === 1 ? 5 : 20),
       },
       setup: {
         reference: false,
@@ -430,21 +465,21 @@
       probes: [],
     };
   }
-  function create(baseline = 3) {
+  function create(baseline = 3, current = 0) {
     if (![1, 2, 3].includes(baseline)) throw Error("Неизвестный профиль.");
     return {
       version: baseline,
       baseline,
       profile: baseline,
       events: [],
-      current: 0,
+      current,
       done: [],
-      errors: Array(baseline === 1 ? 4 : baseline === 2 ? 6 : 10).fill(0),
+      errors: Array(current === plateIndex ? plateIndex + 1 : baseline === 1 ? 4 : baseline === 2 ? 6 : 10).fill(0),
       help: [],
       incidents: [],
       feedback: "",
       lastCheck: null,
-      ...initial(0),
+      ...initial(current),
     };
   }
   function ready(s) {
@@ -453,12 +488,12 @@
   function lessonCount(s) {
     return s.profile === 1 ? 4 : s.profile === 2 ? 6 : lessons.length;
   }
-  function collision(s, a) {
+  function collision(s, a, machineGeometry = geometry) {
     const from = s.position,
       to = { x: a.x, y: a.y, z: a.z },
       hits = [],
-      parts = geometry.parts,
-      obstacles = geometry.obstacles;
+      parts = machineGeometry.parts,
+      obstacles = machineGeometry.obstacles;
     const retract =
       Math.abs(to.x - from.x) < EPS &&
       Math.abs(to.y - from.y) < EPS &&
@@ -565,9 +600,10 @@
     return { ok: true, grid, from: copy(from), to, removed, mode: a.mode };
   }
   function target(t) {
-    if (t.area)
+    const areas = zones(t);
+    if (areas.length)
       return Array.from({ length: 600 }, (_, i) =>
-        inside(i, t.area) ? -t.depth : 0,
+        -depthAt(i, areas) || 0,
       );
     if (!t.slot) return Array(600).fill(0);
     const a = { x: t.slot[0], y: t.slot[2] },
@@ -579,37 +615,38 @@
     );
   }
   function profileMatches(s, t) {
-    const wanted = target(t);
+    const wanted = target(t), areas = zones(t);
     return s.grid.every((z, i) =>
-      t.area
-        ? inside(i, t.area)
-          ? Math.abs(z + t.depth) < EPS
-          : inside(i, t.allow)
-            ? z <= EPS && z >= -t.depth - EPS
-            : Math.abs(z) < EPS
+      areas.length
+        ? wanted[i] < 0
+          ? Math.abs(z - wanted[i]) < EPS
+          : z <= EPS && z >= -depthAt(i, areas, "allow") - EPS
         : Math.abs(z - wanted[i]) < EPS,
     );
   }
   function inspected(s) {
-    if (lessons[s.current].area)
-      return lessons[s.current].checks.every(([x, y]) => {
+    const task = conditions[s.current];
+    const areas = zones(task);
+    if (areas.length)
+      return task.checks.every(([x, y]) => {
         const r = s.measurements[x + "," + y];
         return (
           r &&
           r.afterCut === s.cuts &&
           r.revision === s.setupRevision &&
-          r.value === -lessons[s.current].depth
+          r.value === -depthAt(Math.floor(y / 2) * 30 + Math.floor(x / 2), areas)
         );
       });
     return [13, 31, 49].every((x) => {
       const r = s.measurements[x];
       return (
-        r && r.afterCut === s.cuts && r.value === -lessons[s.current].depth
+        r && r.afterCut === s.cuts && r.value === -task.depth
       );
     });
   }
   function apply(state, a) {
-    if (state.events.length >= (state.profile === 3 ? 480 : 240))
+    const isPlate = state.current === plateIndex;
+    if (state.events.length >= (isPlate ? plateEventLimit : state.profile === 3 ? 480 : 240))
       throw Error("Журнал заполнен; данные сохранены.");
     const fields = {
       mount: ["type", "top"],
@@ -631,7 +668,7 @@
       throw Error("Неизвестное действие.");
     exact(a, fields[a.type]);
     const s = copy(state),
-      t = lessons[s.current],
+      t = conditions[s.current],
       accepted = s.done.some((d) => d.id === t.id);
     if (accepted && !["next", "upgrade"].includes(a.type))
       throw Error("Задание принято. Перейдите дальше.");
@@ -719,7 +756,7 @@
         }
         break;
       case "surface":
-        if (!t.area || !t.checks.some(([x, y]) => x === a.x && y === a.y))
+        if (!zones(t).length || !t.checks.some(([x, y]) => x === a.x && y === a.y))
           throw Error("Выберите заданную точку контроля.");
         if (
           s.spindle ||
@@ -875,7 +912,8 @@
           break;
         }
       case "confirm": {
-        const valid =
+        const result = isPlate ? plateAssessment(s) : null;
+        const valid = result ? result.passed : (
           prepared(s) &&
           s.visited === t.points.length &&
           (!t.required || s.probes.includes(t.required)) &&
@@ -884,11 +922,12 @@
           Object.entries(s.setup).every(([k, v]) => k === "door" || v) &&
           s.position.z >= 12 &&
           profileMatches(s, t) &&
-          (!(t.slot || t.area) || inspected(s));
+          (!(t.slot || zones(t).length) || inspected(s)));
         if (!valid) {
           s.errors[s.current]++;
-          s.feedback =
-            "Не выполнены все условия: точки маршрута, требуемая диагностика на копии, остановка, отвод, профиль и свежий контроль.";
+          s.feedback = result
+            ? result.checks.filter((check) => !check.passed).map((check) => check.title).join(". ") + "."
+            : "Не выполнены все условия: точки маршрута, требуемая диагностика на копии, остановка, отвод, профиль и свежий контроль.";
         } else {
           s.done.push({
             id: t.id,
@@ -898,13 +937,14 @@
             measurements: copy(s.measurements),
             diagnostics: copy(s.probes),
             incidents: copy(s.incidents.filter((e) => e.lesson === t.id)),
+            ...(isPlate ? { independent: !s.help.includes(t.id), attempt: s.attempt } : {}),
           });
           s.feedback = "Задание принято в учебной модели.";
         }
         break;
       }
       case "next":
-        if (!accepted || s.current === lessonCount(s) - 1)
+        if (isPlate || !accepted || s.current === lessonCount(s) - 1)
           throw Error("Следующий этап пока недоступен.");
         s.current++;
         Object.assign(s, initial(s.current));
@@ -960,9 +1000,9 @@
   }
   let cacheKey = null,
     cacheValue = null;
-  function restore(raw) {
+  function replay(raw, current = 0) {
     try {
-      const key = JSON.stringify(raw);
+      const key = JSON.stringify([current, raw]);
       if (key === cacheKey) return copy(cacheValue);
       if (raw?.version === 1) exact(raw, ["version", "events"]);
       else exact(raw, ["version", "baseline", "events"]);
@@ -974,7 +1014,8 @@
         raw.events.length > (raw.version === 3 ? 480 : 240)
       )
         return null;
-      let s = create(raw.version === 1 ? 1 : raw.baseline);
+      if (current && (raw.version !== 3 || raw.baseline !== 3)) return null;
+      let s = create(raw.version === 1 ? 1 : raw.baseline, current);
       for (const a of raw.events) s = apply(s, a);
       if (s.version !== raw.version) return null;
       cacheKey = key;
@@ -983,6 +1024,14 @@
     } catch {
       return null;
     }
+  }
+  const restore = (raw) => replay(raw);
+  function exercise(current) {
+    return {
+      create: () => create(3, current),
+      restore: (raw) => replay(raw, current),
+      transition: (state, action) => apply(state, action),
+    };
   }
   function transition(s, a) {
     const r = restore(snapshot(s));
@@ -999,7 +1048,113 @@
     }
     return null;
   }
+
+  function plateAssessment(state) {
+    const surface = coverage(state);
+    return assignment.evaluate(state.assignment, plateTask.assignment, [
+      { id: "setup", title: "Подтвердите текущую наладку", passed: prepared(state) },
+      { id: "safe", title: "Отведите фрезу на Z≥12, остановите шпиндель, откройте ограждение и сбросьте аварию", passed: state.position.z >= 12 && !state.spindle && !state.setup.door && !state.fault },
+      { id: "depths", title: "Доведите обе полосы до требуемой глубины", passed: surface.remaining === 0 },
+      { id: "stock", title: "Обнаружен лишний съём. Понадобится новая заготовка", passed: surface.overcut === 0 },
+      { id: "measurements", title: "Обновите контроль в четырёх заданных точках", passed: inspected(state) },
+    ], state.help.includes(plateTask.id));
+  }
+  function createPlate() {
+    return { ...create(3, plateIndex), assignment: copy(plateTask.assignment), attempt: 1 };
+  }
+  function applyPlate(state, action) {
+    if (action?.type !== "restart") return apply(state, action);
+    exact(action, ["type"]);
+    if (state.done.length || state.events.length >= plateEventLimit || state.spindle)
+      throw Error("Новая заготовка доступна до зачёта, после остановки шпинделя и при наличии места в журнале.");
+    return {
+      ...copy(state),
+      ...initial(plateIndex),
+      attempt: state.attempt + 1,
+      lastCheck: null,
+      events: [...copy(state.events), { type: "restart" }],
+      feedback: "Новая заготовка установлена. Предыдущие действия и помощь сохранены в журнале.",
+    };
+  }
+  function snapshotPlate(state) {
+    return { version: 1, assignment: copy(state.assignment), events: copy(state.events) };
+  }
+  const plateCache = replayCache?.create({ maxEntries: 8 });
+  function restorePlate(raw) {
+    try {
+      const cached = plateCache?.get(raw);
+      if (cached) return cached;
+      exact(raw, ["version", "assignment", "events"]);
+      if (raw.version !== 1 || !assignment.matches(raw.assignment, plateTask.assignment) ||
+        !Array.isArray(raw.events) || raw.events.length > plateEventLimit)
+        return null;
+      let state = createPlate();
+      for (const action of raw.events) state = applyPlate(state, action);
+      return plateCache ? plateCache.remember(raw, state) : state;
+    } catch {
+      return null;
+    }
+  }
+  const plate = {
+    task: plateTask,
+    lessons: conditions,
+    eventLimit: plateEventLimit,
+    create: createPlate,
+    snapshot: snapshotPlate,
+    restore: restorePlate,
+    transition(state, action) {
+      const verified = restorePlate(snapshotPlate(state));
+      if (!verified) throw Error("Повреждён журнал самостоятельной плиты.");
+      const next = applyPlate(verified, action);
+      return plateCache ? plateCache.remember(snapshotPlate(next), next) : next;
+    },
+    validDraft: (text) => typeof text === "string" && text.length <= 2000 &&
+      !/[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/.test(text),
+  };
+  const routeFeatures = freeze({
+    pocket: {
+      kind: "pocket", area: {minX:6,minY:2,maxX:22,maxY:12}, floor:-2,
+      title: "Закрытый карман", caption: "Границы кармана X6…22, Y2…12. Дно Z−2.",
+    },
+    contour: {
+      kind: "contour", area: {minX:5,minY:4,maxX:20,maxY:12}, floor:-2,
+      title: "Наружный контур", caption: "Сохраните деталь X5…20, Y4…12. Глубина обработки вокруг неё Z−2.",
+    },
+  });
+  function runRoute25d(state, kind, commands) {
+    if (!Object.hasOwn(routeFeatures,kind))
+      throw Error("Выберите карман или наружный контур.");
+    const feature=routeFeatures[kind];
+    const runner=routeEngine.create({
+      stock:{minX:0,minY:0,maxX:config.stock.x,maxY:config.stock.y},
+      diameter:config.radius*2, limits:config.limits, feature,
+      collision:(position,command)=>collision({position},command),
+    });
+    const clean=state && state.profile===3 && ready(state) && !state.spindle &&
+      !state.fault && state.cuts===0 && state.grid.every(depth=>depth===0);
+    const result=runner.simulate(clean?state.position:null,commands);
+    return {...result,material:runner.section(result)};
+  }
+  function previewRoute25d(kind, source) {
+    const parsed=routeEngine.parse(source);
+    if(!parsed.ok) return {ok:false,path:[],material:null,incident:{
+      code:parsed.code,line:parsed.line,title:parsed.message,
+    }};
+    let state=createPlate();
+    for(const command of [
+      {type:"setup",key:"reference",value:true},
+      {type:"setup",key:"clamped",value:true},
+      {type:"configure",zero:{x:120,y:80,z:50},length:50,diameter:6},
+      {type:"verifySetup"},
+      {type:"setup",key:"door",value:true},
+    ]) state=apply(state,command);
+    const result=runRoute25d(state,kind,parsed.commands);
+    if(result.incident) result.incident.line=parsed.lines[result.incident.index]??null;
+    return result;
+  }
+  const route25d = {features:routeFeatures,run:runRoute25d,preview:previewRoute25d};
   return freeze({
+    route25d,
     geometry,
     keepOut,
     advanceAction,
@@ -1012,8 +1167,10 @@
     collision,
     config,
     lessons,
+    plate,
     faults,
     create,
+    exercise,
     ready,
     plan,
     target,

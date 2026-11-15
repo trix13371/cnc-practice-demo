@@ -4,7 +4,7 @@
   const steps=Object.freeze([
     ['parts-learn','Знакомимся с тремя узлами'],['parts-try','Что вращается и что перемещается'],['parts-check','Узнайте резец на другой схеме'],
     ['stop-learn','Команда остановки и полная остановка'],['stop-check','Подготовьте сцену к ручному контролю'],
-    ['scale-learn','Десятые и сотые миллиметра'],['scale-check','Составьте другой размер'],['diameter-learn','Диаметр меняется с двух сторон'],['diameter-check','Найдите слой на другой детали']
+    ['scale-learn','Чтение шкалы'],['scale-check','Чтение шкалы · проверка'],['diameter-learn','Диаметр меняется с двух сторон'],['diameter-check','Найдите слой на другой детали']
   ].map(([id,title])=>Object.freeze({id,title})));
   const copy=value=>JSON.parse(JSON.stringify(value));
   const fail=message=>{throw Error(message);};
@@ -18,8 +18,8 @@
     const value=Number(s.replace(',','.'));return Number.isFinite(value)?value:null;
   }
   function local(step){return {seen:[],motion:step===3?'running':step===4?'coasting':'stopped',tool:0,rotated:false,moved:false,measured:false,scale:step===6?50:0,diameter:32,correct:false,feedback:''};}
-  function create(){return {version:1,step:0,complete:false,...local(0),attempts:Array(9).fill(0),hints:[],assisted:false,events:[]};}
-  function apply(state,action){
+  function create(step=0){return {version:1,step,complete:false,...local(step),attempts:Array(9).fill(0),hints:[],assisted:false,events:[]};}
+  function apply(state,action,lastStep=8){
     if(state.complete)fail('Вводное знакомство уже завершено.');
     if(state.events.length>=MAX_EVENTS)fail('Журнал заполнен. Ваши выполненные действия сохранены; продолжение в этой попытке недоступно.');
     if(!plain(action)||typeof action.type!=='string')fail('Недопустимое действие.');
@@ -45,14 +45,21 @@
       case 'next':{
         const ready=i===0?s.seen.length===3:i===1?s.rotated&&s.moved&&s.motion==='stopped':i===3?s.measured&&s.motion==='stopped':s.correct;
         if(!ready)fail('Сначала выполните действие текущего шага.');
-        if(i===8)s.complete=true;else{Object.assign(s,local(i+1));s.step=i+1;}break;
+        if(i===lastStep)s.complete=true;else{Object.assign(s,local(i+1));s.step=i+1;}break;
       }
     }
     s.events.push(copy(action));return s;
   }
-  function replay(raw){exact(raw,['version','events']);if(raw.version!==1||!Array.isArray(raw.events)||raw.events.length>MAX_EVENTS)fail('Недопустимая версия или длина журнала.');let s=create();for(const action of raw.events)s=apply(s,action);return s;}
+  function replay(raw,step=0,lastStep=8){exact(raw,['version','events']);if(raw.version!==1||!Array.isArray(raw.events)||raw.events.length>MAX_EVENTS)fail('Недопустимая версия или длина журнала.');let s=create(step);for(const action of raw.events)s=apply(s,action,lastStep);return s;}
   function snapshot(state){if(!state||state.version!==1||!Array.isArray(state.events))fail('Повреждено состояние занятия.');return {version:1,events:copy(state.events)};}
   function transition(state,action){return apply(replay(snapshot(state)),action);}
   function restore(raw){try{return replay(raw);}catch{return null;}}
-  return Object.freeze({MAX_EVENTS,steps,parseNumber,create,transition,snapshot,restore});
+  function exercise(step){
+    return {
+      create:()=>create(step),
+      restore(raw){try{return replay(raw,step,step);}catch{return null;}},
+      transition:(state,action)=>apply(state,action,step),
+    };
+  }
+  return Object.freeze({MAX_EVENTS,steps,parseNumber,create,transition,snapshot,restore,exercise});
 });

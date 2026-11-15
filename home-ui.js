@@ -63,6 +63,7 @@
       art: "gauge",
     },
   ];
+  groups.push({title:"Отверстия на токарном", ids:["holes"], copy:"Сверлим, растачиваем и проверяем втулку по чертежу.", art:"part"});
   const artwork = {
     chuck:
       '<svg viewBox="0 0 150 100" fill="none" aria-hidden="true"><ellipse cx="67" cy="53" rx="34" ry="35" fill="#dde3e8" stroke="#8d9eae"/><ellipse cx="77" cy="51" rx="31" ry="35" fill="#edf0f2" stroke="#8d9eae"/><ellipse cx="79" cy="51" rx="12" ry="15" fill="#c0ccd5" stroke="#8497a7"/><path d="m72 18 13 2-1 21-11-1zM49 65l8-10 17 10-5 10zM99 60l-12-3 6-18 11 4z" fill="#b6c3cd" stroke="#8497a7"/><path d="M32 91h83" stroke="#a8b6c3"/></svg>',
@@ -76,6 +77,8 @@
     const pending = window.CNCCourseUI?.pendingSession?.();
     const p = window.CNCLearningUI.progress();
     const currentSession = pending?.key === p.next?.target ? pending : null;
+    const outlineOpen = root.querySelector(".course-outline")?.open;
+    const exercisesOpen = root.querySelector(".home-intro-exercises")?.open;
     root.replaceChildren();
     const hero = node("div", undefined, "home-hero"),
       intro = node("div", undefined, "home-start-copy");
@@ -160,85 +163,10 @@
     meter.append(caption, bar);
     actions.append(start, meter);
     intro.append(actions);
-    if (p.done && window.CNCStartSessionUI) {
-      const first = node(
-        "button",
-        "Первое знакомство со станком",
-        "course-back",
-      );
-      first.type = "button";
-      first.addEventListener("click", () =>
-        window.CNCCourseUI.openIntroduction(),
-      );
-      intro.append(first);
-    }
-    if (window.CNCDrawingSessionUI) {
-      const d = node("button", "Деталь и измерение", "course-back");
-      d.type = "button";
-      d.addEventListener("click", () => window.CNCCourseUI.openDrawing());
-      intro.append(d);
-    }
-    if (window.CNCFirstProcessUI) {
-      const f = node("button", "Координаты и первый процесс", "course-back");
-      f.type = "button";
-      f.addEventListener("click", () => window.CNCCourseUI.openFirstProcess());
-      intro.append(f);
-    }
-    if (window.CNCProgramSetupUI) {
-      const ps = node("button", "Программа и наладка", "course-back");
-      ps.type = "button";
-      ps.addEventListener("click", () => window.CNCCourseUI.openProgramSetup());
-      intro.append(ps);
-    }
-    if (window.CNCShaftProjectUI) {
-      const project = node(
-        "button",
-        "Проект: ступенчатый валик",
-        "course-back",
-      );
-      project.type = "button";
-      project.addEventListener("click", () =>
-        window.CNCCourseUI.openShaftProject(),
-      );
-      intro.append(project);
-    }
-    if (window.CNCOperationCourseUI) {
-      const op = node(
-        "button",
-        "Токарные операции · торец, канавки, конус",
-        "course-back",
-      );
-      op.type = "button";
-      op.onclick = () => window.CNCCourseUI.openOperations();
-      intro.append(op);
-    }
-    if (window.CNCMillingCourseUI) {
-      const mill = node(
-        "button",
-        "Фрезерный станок XYZ · траектории и ошибки",
-        "course-back",
-      );
-      mill.type = "button";
-      mill.onclick = () => window.CNCCourseUI.openMilling();
-      intro.append(mill);
-    }
-    if (window.CNCDiagnosticCourseUI) {
-      const d = node(
-        "button",
-        "Диагностика · причины и исправления",
-        "course-back",
-      );
-      d.type = "button";
-      d.onclick = () => window.CNCCourseUI.openDiagnostics();
-      intro.append(d);
-    }
-    const preparation = node("details", undefined, "home-preparation");
-    preparation.append(node("summary", "Занятия и проекты · выбрать тему"));
-    for (const entry of [...intro.children].filter(
-      (e) => e.className === "course-back",
-    ))
-      preparation.append(entry);
-    if (preparation.children.length > 1) intro.append(preparation);
+    const allTasks = node("button", "Все задания курса", "button secondary");
+    allTasks.type = "button";
+    allTasks.addEventListener("click", openOutline);
+    actions.append(allTasks);
     if (!p.complete)
       intro.append(
         node(
@@ -275,10 +203,9 @@
       const items = p.items.filter((item) => g.ids.includes(item.group)),
         done = items.filter((item) => item.done).length,
         current = items.some((item) => item.id === p.next?.id),
-        available = current || done > 0;
+        target = current ? p.next : items.find((item) => !item.done) || items[0];
       const card = node("button", undefined, "home-route-card");
       card.type = "button";
-      card.disabled = !available;
       card.dataset.current = String(current);
       card.dataset.done = String(done === items.length);
       card.setAttribute(
@@ -288,8 +215,7 @@
           done +
           " из " +
           items.length +
-          " шагов" +
-          (available ? "" : ", откроется позже"),
+          " шагов",
       );
       card.append(
         node(
@@ -312,22 +238,25 @@
               ? "Начать этот этап"
               : done
                 ? done + " из " + items.length + " шагов"
-                : "Откроется дальше",
+                : "Открыть этап",
           "home-route-status",
         ),
-        node("span", available ? "↗" : "—", "home-route-arrow"),
+        node("span", "↗", "home-route-arrow"),
       );
       card.addEventListener("click", () => {
-        const item = current ? p.next : items.find((item) => item.done);
-        if (item) window.CNCLearningUI.open(item.id);
+        if (current) window.CNCLearningUI.open(target.id);
+        else window.CNCLearningUI.openDirect(target.id);
       });
       route.append(card);
     }
     root.append(route);
     const outline = node("details", undefined, "course-outline");
-    outline.append(node("summary", "Подробная программа · этапов: " + p.total));
+    outline.open = !!outlineOpen;
+    outline.append(node("summary", "Подробная программа · заданий: " + p.total));
     const list = node("ol", undefined, "home-path learning-path-cards");
-    for (const [i, g] of p.groups.entries()) {
+    const groupOrder = [...new Set(p.items.map((item) => item.group))];
+    for (const [i, id] of groupOrder.entries()) {
+      const g = p.groups.find((group) => group.id === id);
       const li = node("li");
       li.dataset.done = String(g.complete);
       li.append(
@@ -340,13 +269,27 @@
         const row = node("li"),
           b = node("button", (item.done ? "✓ " : "") + item.title);
         b.type = "button";
-        b.disabled = !item.done && p.next?.id !== item.id;
         b.setAttribute(
           "aria-current",
           p.next?.id === item.id ? "step" : "false",
         );
-        b.addEventListener("click", () => window.CNCLearningUI.open(item.id));
+        b.addEventListener("click", () => window.CNCLearningUI.openDirect(item.id));
         row.append(b);
+        if (item.id === "practice-firstSession" && window.CNCStartSession) {
+          const exercises = node("details", undefined, "home-intro-exercises");
+          exercises.open = !!exercisesOpen;
+          exercises.append(node("summary", "Отдельные упражнения вводного блока"));
+          const exerciseList = node("ul");
+          for (const exercise of window.CNCStartSession.steps) {
+            const entry = node("li"), link = node("button", exercise.title);
+            link.type = "button";
+            link.addEventListener("click", () => window.CNCLearningUI.openIntroExercise(exercise.id));
+            entry.append(link);
+            exerciseList.append(entry);
+          }
+          exercises.append(exerciseList);
+          row.append(exercises);
+        }
         steps.append(row);
       }
       li.append(steps);
@@ -362,7 +305,14 @@
       ),
     );
   }
+  function openOutline() {
+    const outline = root.querySelector(".course-outline");
+    outline.open = true;
+    outline.querySelector("summary").focus();
+    outline.scrollIntoView?.({ block: "start" });
+  }
   window.CNCHomeUI = {
+    openOutline,
     mount(parent, start) {
       onStart = start;
       root = node("section", undefined, "home-screen");

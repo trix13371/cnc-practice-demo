@@ -94,8 +94,8 @@
 
 
   function pause(){window.CNCDemo.pauseWorkshop();window.CNCSandboxUI?.pause();}
-  function setScreen(next){pause();screen=next;try{localStorage.setItem('cnc-workspace-screen-v1',next);}catch{}render();const title=next==='sandbox'?sandbox.querySelector('h1'):next==='course'?course.querySelector('h1'):next==='home'?document.querySelector('.home-screen h1'):next==='catalog'?catalog.querySelector('h1'):next==='training'?(training.querySelector('.cycle-heading h1')||q('.intro h1')):q('.intro h1');title.tabIndex=-1;title.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
-  function chooseStage(next){pause();stage=window.CNCLearningUI.capStage(Math.max(0,Math.min(3,next)));window.CNCMachineUI.saveStage(window.CNCDemo.readState().task,stage);render();
+  function setScreen(next){pause();if(next!=='work')window.CNCDemo.closeControlPractice();screen=next;try{localStorage.setItem('cnc-workspace-screen-v1',next);}catch{}render();const title=next==='sandbox'?sandbox.querySelector('h1'):next==='course'?course.querySelector('h1'):next==='home'?document.querySelector('.home-screen h1'):next==='catalog'?catalog.querySelector('h1'):next==='training'?(training.querySelector('.cycle-heading h1')||q('.intro h1')):q('.intro h1');title.tabIndex=-1;title.focus({preventScroll:true});window.scrollTo({top:0,behavior:'instant'});}
+  function chooseStage(next){pause();if(window.CNCDemo.controlPracticeActive())next=3;stage=window.CNCLearningUI.capStage(Math.max(0,Math.min(3,next)));if(!window.CNCDemo.controlPracticeActive())window.CNCMachineUI.saveStage(window.CNCDemo.readState().task,stage);render();
     const state=window.CNCDemo.readState();if(state.mode==='exam')return;
     if(!$('lab-workspace').hidden)$(stage<2?'lab-target':'lab-result').click();
     else {$(stage===2?'basic-2d':'basic-3d').click();if(stage!==2)$(stage===3?'basic-result':'basic-target').click();}
@@ -120,7 +120,7 @@
     const currentTask=[...window.CNCModel.tasks,...window.CNCLabModel.tasks].find(t=>t.id===state.task);
     q('.intro h1').textContent=screen==='home'?'Мой курс':screen==='gcode'?'Учимся программировать ЧПУ':screen==='skills'?'Карта навыков':screen==='reference'?'Справочник':screen==='sandbox'?'Свободная мастерская':screen==='model-spec'?'Модель тренажёра':screen==='training'?(window.CNCLearningUI?.training()?(window.CNCLearningUI.training().independent?'Самостоятельная работа':'Полный цикл'):'Практикум'):screen==='course'?'ЧПУ с полного нуля':screen==='catalog'?'Задания':screen==='pilot'?'Проверка курса':screen==='progress'?'Мои результаты':screen==='history'?'Разборы экзаменов':exam?'Экзамен':currentTask?.title||'Учебная мастерская';
     $('shell-page-label').textContent=q('.intro h1').textContent;
-    stepper.querySelectorAll('button').forEach((b,i)=>{b.setAttribute('aria-current',i===stage?'step':'false');b.classList.toggle('selected',i===stage);});
+    stepper.querySelectorAll('button').forEach((b,i)=>{b.setAttribute('aria-current',i===stage?'step':'false');b.classList.toggle('selected',i===stage);b.disabled=window.CNCDemo.controlPracticeActive()&&i!==3;});
     $('stage-description').textContent=descriptions[stage];$('stage-count').textContent=`Этап ${stage+1} из 4`;
     $('stage-next').textContent=['Настроить обработку','К обработке','К измерениям','Выбрать задание'][stage];
     $('stage-next').className='button '+(stage<2?'primary':'secondary');$('stage-back').hidden=true;
@@ -168,7 +168,10 @@
   // Pause before a view change, retaining completed passes and all form values.
   window.CNCMachineUI.mount(catalog,work,{stage:()=>stage,go:chooseStage,catalog:()=>setScreen('catalog')});
   window.CNCWorkshop={sync,goStage:chooseStage,results(){setScreen('progress');},pilot(){setScreen('pilot');},examHistory(){setScreen('history');},home(){ $('mode-learn').click();setScreen('home'); },
-    openPractice(id,startStage=0,guided=false){if(!guided)window.CNCLearningUI.deactivate();window.CNCDemo.openPractice(id,guided);setScreen('work');
+    openPractice(id,startStage=0,guided=false,direct=false){if(!guided)window.CNCLearningUI.deactivate();
+      if(direct&&id==='diameter'&&startStage===3&&!window.CNCDemo.basicEvidence(id).finished)window.CNCDemo.openControlPractice();
+      else window.CNCDemo.openPractice(id,guided);
+      setScreen('work');
       const s=window.CNCDemo.machineSnapshot();chooseStage(startStage===3&&!s?.finished?2:startStage);
       if(guided&&!s?.measurement){$('basic-gauge-surface').value='worked';$('basic-gauge-tool').value='micrometer';}},
     openGCode(id,guided=false){if(!guided)window.CNCLearningUI.deactivate();$('mode-learn').click();setScreen('gcode');window.CNCGCodeUI.open(id,guided);window.CNCLearningUI.render();},
@@ -181,6 +184,6 @@
     let introduced=false;try{introduced=localStorage.getItem('cnc-graphite-layout-v1')==='seen';localStorage.setItem('cnc-graphite-layout-v1','seen');}catch{}
     if(introduced&&['home','course','gcode','skills','training','reference','catalog','work','history','progress','pilot','model-spec','sandbox'].includes(remembered))setScreen(remembered);
     else setScreen('home');
-    if(screen==='course')window.CNCLearningUI.restoreCourse();
+    window.CNCLearningUI.restoreSelection(screen);
   }
 })();

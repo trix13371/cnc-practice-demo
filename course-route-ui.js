@@ -12,14 +12,128 @@
     element.addEventListener("click", action);
     return element;
   };
-  function render({ article, step, path, save, available, histories }) {
+  function courseOutline() {
+    window.CNCWorkshop.home();
+    window.CNCHomeUI.openOutline();
+  }
+  function practice({ article, step, engine, ui, index }) {
+    const model = index >= 0 ? { ...engine, ...engine.exercise(index) } : engine;
+    const intro = step.target === "firstSession" && index >= 0;
+    const key = "cnc-course-exercise-v1:" + step.id;
+    let attempt = {};
+    try {
+      const stored = JSON.parse(localStorage.getItem(key) || "null");
+      const restored = model.restore(stored?.saved);
+      if (restored && (index < 0 || (intro ? restored.step : restored.current) === index)) attempt = stored;
+    } catch {
+      // Storage can be unavailable in standalone or private browsing.
+    }
+    const save = () => {
+      try {
+        localStorage.setItem(key, JSON.stringify(attempt));
+        return true;
+      } catch {
+        return false;
+      }
+    };
+    const start = () => step.target === "shaftProject" ? model.create(step.subtask) : model.create();
+    article.replaceChildren(
+      node("p", "Свободная практика. Эта попытка хранится в этом браузере отдельно от зачёта курса.", "start-note"),
+      ui.create({
+        model,
+        singleExercise: intro,
+        headingTag: "h1",
+        saved: attempt.saved || model.snapshot(start()),
+        savedDraft: attempt.draft,
+        routeMode: true,
+        onChange(saved) {
+          attempt = { saved };
+          return save();
+        },
+        onDraft(value) {
+          attempt.saved ??= model.snapshot(start());
+          attempt.draft = step.target === "firstSession"
+            ? { step: model.restore(attempt.saved).step, value }
+            : value;
+          return save();
+        },
+        onDone: courseOutline,
+      }),
+    );
+  }
+  function render({ article, step, path, save, available, histories, direct = false }) {
     const model = window.CNCCourse;
     const key = step.target,
       modelKey = { firstSession: "startSession" }[key] || key,
       engine = model[modelKey],
       raw = path[key],
-      current = engine.restore(raw),
+      current = key === "holeCourse" ? null : engine.restore(raw),
       proofs = [path, ...histories];
+    if (key === "holeCourse") {
+      const id = step.subtask, saved = raw?.works?.[id];
+      const historical = !saved && histories.map(h=>h.holeCourse?.works?.[id]).find(entry=>engine.restore(entry,id)?.complete);
+      article.append(window.CNCHoleCourseUI.create({
+        id, saved: saved || historical, readOnly: !!historical,
+        onChange(value) {
+          const works = {...path.holeCourse?.works};
+          if (value) works[id] = value;
+          else delete works[id];
+          if (Object.keys(works).length) path.holeCourse = {version:1,works};
+          else delete path.holeCourse;
+          save();
+        },
+        onDone: direct ? courseOutline : () => window.CNCWorkshop.home(),
+      }));
+      return;
+    }
+    if (key === "mountingPlate") {
+      article.append(button("Перенос и история работы",()=>window.CNCProgressUI.openMilling()));
+      const archived = !raw && histories.find(item=>item.mountingPlate);
+      article.append(window.CNCMountingPlateUI.create({
+        saved: archived ? archived.mountingPlate : raw,
+        readOnly: !!archived,
+        onChange(value) {
+          path.mountingPlate = value;
+          save();
+          return available();
+        },
+        onDone: direct ? courseOutline : () => window.CNCWorkshop.home(),
+      }));
+      return;
+    }
+    if (key === "millingPlate") {
+      article.append(button("Перенос и история работы",()=>window.CNCProgressUI.openMilling()));
+      const historical = histories.find((item) => engine.restore(item.millingPlate)?.done.length);
+      const review = !raw?.events.length && !path.millingPlateDraft &&
+        (historical || histories.find(item=>item.millingPlate));
+      article.append(window.CNCMillingCourseUI.create({
+        model: engine,
+        headingTag: "h1",
+        saved: review ? review.millingPlate : raw,
+        savedDraft: review ? review.millingPlateDraft : path.millingPlateDraft,
+        readOnly: !!review,
+        routeMode: true,
+        onChange(value) {
+          path.millingPlate = value;
+          save();
+          return available();
+        },
+        onDraft(value) {
+          if (!engine.validDraft(value)) return false;
+          path.millingPlate ??= engine.snapshot(engine.create());
+          path.millingPlateDraft = value;
+          save();
+          return available();
+        },
+        onDone: direct ? courseOutline : () => window.CNCWorkshop.home(),
+      }));
+      return;
+    }
+    if (key === "firstSession" && step.subtask) {
+      const index = engine.steps.findIndex((exercise) => exercise.id === step.subtask);
+      if (index >= 0)
+        return practice({ article, step, engine, ui: window.CNCStartSessionUI, index });
+    }
     const doneIn = (value) => {
       const state = engine.restore(value);
       if (!state) return false;
@@ -34,7 +148,7 @@
       return state.done.some((d) => d.id === step.subtask);
     };
     const proof = proofs.find((h) => doneIn(h[key]));
-    const leave = () => window.CNCWorkshop.home(),
+    const leave = direct ? courseOutline : () => window.CNCWorkshop.home(),
       uiName = {
         firstSession: "CNCStartSessionUI",
         drawingSession: "CNCDrawingSessionUI",
@@ -45,8 +159,10 @@
         operationCourse: "CNCOperationCourseUI",
         millingCourse: "CNCMillingCourseUI",
         diagnosticCourse: "CNCDiagnosticCourseUI",
-      }[key];
+      }[key],
+      ui = window[uiName];
     if (proof && !step.subtask) {
+      if (direct) return practice({ article, step, engine, ui, index: -1 });
       article.replaceChildren(
         node("h1", step.title),
         node(
@@ -79,7 +195,8 @@
         save();
       }
       saved = engine.snapshot(s);
-      if (s.taskId !== step.subtask)
+      if (s.taskId !== step.subtask) {
+        if (direct) return practice({ article, step, engine, ui, index: -1 });
         article.append(
           node(
             "p",
@@ -89,6 +206,7 @@
             "start-hint",
           ),
         );
+      }
     } else if (step.subtask) {
       let s = current || engine.create();
       const definitions = engine.tasks || engine.lessons,
@@ -98,6 +216,8 @@
         if (!action) break;
         s = engine.transition(s, action);
       }
+      if (direct && target >= 0 && s.current !== target)
+        return practice({ article, step, engine, ui, index: target });
       saved = engine.snapshot(s);
       if (JSON.stringify(saved) !== JSON.stringify(raw)) {
         path[key] = saved;
@@ -135,7 +255,7 @@
       }
       return available();
     };
-    const widget = window[uiName].create({
+    const widget = ui.create({
       headingTag: "h1",
       saved,
       savedDraft: readOnly ? undefined : path[key + "Draft"],

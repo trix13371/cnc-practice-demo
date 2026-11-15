@@ -1,0 +1,33 @@
+"use strict";
+const assert=require("node:assert/strict"), hole=require("../hole-course-model"), p=require("../progress-model");
+const {actions,run,book,m,b}=require("./hole-course-fixtures.cjs");
+const confirm={type:"confirm"};
+for(const [id,list] of Object.entries(actions)){
+  const attempt=run(id,[...list,confirm]);
+  assert(attempt.complete,id+": "+JSON.stringify(hole.grade(attempt).checks)+"; "+attempt.feedback);
+  assert(hole.grade(attempt).independent);
+  assert.deepEqual(hole.restore(JSON.parse(JSON.stringify(hole.snapshot(attempt))),id),attempt);
+}
+assert(!run("read",[m(-8,"micrometer"),confirm]).complete);
+assert(!run("depth",[{type:"predict",value:17},...actions.depth.slice(1),confirm]).complete);
+assert(!run("bore",[m(-22),b(10,16),b(12,16),m(-8),confirm]).complete,"pre-cut readings are stale");
+assert(run("bore",[b(12,16),...actions.bore,confirm]).complete,"repair after failed one-pass bore");
+const failed=run("diagnosis",[{type:"preview"},{type:"diagnose",cause:"feed"}]);
+assert(failed.preview && failed.cause==="feed");
+assert.deepEqual(failed.machine.profile,hole.create("diagnosis").machine.profile,"preview cannot cut the original part");
+assert(run("diagnosis",[{type:"preview"},{type:"diagnose",cause:"feed"},...actions.diagnosis.slice(1),confirm]).complete);
+const helped=run("sleeve",[{type:"hint"},{type:"restart"},...actions.sleeve,confirm]);
+assert(helped.complete&&!hole.grade(helped).independent);
+assert(!hole.restore({...hole.snapshot(helped),complete:true},"sleeve"));
+assert(!hole.restore({...hole.snapshot(helped),assignment:{...hole.snapshot(helped).assignment,criteriaVersion:42}},"sleeve"));
+const original=p.empty(),incoming=p.empty();
+original.sections.coursePath.current.holeCourse={version:1,works:{read:hole.snapshot(run("read",[m(-5)]))}};
+incoming.sections.coursePath.current.holeCourse=book();
+const merged=p.merge(original,incoming);
+assert.equal(p.summary(merged).holeCourse.done.length,6);
+assert.equal(merged.sections.coursePath.current.holeCourse.works.read.events[0].z,-5,"unfinished local attempt remains editable");
+assert.deepEqual(p.parse(p.stringify(merged)).sections.coursePath,merged.sections.coursePath);
+assert.deepEqual(p.merge(merged,incoming).sections.coursePath,merged.sections.coursePath);
+assert.equal(p.summary(original).holeCourse.done.length,0);
+assert.equal(p.summary(p.empty()).holeCourse.total,6);
+console.log("Hole course: six workflows, diagnosis recovery, fresh measures, immutable grading, restore and conflict history passed.");

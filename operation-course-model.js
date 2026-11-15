@@ -176,20 +176,20 @@
         predictionInput: "",
       };
     }
-    function initial(version) {
+    function initial(version, current = 0) {
       return {
         version,
         originVersion: version,
         currentAssignment: null,
         events: [],
-        current: 0,
+        current,
         done: [],
         help: [],
         errors: tasks.map(() => 0),
         attempt: 1,
         feedback: "",
-        draft: tasks[0].starter,
-        ...blank(tasks[0]),
+        draft: tasks[current].starter,
+        ...blank(tasks[current]),
       };
     }
     function create() {
@@ -665,9 +665,9 @@
     }
     let cachedKey = null,
       cachedValue = null;
-    function restore(raw) {
+    function replay(raw, current = 0) {
       try {
-        const key = JSON.stringify(raw);
+        const key = JSON.stringify([current, raw]);
         if (key === cachedKey) return copy(cachedValue);
         exact(
           raw,
@@ -683,7 +683,8 @@
         )
           return null;
         text(raw.draft);
-        let s = initial(raw.version === 1 ? 1 : raw.originVersion);
+        if (current && (raw.version !== 2 || raw.originVersion !== 2)) return null;
+        let s = initial(raw.version === 1 ? 1 : raw.originVersion, current);
         for (const a of raw.events) s = apply(s, a);
         if (
           s.version !== raw.version ||
@@ -697,6 +698,18 @@
       } catch {
         return null;
       }
+    }
+    const restore = (raw) => replay(raw);
+    function exercise(current) {
+      const start = () => apply(initial(2, current), {
+        type: "begin",
+        assignment: copy(tasks[current].assignment),
+      });
+      return {
+        create: start,
+        restore: (raw) => replay(raw, current),
+        transition: (state, action) => apply(state, action),
+      };
     }
     function transition(s, a) {
       const r = restore(snapshot(s));
@@ -717,6 +730,7 @@
       review,
       tasks,
       create,
+      exercise,
       snapshot,
       restore,
       transition,

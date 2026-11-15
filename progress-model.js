@@ -41,7 +41,12 @@
     if(id==='course'){
       demand(raw.version===1);recordMap(raw.answers,course.lessons.map(l=>l.id));const s=course.restore(raw);demand(Object.keys(s.answers).length===Object.keys(raw.answers).length,'В архиве есть неподтверждённый ответ урока.');return s;
     }
-    if(id==='coursePath'){if(raw.metrologyCourse!==undefined)demand(course.metrologyCourse.restore(raw.metrologyCourse),'Повреждён контроль размеров.');if(raw.activePractice!==undefined)demand(['course','operationCourse','millingCourse','diagnosticCourse','metrologyCourse'].includes(raw.activePractice),'Неверный раздел практики.');if(raw.diagnosticCourse!==undefined)demand(course.diagnosticCourse.restore(raw.diagnosticCourse),'Повреждена диагностика.');if(raw.millingCourse!==undefined)demand(course.millingCourse.restore(raw.millingCourse),'Повреждён фрезерный практикум.');if(raw.operationCourse!==undefined)demand(course.operationCourse.restore(raw.operationCourse),'Повреждён практикум операций.');demand(raw.version===1&&object(raw.phases)&&Array.isArray(raw.explored));if(raw.shaftProject!==undefined)demand(course.shaftProject.restore(raw.shaftProject),'Повреждён проект валика.');if(raw.shaftProjectDraft!==undefined)demand(course.shaftProject.validDraft(raw.shaftProjectDraft,course.shaftProject.restore(raw.shaftProject)),'Повреждён черновик проекта валика.');if(raw.programSetup!==undefined)demand(course.programSetup.restore(raw.programSetup),'Повреждено занятие программы и наладки.');if(raw.programSetupDraft!==undefined)demand(course.programSetup.validDraft(raw.programSetupDraft,course.programSetup.restore(raw.programSetup)),'Повреждён черновик программы и наладки.');if(raw.firstProcess!==undefined)demand(course.firstProcess.restore(raw.firstProcess),'Повреждён первый процесс.');if(raw.firstProcessDraft!==undefined)demand(course.firstProcess.validDraft(raw.firstProcessDraft,course.firstProcess.restore(raw.firstProcess)),'Повреждён черновик первого процесса.');if(raw.drawingSession!==undefined)demand(course.drawingSession.restore(raw.drawingSession),'Повреждено занятие по измерениям.');if(raw.drawingSessionDraft!==undefined)demand(course.drawingSession.validDraft(raw.drawingSessionDraft,course.drawingSession.restore(raw.drawingSession)),'Повреждён черновик измерения.');if(raw.firstSession!==undefined)demand(course.startSession.restore(raw.firstSession),'Повреждено вводное занятие.');if(raw.firstSessionDraft!==undefined)demand(course.validFirstSessionDraft(raw.firstSessionDraft,course.startSession.restore(raw.firstSession)),'Повреждён черновик вводного занятия.');if(raw.practice!==undefined){recordMap(raw.practice,course.practice.ids);for(const [key,value] of Object.entries(raw.practice))demand(course.practice.restore(value,key),'Повреждена запись практики на схеме.');}return course.restorePath(raw);}
+    if(id==='coursePath'){
+      if(raw.holeCourse!==undefined)demand(course.holeCourse.restoreBook(raw.holeCourse),'Повреждён журнал обработки отверстий или неизвестна версия задания.');
+      if(raw.mountingPlate!==undefined)demand(course.mountingPlate.restore(raw.mountingPlate),'Повреждён журнал монтажной плиты.');
+      if(raw.millingPlate!==undefined)demand(course.millingPlate.restore(raw.millingPlate),'Повреждён журнал самостоятельной плиты.');
+      if(raw.millingPlateDraft!==undefined)demand(raw.millingPlate!==undefined&&course.millingPlate.validDraft(raw.millingPlateDraft),'Повреждён черновик самостоятельной плиты.');
+      if(raw.metrologyCourse!==undefined)demand(course.metrologyCourse.restore(raw.metrologyCourse),'Повреждён контроль размеров.');if(raw.activePractice!==undefined)demand(['course','operationCourse','millingCourse','diagnosticCourse','metrologyCourse'].includes(raw.activePractice),'Неверный раздел практики.');if(raw.diagnosticCourse!==undefined)demand(course.diagnosticCourse.restore(raw.diagnosticCourse),'Повреждена диагностика.');if(raw.millingCourse!==undefined)demand(course.millingCourse.restore(raw.millingCourse),'Повреждён фрезерный практикум.');if(raw.operationCourse!==undefined)demand(course.operationCourse.restore(raw.operationCourse),'Повреждён практикум операций.');demand(raw.version===1&&object(raw.phases)&&Array.isArray(raw.explored));if(raw.shaftProject!==undefined)demand(course.shaftProject.restore(raw.shaftProject),'Повреждён проект валика.');if(raw.shaftProjectDraft!==undefined)demand(course.shaftProject.validDraft(raw.shaftProjectDraft,course.shaftProject.restore(raw.shaftProject)),'Повреждён черновик проекта валика.');if(raw.programSetup!==undefined)demand(course.programSetup.restore(raw.programSetup),'Повреждено занятие программы и наладки.');if(raw.programSetupDraft!==undefined)demand(course.programSetup.validDraft(raw.programSetupDraft,course.programSetup.restore(raw.programSetup)),'Повреждён черновик программы и наладки.');if(raw.firstProcess!==undefined)demand(course.firstProcess.restore(raw.firstProcess),'Повреждён первый процесс.');if(raw.firstProcessDraft!==undefined)demand(course.firstProcess.validDraft(raw.firstProcessDraft,course.firstProcess.restore(raw.firstProcess)),'Повреждён черновик первого процесса.');if(raw.drawingSession!==undefined)demand(course.drawingSession.restore(raw.drawingSession),'Повреждено занятие по измерениям.');if(raw.drawingSessionDraft!==undefined)demand(course.drawingSession.validDraft(raw.drawingSessionDraft,course.drawingSession.restore(raw.drawingSession)),'Повреждён черновик измерения.');if(raw.firstSession!==undefined)demand(course.startSession.restore(raw.firstSession),'Повреждено вводное занятие.');if(raw.firstSessionDraft!==undefined)demand(course.validFirstSessionDraft(raw.firstSessionDraft,course.startSession.restore(raw.firstSession)),'Повреждён черновик вводного занятия.');if(raw.practice!==undefined){recordMap(raw.practice,course.practice.ids);for(const [key,value] of Object.entries(raw.practice))demand(course.practice.restore(value,key),'Повреждена запись практики на схеме.');}return course.restorePath(raw);}
     if(id==='library'){
       demand(raw.version===1&&Array.isArray(raw.read)&&Array.isArray(raw.bookmarks));const s=library.restore(raw);for(const k of ['read','bookmarks'])demand(raw[k].every(v=>s[k].includes(v)));return s;
     }
@@ -76,7 +81,7 @@
   }
   function active(id,s){
     if(id==='sandbox')return sandbox.isActive(s);
-    if(id==='course')return !!Object.keys(s.answers).length;if(id==='coursePath')return registry.books.some(b=>b.hasWork(s[b.key]))||!!s.shaftProject?.events.length||!!s.programSetup?.events.length||!!s.firstProcess?.events.length||!!s.drawingSession?.events.length||!!s.firstSession?.events.length||s.selected!=='machine'||s.explored.length>0||Object.keys(s.phases).length>0||Object.values(s.practice||{}).some(v=>v.events.length||v.selection!==null);
+    if(id==='course')return !!Object.keys(s.answers).length;if(id==='coursePath')return !!s.mountingPlate||!!Object.keys(s.holeCourse?.works||{}).length||!!s.millingPlate?.events.length||!!s.millingPlateDraft||registry.books.some(b=>b.hasWork(s[b.key]))||!!s.shaftProject?.events.length||!!s.programSetup?.events.length||!!s.firstProcess?.events.length||!!s.drawingSession?.events.length||!!s.firstSession?.events.length||s.selected!=='machine'||s.explored.length>0||Object.keys(s.phases).length>0||Object.values(s.practice||{}).some(v=>v.events.length||v.selection!==null);
     if(id==='base')return Object.keys(s.completed).length>0||s.history.length>0||!!s.exam||s.trainingTask!=='diameter'||s.assisted||s.hintLevel>0||canonical(s.draft)!==canonical(defaults)||Object.values(s.basicSessions).some(v=>v.finished||v.assisted||v.hintLevel||canonical(v.settings)!==canonical(defaults));
     if(id==='training')return Object.keys(s.drafts).length>0||Object.values(s.sessions).some(v=>v.actions.length)||Object.values(s.archive).some(a=>a.length);
     if(id==='gcode')return Object.keys(s.drafts).length>0||Object.values(s.predictionDrafts).some(v=>Object.values(v).some(x=>x!==''))||Object.values(s.sessions).some(v=>v.events.length)||Object.keys(s.legacy.passed).length>0||Object.keys(s.legacy.drafts).length>0||Object.values(s.legacy.helped).some(Boolean);
@@ -88,13 +93,22 @@
     safeTree(raw);demand(object(raw)&&raw.format===FORMAT&&raw.version===VERSION,'Эта версия архива не поддерживается.');demand(typeof raw.createdAt==='string'&&Number.isFinite(Date.parse(raw.createdAt)));recordMap(raw.sections,ids);demand(ids.filter(id=>id!=='sandbox').every(id=>Object.hasOwn(raw.sections,id)),'Архив содержит не все разделы.');
     const a=empty();a.createdAt=raw.createdAt;for(const id of ids){const s=raw.sections[id];if(id==='sandbox'&&s===undefined)continue;demand(object(s)&&object(s.current)&&Array.isArray(s.history)&&s.history.length<=MAX_HISTORY);const current=normalize(id,s.current),seen=new Set([canonical(current)]),history=[];for(const v of s.history){demand(object(v));const n=normalize(id,v),key=canonical(n);if(!seen.has(key)){seen.add(key);history.push(n);}}a.sections[id]={current,history};}return a;
   }
-  function parse(text){
-    demand(typeof text==='string'&&new TextEncoder().encode(text).length<=MAX_BYTES,'Выберите JSON-файл до 4 МБ.');let raw;try{raw=JSON.parse(text.replace(/^\uFEFF/,''));}catch{throw Error('Файл не является корректным JSON.');}
+  function readJSON(text){
+    demand(typeof text==='string'&&new TextEncoder().encode(text).length<=MAX_BYTES,'Выберите JSON-файл до 4 МБ.');
+    try{return JSON.parse(text.replace(/^\uFEFF/,''));}
+    catch{throw Error('Файл не является корректным JSON.');}
+  }
+  function parse(text){return parseArchive(readJSON(text));}
+  function parseArchive(raw){
     safeTree(raw);
     if(raw?.format===FORMAT)return validate(raw);
     // The old standalone workshop export contains only its own journal.
     if(object(raw)&&[1,2].includes(raw.version)&&object(raw.sessions)&&typeof raw.selected==='string'&&training.ids().includes(raw.selected)){const a=empty();a.sections.training.current=normalize('training',raw);a.migratedFrom='Практикум прежней версии';return a;}
     throw Error('Формат файла не поддерживается. Нужен общий архив или прежний JSON практикума.');
+  }
+  function ensureSyncSize(a){
+    demand(new TextEncoder().encode(JSON.stringify(a)).length<=MAX_BYTES,'После переноса общий прогресс превысил бы 4 МБ.');
+    return a;
   }
   function stringify(a){const text=JSON.stringify(validate(a),null,2);demand(new TextEncoder().encode(text).length<=MAX_BYTES,'Прогресс превышает 4 МБ. Он не был обрезан; сохраните отдельные отчёты разделов.');return text;}
   function fromRaw(raw){
@@ -104,11 +118,139 @@
   function toRaw(a,raw){
     a=validate(a);const next={...raw};for(const id of ids)next[config.sections[id]]=JSON.stringify(a.sections[id].current);next[config.historyKey]=JSON.stringify({version:1,sections:Object.fromEntries(ids.map(id=>[id,a.sections[id].history]))});return next;
   }
+  const MILLING_WORK_FORMAT='cnc-milling-work';
+  const millingWorks=Object.freeze(Object.fromEntries([
+    ['millingPlate',course.millingPlate,'Сеточный профиль'],
+    ['mountingPlate',course.mountingPlate,'Профиль 2.5D'],
+  ].map(([key,engine,profileTitle])=>{
+    const {profileId,profileVersion}=engine.task.assignment;
+    return [key,Object.freeze({key,title:engine.task.title,profileTitle,profileId,profileVersion})];
+  })));
+  const exactFields=(value,keys)=>object(value)&&Object.keys(value).length===keys.length&&keys.every(k=>Object.hasOwn(value,k));
+  function millingWorkEntry(path,key){
+    const journal=path[key];
+    if(!journal)return null;
+    if(key==='millingPlate'){
+      const draft=path.millingPlateDraft;
+      if(!journal.events.length&&!draft)return null;
+      return draft===undefined?{journal}:{journal,draft};
+    }
+    if(!journal.executed&&journal.order==='pocket-first'&&!Object.values(journal.programs).some(Boolean))return null;
+    return {journal};
+  }
+  function millingWorkStatus(key,entry){
+    const state=course[key].restore(entry.journal);
+    return state.confirmed||state.done?.length?'Зачтена':
+      (key==='mountingPlate'&&state.executed?'После прогона':'В работе');
+  }
+  function normalizeMillingEntry(entry,key){
+    const hasDraft=key==='millingPlate'&&object(entry)&&Object.hasOwn(entry,'draft');
+    demand(exactFields(entry,hasDraft?['journal','draft']:['journal']),
+      'Файл содержит неизвестные поля фрезерной работы.');
+    const engine=course[key],state=engine.restore(entry.journal);
+    demand(state,'Журнал фрезерной работы не прошёл проверку.');
+    if(hasDraft)demand(engine.validDraft(entry.draft),'Черновик фрезерной работы повреждён.');
+    const journal=engine.snapshot(state);
+    const result=millingWorkEntry({[key]:journal,...(hasDraft?{millingPlateDraft:entry.draft}:{})},key);
+    demand(result,'В файле есть пустая фрезерная работа.');
+    return result;
+  }
+  function millingEnvelope(descriptor,current,history){
+    const {key,profileId,profileVersion}=descriptor;
+    return {format:MILLING_WORK_FORMAT,version:1,kind:key,profileId,profileVersion,current,history};
+  }
+  function uniqueMillingEntries(entries,current){
+    const seen=new Set(current?[canonical(current)]:[]),result=[];
+    for(const entry of entries){
+      if(!entry)continue;
+      const signature=canonical(entry);
+      if(seen.has(signature))continue;
+      seen.add(signature);
+      result.push(entry);
+    }
+    return result;
+  }
+  function validateMillingWork(raw){
+    safeTree(raw);
+    demand(exactFields(raw,['format','version','kind','profileId','profileVersion','current','history'])&&
+      raw.format===MILLING_WORK_FORMAT&&raw.version===1&&typeof raw.kind==='string'&&Object.hasOwn(millingWorks,raw.kind),
+      'Формат фрезерной работы не поддерживается.');
+    const descriptor=millingWorks[raw.kind];
+    demand(raw.profileId===descriptor.profileId&&raw.profileVersion===descriptor.profileVersion,
+      'Версия профиля фрезерной работы не поддерживается.');
+    demand(Array.isArray(raw.history)&&raw.history.length<=MAX_HISTORY&&(raw.current!==null||raw.history.length),
+      'В файле нет работы или превышен предел истории.');
+    const current=raw.current===null?null:normalizeMillingEntry(raw.current,raw.kind);
+    const history=uniqueMillingEntries(raw.history.map(entry=>normalizeMillingEntry(entry,raw.kind)),current);
+    return millingEnvelope(descriptor,current,history);
+  }
+  function getMillingWork(archive,key){
+    demand(typeof key==='string'&&Object.hasOwn(millingWorks,key),'Фрезерная работа не найдена.');
+    const path=archive.sections.coursePath;
+    const current=millingWorkEntry(path.current,key);
+    return millingEnvelope(millingWorks[key],current,
+      uniqueMillingEntries(path.history.map(item=>millingWorkEntry(item,key)),current));
+  }
+  function stringifyMillingWork(archive,key){
+    const work=getMillingWork(validate(archive),key);
+    demand(work.current||work.history.length,'Сначала начните фрезерную работу.');
+    const text=JSON.stringify(work,null,2);
+    demand(new TextEncoder().encode(text).length<=MAX_BYTES,'Фрезерная работа превышает 4 МБ.');
+    return text;
+  }
+  function projectPath(entry,key){
+    const state={...course.restorePath(null),[key]:entry.journal};
+    if(key==='millingPlate'&&entry.draft!==undefined)state.millingPlateDraft=entry.draft;
+    return state;
+  }
+  function mergeMillingWork(local,raw,{useImportedCurrent=false}={}){
+    const next=validate(local),work=validateMillingWork(raw);
+    const path=next.sections.coursePath,key=work.kind;
+    const previous=millingWorkEntry(path.current,key);
+    const current=useImportedCurrent&&work.current?work.current:previous||work.current;
+    if(current){
+      path.current[key]=current.journal;
+      if(key==='millingPlate'){
+        delete path.current.millingPlateDraft;
+        if(current.draft!==undefined)path.current.millingPlateDraft=current.draft;
+      }
+      const chosen=canonical(projectPath(current,key));
+      path.history=path.history.filter(item=>canonical(item)!==chosen);
+    }
+    // A whole-course branch may also contain results for other exercises.
+    const seen=new Set([current,...path.history.map(item=>millingWorkEntry(item,key))]
+      .filter(Boolean).map(canonical));
+    for(const entry of [previous,work.current,...work.history]){
+      if(!entry)continue;
+      const signature=canonical(entry);
+      if(seen.has(signature))continue;
+      seen.add(signature);
+      path.history.push(projectPath(entry,key));
+    }
+    demand(path.history.length<=MAX_HISTORY,'В разделе уже слишком много сохранённых состояний. Перенос не выполнен.');
+    return ensureSyncSize(validate(next));
+  }
+  function parseTransfer(text){
+    const raw=readJSON(text);
+    if(raw?.format===MILLING_WORK_FORMAT)return {milling:validateMillingWork(raw)};
+    return {archive:parseArchive(raw)};
+  }
   function merge(local,incoming){
     local=validate(local);incoming=validate(incoming);const result=empty();
     for(const id of ids){const a=local.sections[id],b=incoming.sections[id],keepLocal=active(id,a.current);let current=clone(keepLocal?a.current:b.current);
       if(id==='course')current=course.restore({version:1,answers:{...b.current.answers,...a.current.answers}});
-      if(id==='coursePath'){const metrologyOwner=a.current.metrologyCourse?.events.some(e=>e.type!=='begin')||Object.values(a.current.metrologyCourse?.draft||{}).some(Boolean)?a.current:b.current.metrologyCourse?b.current:null;if(metrologyOwner)current.metrologyCourse=metrologyOwner.metrologyCourse;const diagOwner=a.current.diagnosticCourse?.events.length||a.current.diagnosticCourse?.draft?.program||a.current.diagnosticCourse?.draft?.route?a.current:b.current.diagnosticCourse?b.current:null;if(diagOwner)current.diagnosticCourse=diagOwner.diagnosticCourse;const millOwner=a.current.millingCourse?.events.length?a.current:b.current.millingCourse?b.current:null;if(millOwner)current.millingCourse=millOwner.millingCourse;const opOwner=course.operationCourse.hasWork(a.current.operationCourse)?a.current:b.current.operationCourse?b.current:null;if(opOwner)current.operationCourse=opOwner.operationCourse;const spOwner=a.current.shaftProject?.events.length?a.current:b.current.shaftProject?b.current:null;if(spOwner){current.shaftProject=spOwner.shaftProject;delete current.shaftProjectDraft;if(spOwner.shaftProjectDraft)current.shaftProjectDraft=spOwner.shaftProjectDraft;}const ownerPS=a.current.programSetup?.events.length?a.current:b.current.programSetup?b.current:null;if(ownerPS){current.programSetup=ownerPS.programSetup;delete current.programSetupDraft;if(ownerPS.programSetupDraft)current.programSetupDraft=ownerPS.programSetupDraft;}const po=a.current.firstProcess?.events.length?a.current:b.current.firstProcess?b.current:null;if(po){current.firstProcess=po.firstProcess;delete current.firstProcessDraft;if(po.firstProcessDraft)current.firstProcessDraft=po.firstProcessDraft;}const owner=a.current.drawingSession?.events.length?a.current:b.current.drawingSession?b.current:null;if(owner){current.drawingSession=owner.drawingSession;delete current.drawingSessionDraft;if(owner.drawingSessionDraft)current.drawingSessionDraft=owner.drawingSessionDraft;}const ownIntro=a.current.firstSession,otherIntro=b.current.firstSession;const introOwner=ownIntro?.events.length?a.current:otherIntro?b.current:null;if(introOwner){current.firstSession=introOwner.firstSession;delete current.firstSessionDraft;if(introOwner.firstSessionDraft)current.firstSessionDraft=introOwner.firstSessionDraft;}const practice={};for(const key of course.practice.ids){const own=a.current.practice?.[key],other=b.current.practice?.[key];const chosen=own&&(own.events.length||own.selection!==null)?own:other||own;if(chosen)practice[key]=chosen;}current=course.restorePath({...current,practice,phases:{...b.current.phases,...a.current.phases},explored:[...new Set([...a.current.explored,...b.current.explored])]});}
+      if(id==='coursePath'){
+        if(a.current.mountingPlate||b.current.mountingPlate)
+          current.mountingPlate=millingWorkEntry(a.current,'mountingPlate')?a.current.mountingPlate:
+            b.current.mountingPlate||a.current.mountingPlate;
+        const holes={...b.current.holeCourse?.works,...a.current.holeCourse?.works};if(Object.keys(holes).length)current.holeCourse={version:1,works:holes};
+        const plateOwner=a.current.millingPlate?.events.length||a.current.millingPlateDraft?a.current:b.current.millingPlate?b.current:a.current;
+        if(plateOwner.millingPlate){
+          current.millingPlate=plateOwner.millingPlate;
+          delete current.millingPlateDraft;
+          if(plateOwner.millingPlateDraft!==undefined)current.millingPlateDraft=plateOwner.millingPlateDraft;
+        }
+        const metrologyOwner=a.current.metrologyCourse?.events.some(e=>e.type!=='begin')||Object.values(a.current.metrologyCourse?.draft||{}).some(Boolean)?a.current:b.current.metrologyCourse?b.current:null;if(metrologyOwner)current.metrologyCourse=metrologyOwner.metrologyCourse;const diagOwner=a.current.diagnosticCourse?.events.length||a.current.diagnosticCourse?.draft?.program||a.current.diagnosticCourse?.draft?.route?a.current:b.current.diagnosticCourse?b.current:null;if(diagOwner)current.diagnosticCourse=diagOwner.diagnosticCourse;const millOwner=a.current.millingCourse?.events.length?a.current:b.current.millingCourse?b.current:null;if(millOwner)current.millingCourse=millOwner.millingCourse;const opOwner=course.operationCourse.hasWork(a.current.operationCourse)?a.current:b.current.operationCourse?b.current:null;if(opOwner)current.operationCourse=opOwner.operationCourse;const spOwner=a.current.shaftProject?.events.length?a.current:b.current.shaftProject?b.current:null;if(spOwner){current.shaftProject=spOwner.shaftProject;delete current.shaftProjectDraft;if(spOwner.shaftProjectDraft)current.shaftProjectDraft=spOwner.shaftProjectDraft;}const ownerPS=a.current.programSetup?.events.length?a.current:b.current.programSetup?b.current:null;if(ownerPS){current.programSetup=ownerPS.programSetup;delete current.programSetupDraft;if(ownerPS.programSetupDraft)current.programSetupDraft=ownerPS.programSetupDraft;}const po=a.current.firstProcess?.events.length?a.current:b.current.firstProcess?b.current:null;if(po){current.firstProcess=po.firstProcess;delete current.firstProcessDraft;if(po.firstProcessDraft)current.firstProcessDraft=po.firstProcessDraft;}const owner=a.current.drawingSession?.events.length?a.current:b.current.drawingSession?b.current:null;if(owner){current.drawingSession=owner.drawingSession;delete current.drawingSessionDraft;if(owner.drawingSessionDraft)current.drawingSessionDraft=owner.drawingSessionDraft;}const ownIntro=a.current.firstSession,otherIntro=b.current.firstSession;const introOwner=ownIntro?.events.length?a.current:otherIntro?b.current:null;if(introOwner){current.firstSession=introOwner.firstSession;delete current.firstSessionDraft;if(introOwner.firstSessionDraft)current.firstSessionDraft=introOwner.firstSessionDraft;}const practice={};for(const key of course.practice.ids){const own=a.current.practice?.[key],other=b.current.practice?.[key];const chosen=own&&(own.events.length||own.selection!==null)?own:other||own;if(chosen)practice[key]=chosen;}current=course.restorePath({...current,practice,phases:{...b.current.phases,...a.current.phases},explored:[...new Set([...a.current.explored,...b.current.explored])]});}
       if(id==='library')for(const k of ['read','bookmarks'])current[k]=[...new Set([...a.current[k],...b.current[k]])];
       if(id==='lab')current={...b.current,...a.current};
       if(id==='machinePath')current.stages={...b.current.stages,...a.current.stages};
@@ -156,6 +298,10 @@
     for(const key of ['firstSession','drawingSession','firstProcess','programSetup']){const id='practice-'+key,modelKey={firstSession:'startSession',drawingSession:'drawingSession',firstProcess:'firstProcess',programSetup:'programSetup'}[key];if(!done.has(id)&&course[modelKey].restore(v[key])?.complete)done.add(id);}
     if(course.shaftProject.variants.some(t=>!done.has('project-'+t.id))){const s=course.shaftProject.restore(v.shaftProject);if(s){for(const prior of s.completedProjects||[]){const old=course.shaftProject.restore(prior);if(old?.complete)done.add('project-'+old.taskId);}if(s.complete)done.add('project-'+s.taskId);}}
     for(const {key,definitions,prefix,engine}of registry.books){if(definitions.some(t=>!done.has(prefix+t.id))){const book=engine.restore(v[key]);for(const item of book?.done||[])done.add(prefix+item.id);}}
+    for(const row of course.holeCourse.summary(v.holeCourse))done.add('hole-'+row.id);
+    if(!done.has(course.mountingPlate.id)&&course.mountingPlate.restore(v.mountingPlate)?.confirmed)done.add(course.mountingPlate.id);
+    const plateId='milling-'+course.millingPlate.task.id;
+    if(!done.has(plateId)&&course.millingPlate.restore(v.millingPlate)?.done.length)done.add(plateId);
     return [...done];
   }
   function combineEvidence(a,b){
@@ -168,9 +314,11 @@
     for(const raw of states(a,'training')){const s=training.restoreBook(raw),check=id=>training.evidence(s.sessions[id],s.archive[id]);ev=combineEvidence(ev,{training:{guidedPassed:check('cycle-0').passed,transferPassed:['cycle-3','cycle-4','cycle-5'].some(id=>check(id).independent)}});}
     for(const raw of states(a,'gcode')){const s=gcode.restoreBook(raw);ev=combineEvidence(ev,{gcode:{core:gcode.coreIds().filter(id=>gcode.evidence(s,id).passed),final:gcode.finalIds().some(id=>gcode.evidence(s,id).independent)}});}for(const raw of states(a,'coursePath'))ev=combineEvidence(ev,{courseSteps:courseEvidence(raw,ev.courseSteps||[])});return ev;
   }
-  function summary(input){
-    const a=validate(input),ev=evidence(a),progress=path.status(ev),trainingRows=training.ids().map(id=>{let passed=false,independent=false,hints=0,errors=0,attempts=new Set();for(const raw of states(a,'training')){const book=training.restoreBook(raw),proof=training.evidence(book.sessions[id],book.archive[id]);passed||=proof.passed;independent||=proof.independent;for(const s of [book.sessions[id],...(book.archive[id]||[])].filter(Boolean)){const key=canonical(training.snapshot(s));if(attempts.has(key))continue;attempts.add(key);const g=training.grade(s);hints=Math.max(hints,s.hints);errors=Math.max(errors,g.blockedActions+g.predictionErrors+g.inspectionErrors);}}const split=id.lastIndexOf('-'),t=training.task(id.slice(0,split),Number(id.slice(split+1)));return {id,title:t.title,passed,independent,hints,errors,attempts:attempts.size};});
-    const gcodeRows=gcode.ids().map(id=>{let passed=false,independent=false,legacy=false,helped=false,errors=0,attempts=new Set();for(const raw of states(a,'gcode')){const book=gcode.restoreBook(raw),proof=gcode.evidence(book,id);passed||=proof.passed;independent||=proof.independent;legacy||=proof.legacy;const s=book.sessions[id];if(s){attempts.add(canonical(gcode.snapshot(s)));helped||=s.helped;errors=Math.max(errors,s.predictionErrors+s.checkErrors);}}const code=node?require('./gcode-model.js'):root.CNCGCode;return {id,title:code.tasks.find(t=>t.id===id).title,passed,independent,legacy,helped,errors,attempts:attempts.size};});
+  function summarize(a){
+    const trainingBooks=states(a,'training').map(raw=>training.restoreBook(raw));
+    const gcodeBooks=states(a,'gcode').map(raw=>gcode.restoreBook(raw));
+    const ev=evidence(a),progress=path.status(ev),trainingRows=training.ids().map(id=>{let passed=false,independent=false,hints=0,errors=0,attempts=new Set();for(const book of trainingBooks){const proof=training.evidence(book.sessions[id],book.archive[id]);passed||=proof.passed;independent||=proof.independent;for(const s of [book.sessions[id],...(book.archive[id]||[])].filter(Boolean)){const key=canonical(training.snapshot(s));if(attempts.has(key))continue;attempts.add(key);const g=training.grade(s);hints=Math.max(hints,s.hints);errors=Math.max(errors,g.blockedActions+g.predictionErrors+g.inspectionErrors);}}const split=id.lastIndexOf('-'),t=training.task(id.slice(0,split),Number(id.slice(split+1)));return {id,title:t.title,passed,independent,hints,errors,attempts:attempts.size};});
+    const gcodeRows=gcode.ids().map(id=>{let passed=false,independent=false,legacy=false,helped=false,errors=0,attempts=new Set();for(const book of gcodeBooks){const proof=gcode.evidence(book,id);passed||=proof.passed;independent||=proof.independent;legacy||=proof.legacy;const s=book.sessions[id];if(s){attempts.add(canonical(gcode.snapshot(s)));helped||=s.helped;errors=Math.max(errors,s.predictionErrors+s.checkErrors);}}const code=node?require('./gcode-model.js'):root.CNCGCode;return {id,title:code.tasks.find(t=>t.id===id).title,passed,independent,legacy,helped,errors,attempts:attempts.size};});
     const skillRows=skills.skills.map(k=>{const proofs=states(a,'skills').map(raw=>skills.mastery(skills.restore(raw),k.id));const order={new:0,learning:1,review:2,mastered:3};const best=proofs.sort((x,y)=>order[y.status]-order[x.status]||y.streak-x.streak)[0];return {id:k.id,title:k.title,...best};});
     const reading=new Set(),bookmarks=new Set();for(const s of states(a,'library')){s.read.forEach(id=>reading.add(id));s.bookmarks.forEach(id=>bookmarks.add(id));}
     const examRows=[],seen=new Set();for(const s of states(a,'base'))for(const e of [...s.history,...(s.exam?.answers.length===3?[s.exam]:[])]){const key='basic'+canonical(e);if(seen.has(key))continue;seen.add(key);const grade=basic.gradeExam(e);examRows.push({type:'basic',at:e.startedAt,score:grade.percent,passed:grade.correct===3});}
@@ -179,9 +327,13 @@
       const t=lab.tasks.find(t=>t.id===id);if(t)for(const s of states(a,'lab')){const v=s[id];if(!v||!lab.validate(t,v.plan))continue;let total;try{total=process.timeline(t,v.plan).length;}catch{continue;}currentControlled||=v.simulation.reached===total&&total>0&&lab.evaluate(t,v.plan).success&&process.control(t,v.plan,v.simulation.logs).passed;}
       return {id,title:[...basic.tasks,...lab.tasks].find(t=>t.id===id).title,passed:historical||currentControlled,independent,historical,legacy};});
     const operationProofs=new Map();for(const raw of states(a,'coursePath'))for(const row of course.operationCourse.restore(raw.operationCourse)?.done||[]){const prior=operationProofs.get(row.id);if(!prior||row.independent===true||prior.legacy&&!row.legacy)operationProofs.set(row.id,row);}
+    const holes=new Map();
+    for(const raw of states(a,'coursePath'))for(const row of course.holeCourse.summary(raw.holeCourse))if(!holes.has(row.id)||row.independent)holes.set(row.id,row);
     const rows=progress.items.map(s=>{let detail='Нужно пройти',assisted=null;
       if(s.done){if(s.kind==='coursePractice')detail='Подтверждено журналом практики';else if(s.kind==='lesson')detail='Ответ подтверждён';else if(s.id==='self-cycle'||s.id==='self-code'){detail='Другое условие без помощи';assisted=false;}else if(s.id==='full-cycle'){const row=trainingRows.find(t=>t.id==='cycle-0');assisted=!row.independent;detail=assisted?'Выполнено с разбором':'Есть самостоятельная попытка';}else if(s.kind==='gcode'){const row=gcodeRows.find(t=>t.id===s.target);assisted=!row.independent;detail=row.legacy?'Сохранён прежний зачёт':assisted?'Выполнено с разбором или исправлениями':'Прогноз и программа без помощи';}else{const rec=ev.records?.diameter;assisted=rec?rec.assisted:true;detail=rec?'Сохранён зачёт контроля':'Состояние детали проверено моделью';}}
       if(s.done&&s.target==='operationCourse'){const proof=operationProofs.get(s.subtask);if(proof){assisted=proof.legacy?null:!proof.independent;detail=proof.legacy?'Прежний зачёт · самостоятельность не оценена':proof.independent?'Изготовлено и измерено без разбора':'Изготовлено и измерено с разбором';}}
+      if(s.done&&s.target==='mountingPlate'){assisted=false;detail='Подтверждены программа, остаток и контроль по чертежу';}
+      if(s.done&&s.target==='holeCourse'){const proof=holes.get(s.subtask);if(proof){assisted=!proof.independent;detail=assisted?'Геометрия и замеры подтверждены с подсказкой':'Геометрия и замеры подтверждены самостоятельно';}}
       return {...s,detail,assisted};});
     const start=course.startSession.restore(a.sections.coursePath.current.firstSession),historicalCompleted=states(a,'coursePath').some(v=>course.startSession.restore(v.firstSession)?.complete);
     const checks=[2,4,6,8],attempts=start?checks.reduce((n,i)=>n+start.attempts[i],0):0,successes=start?checks.filter(i=>start.step>i||start.step===i&&start.correct).length:0;
@@ -190,8 +342,15 @@
     const fp=course.firstProcess.restore(a.sections.coursePath.current.firstProcess),firstProcess={status:!fp?.events.length?'not-started':fp.complete?'complete':'in-progress',step:fp?.step??0,total:8,completed:!!fp?.complete,assisted:!!fp?.assisted,errors:fp?.errors.reduce((a,b)=>a+b,0)||0};
     const ps=course.programSetup.restore(a.sections.coursePath.current.programSetup),programSetup={status:!ps?.events.length?'not-started':ps.complete?'complete':'in-progress',step:ps?.step??0,total:7,completed:!!ps?.complete,assisted:!!ps?.assisted,errors:ps?.errors.reduce((a,b)=>a+b,0)||0};
     const sp=course.shaftProject.restore(a.sections.coursePath.current.shaftProject),shaftProject={evidence:sp?course.shaftProject.evidence(sp):null,taskId:sp?.taskId||'RF5-SHAFT-01',accepted:[...(sp?.completedProjects||[]),...(sp?.complete?[course.shaftProject.snapshot({...sp,completedProjects:[]})]:[])].map(raw=>({taskId:raw.taskId||'RF5-SHAFT-01',report:course.shaftProject.report(course.shaftProject.restore(raw))})),status:!sp?.events.length?'not-started':sp.complete?'complete':'in-progress',step:sp?.step??0,total:7,completed:!!sp?.complete,assisted:!!sp?.assisted,errors:sp?.errors.reduce((a,b)=>a+b,0)||0,recorded:Object.keys(sp?.records||{}).length,measurements:6,attempt:sp?.attempt||1,report:sp?.complete?course.shaftProject.report(sp):null};
-    return {routeVersion:ROUTE_VERSION,progress,metrologyCourse:(()=>{const s=course.metrologyCourse.restore(a.sections.coursePath.current.metrologyCourse);return {done:s?.done||[],current:s?.current||0,total:6,errors:s?.errors||[],help:s?.help||[]};})(),diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
+    const plate=course.millingPlate.restore(a.sections.coursePath.current.millingPlate);
+    const millingPlate=plate?{assignment:plate.assignment,attempt:plate.attempt,actions:plate.events.length,result:plate.done[0]||null}:null;
+    return {routeVersion:ROUTE_VERSION,progress,millingPlate,holeCourse:{total:course.holeCourse.tasks.length,done:[...holes.values()]},metrologyCourse:(()=>{const s=course.metrologyCourse.restore(a.sections.coursePath.current.metrologyCourse);return {done:s?.done||[],current:s?.current||0,total:6,errors:s?.errors||[],help:s?.help||[]};})(),diagnosticCourse:(()=>{const d=course.diagnosticCourse.restore(a.sections.coursePath.current.diagnosticCourse);return {done:d?.done||[],current:d?.current||0,total:course.diagnosticCourse.tasks.length,errors:d?.errors||[],help:d?.help||[]};})(),millingCourse:(()=>{const m=course.millingCourse.restore(a.sections.coursePath.current.millingCourse);return {done:m?.done||[],current:m?.current||0,total:m?course.millingCourse.lessonCount(m):course.millingCourse.lessons.length,errors:m?.errors||[],help:m?.help||[],fault:m?.fault||null,incidents:m?.incidents||[]};})(),operationCourse:(()=>{const op=course.operationCourse.restore(a.sections.coursePath.current.operationCourse);return {done:op?.done||[],current:op?.current||0,total:course.operationCourse.tasks.length,errors:op?.errors||[],help:op?.help||[]};})(),shaftProject,programSetup,firstProcess,drawing,introduction,rows,training:trainingRows,gcode:gcodeRows,skills:skillRows,station:stationRows,library:{read:reading.size,bookmarks:bookmarks.size,total:library.articles.length},exams:examRows.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)),histories:ids.reduce((n,id)=>n+a.sections[id].history.length,0),sections:ids.map(id=>({id,title:labels[id],active:active(id,a.sections[id].current),histories:a.sections[id].history.length}))};
   }
+  function validateWithSummary(raw){
+    const archive=validate(raw);
+    return {archive,summary:summarize(archive)};
+  }
+  const summary=raw=>validateWithSummary(raw).summary;
   function report(a){const s=summary(a),lines=['ЧПУ Практика — общая сводка',`Обязательный путь: ${s.progress.done} / ${s.progress.total}`,`Создано: ${a.createdAt}`,'Исторические результаты отделены от текущих черновиков. Это учебная самопроверка, не допуск к реальному станку.',`Первое знакомство: ${s.introduction.status==='complete'?'завершено':s.introduction.status==='in-progress'?'действие '+(s.introduction.step+1)+' / '+s.introduction.total:'не начато'}; подсказки ${s.introduction.assisted?'открывались':'не открывались'}; неверных проверочных действий ${s.introduction.errors}`,'Вводное занятие учитывается отдельно от прежних зачётов курса.',`Проект валика: ${s.shaftProject.status}; протокол ${s.shaftProject.recorded}/6; помощь ${s.shaftProject.assisted?'да':'нет'}; ошибок ${s.shaftProject.errors}`,`Программа и наладка: ${s.programSetup.status}; помощь ${s.programSetup.assisted?'да':'нет'}; ошибок ${s.programSetup.errors}`,`Первый процесс: ${s.firstProcess.status}; помощь ${s.firstProcess.assisted?'да':'нет'}; ошибок ${s.firstProcess.errors}`,`Деталь и измерение: ${s.drawing.status}; действие ${s.drawing.step+1} / ${s.drawing.total}; помощь ${s.drawing.assisted?'да':'нет'}; ошибок ${s.drawing.errors}`,''];for(const row of s.rows)lines.push(`${row.done?'✓':'○'} ${row.title}: ${row.detail}`);lines.push('','Дополнительные разделы',`На станке: ${s.station.filter(r=>r.passed).length} / ${s.station.length}`,`Практикум: ${s.training.filter(r=>r.passed).length} / ${s.training.length}`,`G-код: ${s.gcode.filter(r=>r.passed).length} / ${s.gcode.length}`,`Навыки, подтверждённые хотя бы в одной истории: ${s.skills.filter(r=>r.status==='mastered').length} / ${s.skills.length}`,`Прочитано: ${s.library.read} / ${s.library.total}`,`Экзаменов в истории: ${s.exams.length}`,'');for(const row of [...s.training,...s.gcode])lines.push(`${row.title}: ${row.independent?'самостоятельный результат':row.passed?'с разбором / прежний зачёт':'не подтверждено'}; помощь ${row.helped||row.hints?'есть':'не отмечена'}; ошибок в одной истории до ${row.errors}`);return lines.join('\n');}
-  const api={ROUTE_VERSION,FORMAT,VERSION,MAX_BYTES,MAX_HISTORY,ids,labels,empty,normalize,active,canonical,validate,parse,stringify,fromRaw,toRaw,merge,summary,evidence,courseEvidence,combineEvidence,report,planDraft};root.CNCProgress=api;if(node)module.exports=api;
+  const api={ROUTE_VERSION,FORMAT,VERSION,MAX_BYTES,MAX_HISTORY,ids,labels,empty,normalize,active,canonical,validate,validateWithSummary,parse,stringify,fromRaw,toRaw,merge,summary,evidence,courseEvidence,combineEvidence,report,planDraft,ensureSyncSize,millingWorks,getMillingWork,millingWorkStatus,stringifyMillingWork,mergeMillingWork,parseTransfer};root.CNCProgress=api;if(node)module.exports=api;
 })(typeof window!=='undefined'?window:globalThis);

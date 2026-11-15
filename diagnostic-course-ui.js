@@ -1,6 +1,6 @@
 (function (root) {
   "use strict";
-  const m = root.CNCDiagnosticCourse;
+  const engine = root.CNCDiagnosticCourse;
   const el = (tag, text, cls) => {
     const n = document.createElement(tag);
     if (text !== undefined) n.textContent = text;
@@ -16,6 +16,7 @@
           .join(" · ")
       : "нет движения";
   function create({
+    model: m = engine,
     headingTag = "h3",
     saved,
     readOnly = false,

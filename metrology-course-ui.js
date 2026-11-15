@@ -1,6 +1,6 @@
 (function (root) {
   "use strict";
-  const m = root.CNCMetrologyCourse,
+  const engine = root.CNCMetrologyCourse,
     mm = (n) => (n / 1000).toFixed(3).replace(".", ","),
     e = (tag, text, cls) => {
       const el = document.createElement(tag);
@@ -9,6 +9,7 @@
       return el;
     };
   function create({
+    model: m = engine,
     headingTag = "h3",
     saved,
     readOnly = false,

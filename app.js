@@ -8,18 +8,20 @@
   const routeExam=window.CNCRouteExamUI;routeExam.init((navigate=false)=>{if(navigate)mode='exam';renderMode();renderHistory();save();},id=>{trainingTask=id;changeMode('learn');});
   $('readouts').insertAdjacentHTML('afterend','<div id="basic-gauge" class="basic-gauge"><label>Поверхность<select id="basic-gauge-surface"><option value="worked">Обработанный участок</option><option value="stock">Необработанный хвостовик</option></select></label><label>Прибор<select id="basic-gauge-tool"><option value="caliper">Штангенциркуль · 0,1 мм</option><option value="micrometer">Микрометр · 0,01 мм</option></select></label><button id="basic-measure" type="button" class="button secondary" disabled>Измерить деталь</button><output id="basic-gauge-value" aria-live="polite">Завершите проход для замера.</output></div>');
   $('basic-gauge').insertAdjacentHTML('beforeend','<label>Мой вывод<select id="basic-verdict"><option value="">Выберите вывод</option><option value="ok">В допуске</option><option value="large">Больше допуска</option><option value="small">Меньше допуска</option><option value="uncertain">Нужно уточнить</option></select></label><button type="button" id="basic-inspect" class="button primary" disabled>Подтвердить контроль</button><p class="small-note">Для зачёта: правильные настройки, завершённый проход, замер обработанного участка и верный вывод. Повторный запуск начинает с новой заготовки.</p>');
-  $('basic-inspect').addEventListener('click',()=>{if(mode!=='learn'||part!==1||pass||!basicMeasurement||!$('basic-verdict').value)return;const check=model.inspect(values(),task,{...basicMeasurement,verdict:$('basic-verdict').value});basicInspection=check;$('check-result').className='check-result '+(check.passed?'success':'error');$('check-result').textContent=check.reason;if(check.passed){const prev=completed[task.id];completed[task.id]={at:new Date().toISOString(),assisted:prev?.controlVersion===1&&prev.assisted===false?false:assisted,controlVersion:1};updateProgress();save();}else assisted=true;save();window.dispatchEvent(new Event('cnc-machine-change'));});
+  $('basic-inspect').addEventListener('click',()=>{if(mode!=='learn'||part!==1||pass||!basicMeasurement||!$('basic-verdict').value)return;const check=model.inspect(values(),task,{...basicMeasurement,verdict:$('basic-verdict').value});basicInspection=check;$('check-result').className='check-result '+(check.passed?'success':'error');$('check-result').textContent=check.reason;if(check.passed&&!controlPractice){const prev=completed[task.id];completed[task.id]={at:new Date().toISOString(),assisted:prev?.controlVersion===1&&prev.assisted===false?false:assisted,controlVersion:1};updateProgress();save();}else if(!check.passed)assisted=true;save();window.dispatchEvent(new Event('cnc-machine-change'));});
   for(const id of ['basic-gauge-surface','basic-gauge-tool'])$(id).addEventListener('change',()=>{basicMeasurement=null;basicInspection=null;$('basic-inspect').disabled=true;$('basic-verdict').value='';$('basic-gauge-value').textContent='Прибор или поверхность изменены. Измерьте деталь заново.';basicViewer.measurement=null;basicViewer.draw();save();});
   $('basic-verdict').addEventListener('change',()=>{basicInspection=null;$('basic-inspect').disabled=!basicMeasurement||!$('basic-verdict').value;save();});
   const fields = ['x','offset','feed','rpm','tool'], storageKey = 'cnc-practice-v2';
   let task = model.tasks[0], mode = 'learn', hintLevel = 0, assisted = false;
   let completed = {}, history = [], exam = null, examDraft = null, report = null, trainingTask = 'diameter', basicSessions = {};
+  let controlPractice = null;
   let animation = null, playing = false, pass = null, part = 0, lastResult = null, saveAvailable = true, basicMeasurement=null,basicInspection=null,basicChecked=false;
   const fmt = (v,n=1) => Number.isFinite(v) ? v.toLocaleString('ru-RU',{minimumFractionDigits:n,maximumFractionDigits:n}) : '—';
   const el = (tag,text,className) => { const e=document.createElement(tag);e.textContent=text;if(className)e.className=className;return e; };
   function values() { const p={tool:$('tool').value};for(const k of fields.slice(0,4))p[k]=$(k).value.trim()===''?NaN:Number($(k).value);return p; }
   function setValues(p) { for(const k of fields)$(k).value=p[k]; }
   function save() {
+    if(controlPractice){window.dispatchEvent(new Event('cnc-machine-change'));return;}
     rememberBasic();
     window.dispatchEvent(new Event('cnc-machine-change'));
     if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();
@@ -28,7 +30,7 @@
     $('storage-note').textContent=saveAvailable?'':'Хранилище недоступно: результаты сохраняются только до закрытия страницы';
     $('storage-note').hidden=saveAvailable;
   }
-  function progressSnapshot(){rememberBasic();return {version:2,completed,history,exam,examDraft,mode,trainingTask,draft:values(),assisted,hintLevel,basicSessions};}
+  function progressSnapshot(){if(controlPractice)return controlPractice.before;rememberBasic();return {version:2,completed,history,exam,examDraft,mode,trainingTask,draft:values(),assisted,hintLevel,basicSessions};}
   function restore() {
     try {
       const s=JSON.parse(localStorage.getItem(storageKey)||'null');if(!s||s.version!==2)return null;
@@ -97,14 +99,14 @@
   function updateBasicViewer(){if(task.advanced)return;const r=model.evaluate(values(),task),diameter=basicShape==='target'?task.target:(r.finalDiameter||task.stock);basicViewer.set({segments:[{length:15,diameter:task.stock},{length:task.length,diameter}],bore:0},basicShape==='target'?'Целевая деталь':part===1&&!pass?'После выполненного прохода':'Прогноз по настройкам');}
   function renderBasicView(){const visible=mode==='learn'&&basicView==='3d';$('basic-3d-panel').hidden=!visible;document.querySelector('.drawing').hidden=visible;document.querySelector('.view-toolbar').hidden=visible;document.querySelector('.legend').hidden=visible;$('basic-2d').setAttribute('aria-pressed',String(!visible));$('basic-3d').setAttribute('aria-pressed',String(visible));if(visible)updateBasicViewer();}
   function rememberBasic() {
-    if(mode!=='learn'||!task||task.advanced)return;
+    if(controlPractice||mode!=='learn'||!task||task.advanced)return;
     const session=window.CNCBasicSession.snapshot({version:1,task:task.id,settings:values(),finished:part===1&&!pass,
       measurement:basicMeasurement,verdict:basicInspection?$('basic-verdict').value:'',assisted,hintLevel});
     if(session)basicSessions[task.id]=session;else delete basicSessions[task.id];
   }
-  function restoreBasic() {
+  function restoreBasic(raw = basicSessions[task.id]) {
     if(mode!=='learn'||task.advanced)return;
-    const session=window.CNCBasicSession.restore(basicSessions[task.id],task);if(!session)return;
+    const session=window.CNCBasicSession.restore(raw,task);if(!session)return;
     setValues(session.settings);settingsChanged(false);assisted=session.assisted;hintLevel=session.hintLevel;
     $('hint-count').textContent=hintLevel+' / 3';$('hint').disabled=hintLevel===3;
     if(hintLevel)$('mentor-answer').textContent=task.hints[hintLevel-1];
@@ -201,7 +203,7 @@
     $('check-result').className='check-result';$('check-result').textContent='Ответ сохранён. Разбор будет доступен после третьего задания.';lock();
   }
   function changeMode(next) {
-    if(next===mode)return;rememberBasic();routeExam.invalidate();if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
+    if(next===mode)return;closeControlPractice();rememberBasic();routeExam.invalidate();if(mode==='exam'&&exam&&!exam.awaitingNext)examDraft=values();cancel();mode=next;
     if(mode==='learn')loadTask(allTasks.find(t=>t.id===trainingTask),false);
     else if(exam){loadTask(model.examTask(exam),false);if(examDraft&&model.evaluate(examDraft,task).valid){setValues(examDraft);settingsChanged(false);}if(exam.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}}
     renderMode();save();
@@ -263,11 +265,31 @@
   if(mode==='exam'&&exam?.awaitingNext){setValues(exam.answers[exam.index].settings);program(values());showAccepted();}
   renderHistory();renderReport();renderMode();
   function readState(){if(mode==='exam'&&$('exam-level').value!=='easy')return {mode,exam:routeExam.readState(),result:null};return {mode,task:task.id,settings:task.advanced?window.CNCLabUI.readState():values(),running:playing,paused:!!pass&&!playing,progress:part,completed:Object.keys(completed),exam:exam?{index:exam.index,submitted:exam.answers.length,awaitingNext:exam.awaitingNext}:null,result:mode==='learn'&&!task.advanced?lastResult:null};}
+  function openControlPractice() {
+    if(controlPractice)return;
+    changeMode('learn');
+    controlPractice={before:progressSnapshot(),taskId:task.id};
+    const controlTask=allTasks.find(t=>t.id==='diameter');
+    loadTask(controlTask,false);
+    restoreBasic({
+      version:1,task:controlTask.id,finished:true,assisted:true,
+      settings:{...controlTask.defaults,x:controlTask.target,offset:0,feed:.2,rpm:800,tool:'turning'},
+    });
+    $('machine-status').textContent='Деталь подготовлена';
+    $('check-result').textContent='Учебная деталь уже обработана. Измерьте её и подтвердите вывод по допуску.';
+  }
+  function closeControlPractice() {
+    if(!controlPractice)return;
+    const previous=allTasks.find(t=>t.id===controlPractice.taskId);
+    controlPractice=null;
+    loadTask(previous,false);
+  }
   function machineSnapshot(){if(mode!=='learn')return null;if(task.advanced){const data=window.CNCLabUI.readState(),s=data.simulation;if(!s)return null;return {...s,checked:data.checked,result:window.CNCLabModel.evaluate(task,data.plan),plan:data.plan,controlPassed:s.finished&&window.CNCProcess.control(task,data.plan,s.logs).passed};}return {finished:part===1&&!pass,started:part>0,playing,progress:part,checked:basicChecked,result:lastResult,measurement:basicMeasurement?{...basicMeasurement}:null,inspection:basicInspection?{...basicInspection}:null,controlPassed:!!basicInspection?.passed,verdict:$('basic-verdict').value,profile:part===1&&!pass?{segments:[{length:15,diameter:task.stock},{length:task.length,diameter:lastResult.finalDiameter}],bore:0}:{segments:[{length:task.length+15,diameter:task.stock}],bore:0}};}
   window.CNCDemo={readState,machineSnapshot,completionRecords:()=>structuredClone(completed),
-    basicEvidence(id){const current=mode==='learn'&&task.id===id&&!task.advanced;if(current)return {task:id,finished:part===1&&!pass&&lastResult.success,controlled:!!basicInspection?.passed};
+    basicEvidence(id){const current=!controlPractice&&mode==='learn'&&task.id===id&&!task.advanced;if(current)return {task:id,finished:part===1&&!pass&&lastResult.success,controlled:!!basicInspection?.passed};
       const saved=window.CNCBasicSession.restore(basicSessions[id],model.tasks.find(t=>t.id===id));return {task:id,finished:!!saved?.finished&&model.evaluate(saved.settings,model.tasks.find(t=>t.id===id)).success,controlled:!!saved?.inspection?.passed};},
-    openPractice(id,guided=false){const next=allTasks.find(t=>t.id===id);if(!next)return;changeMode('learn');if(task.id!==id)loadTask(next);trainingTask=id;
+    openControlPractice,closeControlPractice,controlPracticeActive:()=>!!controlPractice,
+    openPractice(id,guided=false){closeControlPractice();const next=allTasks.find(t=>t.id===id);if(!next)return;changeMode('learn');if(task.id!==id)loadTask(next);trainingTask=id;
       if(guided&&!next.advanced){const p=values(),defaults={offset:0,feed:.2,rpm:800,tool:'turning'};if(Object.entries(defaults).some(([k,v])=>p[k]!==v)){setValues({...p,...defaults});settingsChanged(false);}assisted=true;save();}renderMode();},
     progressSnapshot,pauseWorkshop:()=>{if(playing)pause();window.CNCLabUI.pause();rememberBasic();}};
   const context=document.modelContext;

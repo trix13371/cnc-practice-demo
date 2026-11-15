@@ -39,7 +39,7 @@ assert.equal(path.status({...readyCycle,training:{guidedPassed:true,transferPass
 assert.equal(path.status({...readyCycle,training:{guidedPassed:true,transferPassed:false}}).complete,false);
 assert.equal(path.resume({version:1,active:true,selected:'self-cycle'},readyCycle).id,'full-cycle');
 assert.equal(path.following('first-control').id,'metrology-outer-control');
-assert.equal(path.steps.length,68);
+assert.equal(path.steps.length,76);
 
 const readyCode={...readyCycle,courseSteps:[...readyCycle.courseSteps,'practice-programSetup'],training:{guidedPassed:true,transferPassed:true},gcode:{core:['coordinates','motion','modal','feed','spindle','retract'],final:false}};
 assert.equal(path.next(readyCode).id,'self-code');

@@ -1,5 +1,22 @@
 (function(){
   'use strict';
+  function displayBands(profile) {
+    if(!profile.inner?.length) return profile.segments;
+    const total=profile.segments.reduce((sum,part)=>sum+part.length,0);
+    const bands=(parts,origin)=>{
+      let x=origin;
+      return parts.map(part=>{const start=x;x+=part.length;return {start,end:x,d:part.diameter,d2:part.endDiameter??part.diameter};});
+    };
+    const inner=[...profile.inner].reverse().map(part=>({...part,diameter:part.endDiameter,endDiameter:part.diameter}));
+    const outerRanges=bands(profile.segments,0),innerRanges=bands(inner,total-inner.reduce((sum,part)=>sum+part.length,0));
+    const ends=[0,total,...outerRanges.map(part=>part.end),...innerRanges.flatMap(part=>[part.start,part.end])].sort((a,b)=>a-b);
+    const at=(p,x)=>p?p.d+(p.d2-p.d)*(x-p.start)/(p.end-p.start):0;
+    return ends.flatMap((a,i)=>{
+      const b=ends[i+1];if(!(b-a>1e-8)) return [];
+      const mid=(a+b)/2, outer=outerRanges.find(p=>mid>=p.start&&mid<p.end), bore=innerRanges.find(p=>mid>=p.start&&mid<p.end);
+      return [{length:b-a,diameter:at(outer,a),endDiameter:at(outer,b),bore:at(bore,a),endBore:at(bore,b)}];
+    });
+  }
   class PartViewer {
     constructor(host){
       this.host=host;this.yaw=-.65;this.pitch=.35;this.zoom=1;this.section=false;this.profile={segments:[{length:45,diameter:28}],bore:0};
@@ -15,13 +32,13 @@
       this.canvas.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','+','=','-','Home'].includes(e.key))return;e.preventDefault();if(e.key.startsWith('Arrow'))this.preset.value='custom';if(e.key==='ArrowLeft')this.yaw-=.15;if(e.key==='ArrowRight')this.yaw+=.15;if(e.key==='ArrowUp')this.pitch-=.15;if(e.key==='ArrowDown')this.pitch+=.15;if(['+','='].includes(e.key))this.zoom=Math.min(2.5,this.zoom*1.15);if(e.key==='-')this.zoom=Math.max(.55,this.zoom/1.15);if(e.key==='Home'){this.yaw=-.65;this.pitch=.35;this.zoom=1;this.section=false;this.preset.value='iso';}this.draw();});
       this.observer=new ResizeObserver(()=>this.draw());this.observer.observe(host);this.draw();
     }
-    set(profile,caption='Целевая деталь'){this.profile=profile;this.host.querySelector('.viewer-caption').textContent=caption;this.canvas.setAttribute('aria-label',`${caption}. Длина ${profile.segments.reduce((s,p)=>s+p.length,0)} мм; диаметры ${profile.segments.map(s=>s.diameter+(s.endDiameter&&s.endDiameter!==s.diameter?'–'+s.endDiameter:'')).join(', ')} мм; отверстие ${profile.bore||0} мм. Вращение стрелками, масштаб плюс и минус.`);this.draw();}
+    set(profile,caption='Целевая деталь'){this.profile=profile;this.host.querySelector('.viewer-caption').textContent=caption;this.canvas.setAttribute('aria-label',`${caption}. Длина ${profile.segments.reduce((s,p)=>s+p.length,0)} мм; диаметры ${profile.segments.map(s=>s.diameter+(s.endDiameter&&s.endDiameter!==s.diameter?'–'+s.endDiameter:'')).join(', ')} мм; ${profile.inner?.length?'Переменное отверстие. Для просмотра выберите продольный разрез.':'Отверстие '+(profile.bore||0)+' мм.'} Вращение стрелками, масштаб плюс и минус.`);this.draw();}
     draw(){
       this.zoomControl.value=String(Math.round(this.zoom*100));const c=this.canvas,ctx=this.ctx,w=c.clientWidth,h=c.clientHeight;if(!w||!h||!ctx)return;
       const dpr=Math.min(window.devicePixelRatio||1,2);c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);ctx.scale(dpr,dpr);
       ctx.fillStyle='#f8fafc';ctx.fillRect(0,0,w,h);ctx.strokeStyle='#e0e7ef';ctx.lineWidth=.5;
       for(let x=0;x<w;x+=32){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,h);ctx.stroke();}for(let y=0;y<h;y+=32){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(w,y);ctx.stroke();}
-      const segments=this.profile.segments,total=segments.reduce((s,p)=>s+p.length,0),bore=(this.profile.bore||0)/2,maxD=Math.max(...segments.map(s=>Math.max(s.diameter,s.endDiameter||s.diameter)),1),size=Math.max(total,maxD),scale=Math.min(w/(size*1.55),h/(size*.95))*this.zoom;
+      const segments=displayBands(this.profile),total=segments.reduce((s,p)=>s+p.length,0),bore=(this.profile.bore||0)/2,maxD=Math.max(...segments.map(s=>Math.max(s.diameter,s.endDiameter||s.diameter)),1),size=Math.max(total,maxD),scale=Math.min(w/(size*1.55),h/(size*.95))*this.zoom;
       const cy=Math.cos(this.yaw),sy=Math.sin(this.yaw),cp=Math.cos(this.pitch),sp=Math.sin(this.pitch);
       const rotate=([x,y,z])=>{const a=x*cy+z*sy,b=-x*sy+z*cy;return [a,y*cp-b*sp,y*sp+b*cp];};
       const project=p=>{const k=size*4/(size*4-p[2]);return [w/2+p[0]*scale*k,h/2-p[1]*scale*k];};
@@ -30,15 +47,15 @@
       const add=(points,cut=false)=>{const p=points.map(rotate);faces.push({p,z:p.reduce((s,v)=>s+v[2],0)/p.length,cut});};
       const cap=(x,outer,inner)=>{if(Math.abs(outer-inner)<.00001)return;for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,outer,a),ring(x,outer,b),ring(x,inner,b),ring(x,inner,a)]);}};
       let x=0,prior=segments[0].diameter/2,priorBore=(segments[0].bore??this.profile.bore??0)/2;cap(0,prior,priorBore);
-      for(const s of segments){const bore=(s.bore??this.profile.bore??0)/2;cap(x,Math.max(bore,priorBore),Math.min(bore,priorBore));const r=s.diameter/2,r2=(s.endDiameter||s.diameter)/2;cap(x,Math.max(r,prior),Math.min(r,prior));
-        for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,r2,b),ring(x,r,b)]);if(bore)add([ring(x,bore,b),ring(x+s.length,bore,b),ring(x+s.length,bore,a),ring(x,bore,a)]);}
-        if(this.section)for(const a of [0,Math.PI])add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,bore,a),ring(x,bore,a)],true);
-        x+=s.length;prior=r2;priorBore=bore;
+      for(const s of segments){const bore=(s.bore??this.profile.bore??0)/2,boreEnd=(s.endBore??(bore*2))/2;cap(x,Math.max(bore,priorBore),Math.min(bore,priorBore));const r=s.diameter/2,r2=(s.endDiameter||s.diameter)/2;cap(x,Math.max(r,prior),Math.min(r,prior));
+        for(let i=start;i<N;i++){const a=i/N*2*Math.PI,b=(i+1)/N*2*Math.PI;add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,r2,b),ring(x,r,b)]);if(bore||boreEnd)add([ring(x,bore,b),ring(x+s.length,boreEnd,b),ring(x+s.length,boreEnd,a),ring(x,bore,a)]);}
+        if(this.section)for(const a of [0,Math.PI])add([ring(x,r,a),ring(x+s.length,r2,a),ring(x+s.length,boreEnd,a),ring(x,bore,a)],true);
+        x+=s.length;prior=r2;priorBore=boreEnd;
       }cap(x,prior,priorBore);
       faces.sort((a,b)=>a.z-b.z);
       for(const f of faces){const [a,b,c0]=f.p,u=b.map((v,i)=>v-a[i]),v=c0.map((n,i)=>n-a[i]);const n=[u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]],len=Math.hypot(...n)||1,light=.3+.7*Math.abs((n[0]*-.2+n[1]*.65+n[2]*.73)/len);ctx.fillStyle=f.cut?'#a9c2e8':`rgb(${Math.round(106+90*light)},${Math.round(130+85*light)},${Math.round(142+85*light)})`;ctx.beginPath();f.p.forEach((p,i)=>{const q=project(p);if(i)ctx.lineTo(...q);else ctx.moveTo(...q);});ctx.closePath();ctx.fill();ctx.strokeStyle=f.cut?'#7096ca':'rgba(55,80,108,.18)';ctx.lineWidth=.5;ctx.stroke();}
       if(this.measurement){const m=this.measurement,r=m.actual/2,pts=[ring(m.x,r,0),ring(m.x,r,Math.PI)].map(v=>project(rotate(v)));ctx.strokeStyle='#255beb';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(...pts[0]);ctx.lineTo(...pts[1]);for(const q of pts){ctx.moveTo(q[0]-8,q[1]);ctx.lineTo(q[0]+8,q[1]);}ctx.stroke();ctx.fillStyle='#255beb';ctx.font='bold 14px Segoe UI';ctx.fillText('Место замера',16,24);}
-      ctx.fillStyle='#5b7289';ctx.font='13px Segoe UI, sans-serif';ctx.fillText(`L ${Number(total.toFixed(1))} мм${bore?' · отверстие Ø'+Number((bore*2).toFixed(1)):''}`,16,h-17);
+      ctx.fillStyle='#5b7289';ctx.font='13px Segoe UI, sans-serif';ctx.fillText(`L ${Number(total.toFixed(1))} мм${this.profile.inner?.length?' · переменное отверстие':bore?' · отверстие Ø'+Number((bore*2).toFixed(1)):''}`,16,h-17);
     }
   }
   window.PartViewer=PartViewer;

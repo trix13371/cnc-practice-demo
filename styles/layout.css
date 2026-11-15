@@ -574,6 +574,22 @@ body[data-screen="home"] .learning-bar {
   color: var(--accent);
   background: #edf3ff;
 }
+.home-path.learning-path-cards button:hover {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.home-intro-exercises {
+  margin: 4px 0 8px;
+  padding-left: 12px;
+  border-left: 2px solid var(--line);
+  color: #526478;
+}
+.home-intro-exercises summary {
+  cursor: pointer;
+  font-size: var(--text-sm, 14px);
+  line-height: 1.5;
+}
 .home-path.learning-path-cards button:disabled {
   color: #526478;
   opacity: 1;
@@ -2693,6 +2709,135 @@ body[data-screen="course"] .course-index {
   color: #50677c;
   border-top: 1px solid #d7e1eb;
 }
+.start-lathe {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: radial-gradient(ellipse at 52% 40%, #f7fafd, #eaf1f9);
+}
+.start-phases {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 610px;
+  padding: 0 10px 16px;
+  margin: 0 auto;
+  list-style: none;
+  color: #50677c;
+}
+.start-phases li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: clamp(0.75rem, 2.5vw, 0.95rem);
+}
+.start-phases li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 14px;
+  height: 14px;
+  border: 1.5px solid #71899f;
+  border-radius: 50%;
+}
+.start-phases li[aria-current] {
+  color: #1746b3;
+  font-weight: 700;
+}
+.start-phases li[aria-current]::before {
+  border-color: #2458ee;
+}
+.start-phases li[data-phase="running"][aria-current]::before {
+  background: #2458ee;
+  box-shadow: inset 0 0 0 3px #f6f9fc;
+}
+.start-phases li[data-phase="coasting"]::before {
+  border-style: dashed;
+  border-width: 2px;
+}
+.start-phases li[data-phase="stopped"][aria-current] {
+  color: #225b44;
+}
+.start-phases li[data-phase="stopped"][aria-current]::before {
+  border-color: #2c6f54;
+  background: #2c6f54;
+  box-shadow: inset 0 0 0 3px #f6f9fc;
+}
+.start-ruler {
+  padding: 18px clamp(14px, 5%, 38px) 17px;
+  cursor: crosshair;
+  user-select: none;
+}
+.start-ruler[aria-disabled="true"] {
+  cursor: default;
+}
+.start-ruler:focus-visible {
+  outline: 2px solid #2458ee;
+  outline-offset: -4px;
+  border-radius: 12px;
+}
+.start-ruler-track {
+  position: relative;
+  height: 94px;
+  color: #506b81;
+}
+.start-ruler-marks {
+  position: absolute;
+  top: 36px;
+  width: 100%;
+}
+.start-ruler .start-ruler-marks svg {
+  height: 34px;
+  overflow: visible;
+}
+.start-ruler-pointer,
+.start-ruler-label {
+  position: absolute;
+  transform: translateX(-50%);
+}
+.start-ruler-pointer {
+  width: 16px;
+  top: 0;
+  color: #2458ee;
+  transition: left 180ms ease-out;
+}
+.start-ruler-previous {
+  color: #afc3ec;
+  transition: none;
+}
+.start-ruler-label {
+  top: 73px;
+  font-size: clamp(0.69rem, 2.2vw, 0.94rem);
+  font-variant-numeric: tabular-nums;
+}
+.start-session .start-diameter-label {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+.start-diameter-input {
+  display: inline-grid;
+  grid-template-columns: 44px 86px 44px;
+  margin-bottom: 14px;
+}
+.start-diameter-input .button,
+.start-diameter-input input {
+  min-height: 44px;
+  padding: 6px;
+  text-align: center;
+}
+.start-diameter-input input {
+  min-width: 0;
+  width: 100%;
+  border-radius: 0;
+  font-variant-numeric: tabular-nums;
+}
+.start-diameter-input .button:first-child {
+  border-radius: 8px 0 0 8px;
+  border-right: 0;
+}
+.start-diameter-input .button:last-child {
+  border-radius: 0 8px 8px 0;
+  border-left: 0;
+}
 .start-controls {
   display: flex;
   flex-wrap: wrap;
@@ -2757,19 +2902,9 @@ body[data-screen="course"] .course-index {
   font-size: 14px;
   color: #50677c;
 }
-.start-spinning {
-  animation: start-spin 1.4s linear infinite;
-  transform-box: fill-box;
-  transform-origin: center;
-}
-@keyframes start-spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
 @media (prefers-reduced-motion: reduce) {
-  .start-spinning {
-    animation: none;
+  .start-ruler-pointer {
+    transition: none;
   }
 }
 @media (max-width: 600px) {
@@ -3149,3 +3284,38 @@ body[data-screen="course"] .course-index {
   .milling-collision-facts { grid-template-columns: minmax(0, 1fr); gap: 4px; }
   .milling-collision-facts dd { margin-bottom: 10px; }
 }
+
+/* Lathe hole lessons */
+.hole-course { min-width: 0; }
+.hole-course-diagram { margin: 1.25rem 0; border: 1px solid #d4e0ec; border-radius: .75rem; overflow: hidden; background: #f1f6fa; }
+.hole-course-diagram svg { display: block; width: 100%; max-height: 270px; }
+.hole-course-diagram figcaption { padding: .75rem 1rem; border-top: 1px solid #d4e0ec; color: #365976; font-size: .875rem; }
+.hole-course-controls { display: grid; gap: 1rem; margin-block: 1rem; }
+.hole-course-form fieldset { display: flex; flex-wrap: wrap; align-items: end; gap: .75rem; min-width: 0; margin: 0; padding: .875rem; border: 1px solid #d4e0ec; border-radius: .625rem; }
+.hole-course-form legend { padding-inline: .375rem; font-weight: 650; }
+.hole-course-form label { display: grid; min-width: 0; flex: 1 1 11rem; gap: .375rem; }
+.hole-course-form :is(input, select) { width: 100%; min-height: 2.75rem; }
+.hole-course-actions { display: flex; flex-wrap: wrap; gap: .625rem; margin-block: 1rem; }
+.hole-course :is(details, .hole-course-note) { margin-block: .75rem; }
+.hole-course-note { font-size: .875rem; }
+.hole-course pre { overflow: auto; }
+
+/* Isolated 2.5D milling preview */
+.milling-route-preview form, .milling-route-preview label { display: grid; gap: .5rem; }
+.milling-route-preview form { margin-block: .75rem; }
+.milling-route-preview textarea { box-sizing: border-box; width: 100%; resize: vertical; font-family: ui-monospace, Consolas, monospace; }
+.milling-route-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.milling-route-result figure { margin: .75rem 0 0; }
+.milling-route-result svg { display: block; width: 100%; max-height: 18rem; background: #f5f8fc; border-radius: .5rem; }
+
+/* Mounting plate project */
+.mounting-plate { min-width: 0; }
+.mounting-plate-drawing { margin: 1rem 0; border: 1px solid #cbd9e8; border-radius: .75rem; overflow: hidden; background: #f6f9fd; }
+.mounting-plate-drawing svg { display: block; width: 100%; max-height: 22rem; }
+.mounting-plate-drawing figcaption { padding: .6rem .85rem; border-top: 1px solid #cbd9e8; }
+.mounting-plate-table { width: 100%; border-collapse: collapse; margin-block: .75rem 1rem; }
+.mounting-plate-table th, .mounting-plate-table td { text-align: left; padding: .45rem .35rem; border-bottom: 1px solid #d7e0ec; vertical-align: top; }
+.mounting-plate-table td button { display: block; margin-top: .25rem; }
+.mounting-plate-source, .mounting-plate > label { display: grid; gap: .35rem; margin-block: 1rem; }
+.mounting-plate-source textarea { box-sizing: border-box; width: 100%; min-width: 0; resize: vertical; font-family: ui-monospace, Consolas, monospace; }
+.mounting-plate-evidence { margin-block: 1.25rem; }

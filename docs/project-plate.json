@@ -1,0 +1,159 @@
+{
+  "title": "Проект: монтажная плита",
+  "assignment": {
+    "id": "mounting-plate",
+    "contentVersion": 1,
+    "criteriaVersion": 1,
+    "profileId": "milling-25d-project",
+    "profileVersion": 1,
+    "seed": "MP-01"
+  },
+  "code": "MP-01",
+  "units": "мм",
+  "blank": {
+    "minX": 0,
+    "minY": 0,
+    "maxX": 60,
+    "maxY": 40,
+    "thickness": 10
+  },
+  "fixture": {
+    "x0": 25,
+    "x1": 35,
+    "y0": 36,
+    "y1": 39,
+    "z0": -10,
+    "z1": 8
+  },
+  "tool": {
+    "diameter": 6,
+    "maxStep": 1
+  },
+  "start": {
+    "x": -10,
+    "y": 5,
+    "z": 20
+  },
+  "safeZ": 12,
+  "operations": {
+    "pocket": {
+      "title": "Карман",
+      "kind": "pocket",
+      "area": {
+        "minX": 16,
+        "minY": 9,
+        "maxX": 28,
+        "maxY": 17
+      },
+      "floor": -2,
+      "resolution": 0.25,
+      "maxResidual": 12
+    },
+    "contour": {
+      "title": "Наружный контур",
+      "kind": "contour",
+      "area": {
+        "minX": 8,
+        "minY": 7,
+        "maxX": 38,
+        "maxY": 19
+      },
+      "floor": -1,
+      "window": {
+        "minX": 2,
+        "minY": 1,
+        "maxX": 44,
+        "maxY": 25
+      },
+      "boundedContour": true,
+      "resolution": 0.25,
+      "maxResidual": 55
+    },
+    "holes": {
+      "title": "Два глухих отверстия Ø6",
+      "floor": -2,
+      "holeCenters": [
+        {
+          "x": 12,
+          "y": 13
+        },
+        {
+          "x": 34,
+          "y": 13
+        }
+      ]
+    }
+  },
+  "checks": [
+    {
+      "id": "p1",
+      "title": "Карман, левая часть",
+      "x": 17,
+      "y": 13,
+      "z": -2
+    },
+    {
+      "id": "p2",
+      "title": "Карман, правая часть",
+      "x": 27,
+      "y": 13,
+      "z": -2
+    },
+    {
+      "id": "c1",
+      "title": "Контур слева",
+      "x": 5,
+      "y": 13,
+      "z": -1
+    },
+    {
+      "id": "c2",
+      "title": "Контур справа",
+      "x": 41,
+      "y": 13,
+      "z": -1
+    },
+    {
+      "id": "c3",
+      "title": "Контур снизу",
+      "x": 23,
+      "y": 4,
+      "z": -1
+    },
+    {
+      "id": "c4",
+      "title": "Контур сверху",
+      "x": 23,
+      "y": 22,
+      "z": -1
+    },
+    {
+      "id": "h1",
+      "title": "Отверстие А",
+      "x": 12,
+      "y": 13,
+      "z": -2
+    },
+    {
+      "id": "h2",
+      "title": "Отверстие Б",
+      "x": 34,
+      "y": 13,
+      "z": -2
+    },
+    {
+      "id": "top",
+      "title": "Сохранённая верхняя поверхность",
+      "x": 23,
+      "y": 8,
+      "z": 0
+    },
+    {
+      "id": "frame",
+      "title": "Сохранённая рама за полосой",
+      "x": 46,
+      "y": 13,
+      "z": 0
+    }
+  ]
+}

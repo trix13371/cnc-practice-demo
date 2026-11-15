@@ -26,6 +26,7 @@ const stockShapes=typeof module==='object'&&module.exports?require('./stock-shap
 
 /* ===== Константы ===== */
 const radialOps=typeof module==='object'&&module.exports?require('./radial-ops-model.js'):CNCRadialOps;
+const internalProfile=typeof module==='object'&&module.exports?require('./internal-profile-model.js'):CNCInternalProfile;
 const MAX_EVENTS = 240;
 const MAX_SOURCE = 4000;
 const MAX_LINES = 80;
@@ -40,7 +41,9 @@ const TOOLS = [
   { id: 2, code: 'T0202', title: 'T0202 · Чистовой',
     trueGeometry: { x: -0.8, z: 1 }, radius: 0.4, maxDepth: 0.5, feedRange: [0.03, 0.15] },
   {id:3,code:'T0303',title:'T0303 · Торцевой',trueGeometry:{x:.4,z:1.5},radius:.4,maxDepth:1,feedRange:[.03,.2]},
-  {id:4,code:'T0404',title:'T0404 · Канавочный 2 мм',trueGeometry:{x:-.4,z:.5},radius:.1,width:2,maxDepth:2,feedRange:[.02,.12]}
+  {id:4,code:'T0404',title:'T0404 · Канавочный 2 мм',trueGeometry:{x:-.4,z:.5},radius:.1,width:2,maxDepth:2,feedRange:[.02,.12]},
+  {id:5,code:'T0505',title:'T0505 · Сверло Ø8',trueGeometry:{x:.4,z:1},radius:0,diameter:8,tip:2,reach:45,feedRange:[.04,.18]},
+  {id:6,code:'T0606',title:'T0606 · Расточной',trueGeometry:{x:-.4,z:1},radius:.2,bar:6,reach:50,maxDepth:1,feedRange:[.03,.15]}
 ];
 
 const LIMITS = {
@@ -81,7 +84,7 @@ const DIALECT = {
       'радиус инструмента носит информационный характер, контур рассчитывается по вершине резца',
     'Переменные, макросы, выражения (#, =, *), U/W/Y, резьба',
     'Отрезка, внутренние и торцевые канавки, боковое/диагональное резание канавочным инструментом не поддерживаются',
-    'Расточка и сверление не поддерживаются: отверстие трубы задано исходной формой и не изменяется; минимальная стенка 1 мм — учебное ограничение.'
+    'Профиль отверстий использует осевые G01. Сверлильные циклы, наклонное врезание и расточка за существующим дном выходят за границы модели.'
   ],
   formulas: {
     volume: 'Объём участка (конус/цилиндр): V = pi/12 · l · (D1² + D1·D2 + D2²); ' +
@@ -93,6 +96,7 @@ const DIALECT = {
     rpmG97: 'n = S · перекрытие, не выше speedLimit и 2500',
     reading: 'Квантование в целые микрометры, округление половины вверх (положительные значения)'
   },
+  internalTools: ['T0505 — сверло Ø8 с конусом 2 мм','T0606 — расточной резец с державкой Ø6; только stock.internal=true'],
   limitations: [
     'Референс устанавливает учебный признак готовности осей; движение к аппаратным датчикам нуля не рассчитывается.',
     'Ручная привязка требует касания с допуском 0.005 мм и записи обеих осей X/Z; координата плоскости касания Z должна быть заранее известна.',
@@ -157,9 +161,9 @@ function create(stock, strict) {
   if (strict) {
     for (const k of ['diameter', 'length', 'grip']) if (!Object.hasOwn(stock,k)) return null;
   } else {
-    for (const k of keys) if (['diameter', 'length', 'grip','shape','stepDiameter','stepLength','bore'].indexOf(k) < 0) return null;
+    for (const k of keys) if (['diameter', 'length', 'grip','shape','stepDiameter','stepLength','bore','internal'].indexOf(k) < 0) return null;
   }
-  if(keys.some(k=>!['diameter','length','grip','shape','stepDiameter','stepLength','bore'].includes(k)))return null;
+  if(keys.some(k=>!['diameter','length','grip','shape','stepDiameter','stepLength','bore','internal'].includes(k)))return null;
   const out = {};
   const ranges = { diameter: LIMITS.stockDiameter, length: LIMITS.stockLength, grip: LIMITS.grip };
   for (const k of ['diameter', 'length', 'grip']) {
@@ -169,6 +173,7 @@ function create(stock, strict) {
     if (v < ranges[k].min - EPS || v > ranges[k].max + EPS) return null;
     out[k] = v;
   }
+  if (Object.hasOwn(stock,"internal")) { if (stock.internal !== true) return null; out.internal = true; }
   const shape=stockShapes.normalizeShape(stock,out.diameter,out.length);return shape?Object.assign(out,shape):null;
 }
 
@@ -183,7 +188,8 @@ function initState(stock) {
       '1': { x: 0, z: 0, wearX: 0, wearZ: 0, calibrated: false, measuredX:false, measuredZ:false },
       '2': { x: 0, z: 0, wearX: 0, wearZ: 0, calibrated: false, measuredX:false, measuredZ:false },
       '3':{x:0,z:0,wearX:0,wearZ:0,calibrated:false,measuredX:false,measuredZ:false},
-      '4':{x:0,z:0,wearX:0,wearZ:0,calibrated:false,measuredX:false,measuredZ:false}
+      '4':{x:0,z:0,wearX:0,wearZ:0,calibrated:false,measuredX:false,measuredZ:false},
+      ...(s.internal ? Object.fromEntries([5,6].map(id => [id,{x:0,z:0,wearX:0,wearZ:0,calibrated:false,measuredX:false,measuredZ:false}])) : {})
     },
     workOffset: { x: 0, z: 100, confirmed: false },
     axes: { x: r3(s.diameter + 12), z: 112 },      // координаты салазок
@@ -229,10 +235,26 @@ function profileDiameter(profile, z) {
   return dAt(rs[rs.length - 1], rs[rs.length - 1].z1);
 }
 function profileVolume(profile) {
+  if (profile.inner) return internalProfile.analyze(internalGeometry(profile)).materialVolume;
   let v = 0;
   for (const s of profile.segments)
     v += Math.PI / 12 * s.length * (s.diameter * s.diameter + s.diameter * s.endDiameter + s.endDiameter * s.endDiameter - 3*(s.bore??profile.bore??0)**2);
   return v;
+}
+
+function internalGeometry(profile) {
+  const outside = internalProfile.fromLegacy(profile);
+  return profile.inner ? { ...outside, inner: profile.inner } : outside;
+}
+
+function checkedInternalOutside(profile, inner) {
+  const next = { ...profile, inner };
+  let wall;
+  try { wall = internalProfile.analyze(internalGeometry(next)).minWall; }
+  catch (error) { throw err('WALL', error.message, true); }
+  if (wall !== null && wall < 1 - EPS)
+    throw err('WALL', 'Стенка стала бы тоньше учебного минимума 1 мм.', true);
+  return next;
 }
 
 /* ===== Координаты ===== */
@@ -295,7 +317,7 @@ function gUnsupported(v) {
   return 'код G' + v + ' не поддерживается';
 }
 
-function compileBlock(words,row,raw){
+function compileBlock(words,row,raw,enabled){
   const fail=message=>({ok:false,message:'Строка '+row+': '+message}),groups={},values={},gs=[];let m=null;
   const group={0:'motion',1:'motion',18:'plane',21:'units',40:'compensation',54:'work',96:'speed',97:'speed',98:'feed',99:'feed',50:'cap'};
   for(const {L,v}of words){
@@ -305,7 +327,7 @@ function compileBlock(words,row,raw){
     else if(['X','Z','F','S','T'].includes(L)){if(Object.hasOwn(values,L))return fail('Повтор адреса '+L);values[L]=v;}
     else return fail('Адрес '+L+' не поддерживается.');
   }
-  if(values.T!==undefined){if(words.length!==1||![101,202,303,404].includes(values.T))return fail('T0101…T0404 задаются отдельным блоком.');return {ok:true,block:{row,raw,ops:[{k:'tool',v:values.T/101}]}};}
+  if(values.T!==undefined){if(words.length!==1||!toolAllowed(values.T/101,enabled))return fail((enabled?'T0101…T0606':'T0101…T0404')+' задаются отдельным блоком.');return {ok:true,block:{row,raw,ops:[{k:'tool',v:values.T/101}]}};}
   if(values.F!==undefined&&(!(values.F>0)||values.F>1500))return fail('Подача F: 0 < F ≤ 1500.');
   if(values.S!==undefined&&(!(values.S>0)||values.S>2500))return fail('Положительное S не больше 2500; в G96 действуют единицы скорости резания.');
   if(m===30&&(values.X!==undefined||values.Z!==undefined))return fail('M30 и перемещение задаются разными блоками.');
@@ -319,7 +341,7 @@ function compileBlock(words,row,raw){
   if(m!==null&&m!==3&&m!==5)ops.push({k:'m',v:m});
   return {ok:true,block:{row,raw,ops}};
 }
-function parseProgram(source){
+function parseProgram(source,enabled=false){
   const fail=(row,message)=>({ok:false,message:'Строка '+row+': '+message});
   if(typeof source!=='string'||source.length>MAX_SOURCE)return {ok:false,message:'Программа должна содержать не больше '+MAX_SOURCE+' символов.'};
   if(sourceControls.test(source))return {ok:false,message:'Удалите скрытые управляющие символы из программы.'};
@@ -335,7 +357,7 @@ function parseProgram(source){
     if(words[0]?.L==='O'){if(words.length!==1||blocks.length||seenProgram||!Number.isInteger(words[0].v)||words[0].v<1||words[0].v>99999)return fail(i+1,'Один отдельный O1…99999 перед исполняемыми блоками.');seenProgram=true;continue;}
     if(words[0]?.L==='N'){const n=words.shift().v;if(!Number.isInteger(n)||n<0||n>99999)return fail(i+1,'Номер N0…99999 должен быть целым.');}
     if(!words.length)continue;if(ended)return fail(i+1,'Исполняемые блоки после M30 запрещены.');
-    const result=compileBlock(words,i+1,lines[i].trim());if(!result.ok)return result;blocks.push(result.block);if(words.some(w=>w.L==='M'&&w.v===30))ended=true;
+    const result=compileBlock(words,i+1,lines[i].trim(),enabled);if(!result.ok)return result;blocks.push(result.block);if(words.some(w=>w.L==='M'&&w.v===30))ended=true;
   }return {ok:true,blocks};
 }
 
@@ -373,6 +395,7 @@ function checkBladeAir(st,p0,p1,jog){
   }
 }
 function checkNonCutting(st,p0,p1,jog){
+  if (st.tool === 5 || st.tool === 6) return checkInternalAir(st, p0, p1, jog);
   const L=st.stock.length,dz=p1.z-p0.z,dx=p1.x-p0.x,front=st.profile.frontZ??0;
   if(st.tool===4)return checkBladeAir(st,p0,p1,jog);
   // Contact at the front is allowed only in JOG; withdrawing from it enters free space.
@@ -391,6 +414,107 @@ function checkNonCutting(st,p0,p1,jog){
     const lo=Math.max(zmin,r.z1),hi=Math.min(zmax,r.z0);if(hi<lo-EPS)continue;
     for(const z of [lo,hi])if(xAt(z)<dAt(r,z)+LIMITS.clearance-EPS)throw err('COLLISION','Траектория пересекает материал: сначала отведите X, затем перемещайтесь вдоль Z.',true);
   }
+}
+
+function requireOpening(profile, from, to, needed, bend, cuttingEdge = false) {
+  const bands = internalProfile.innerRanges(profile);
+  if (!bands.length || to > bands.at(-1).end + EPS)
+    throw err('BORE_ACCESS', 'Инструмент пересекает дно или входит в сплошной материал.', true);
+  for (const band of bands) {
+    if (cuttingEdge && band.start >= to - EPS) continue;
+    const lo = Math.max(from, band.start), hi = Math.min(to, band.end);
+    if (hi < lo - EPS) continue;
+    const depths = bend > lo && bend < hi ? [lo, bend, hi] : [lo, hi];
+    for (const depth of depths) {
+      const t = (depth - band.start) / (band.end - band.start);
+      const available = band.diameter + (band.endDiameter - band.diameter) * t;
+      if (available < needed(depth) - EPS)
+        throw err('BORE_ACCESS', 'Инструменту не хватает зазора внутри отверстия.', true);
+    }
+  }
+}
+
+function checkDrillOpening(profile, depth, tool) {
+  if (depth <= EPS) return;
+  requireOpening(profile, 0, depth, (at) => tool.diameter *
+    Math.min(1, Math.max(0, (depth - at) / tool.tip)), depth - tool.tip);
+}
+
+function checkInternalAir(st, p0, p1, jog) {
+  const profile = internalGeometry(st.profile), tool = toolById(st.tool);
+  const from = profile.frontZ - p0.z, to = profile.frontZ - p1.z;
+  const deepest = Math.max(from, to);
+  if (deepest < -EPS) return;
+  if (Math.min(p0.z,p1.z) <= -st.stock.length + 2 + EPS) throw err('CHUCK', 'Внутренний инструмент вошёл бы в зону зажима.', true);
+  if (deepest > tool.reach + EPS) throw err('BORE_ACCESS', 'Превышен вылет внутреннего инструмента.', true);
+  if (tool.id === 5) {
+    if (Math.max(Math.abs(p0.x), Math.abs(p1.x)) > EPS)
+      throw err('DRILL_AXIS', 'Сверло входит в заготовку только вдоль оси X0.', true);
+    checkDrillOpening(profile, deepest, tool);
+    return;
+  }
+  const radialRetract = Math.abs(p0.z - p1.z) <= EPS && p1.x < p0.x;
+  if (radialRetract) {
+    const at = internalProfile.insideAt(profile,p0.z);
+    if (!at || at.d < Math.max(tool.bar,p0.x)-EPS)
+      throw err('BORE_ACCESS','Расточной резец находится вне свободного сечения.',true);
+    return;
+  }
+  const clearance = jog ? 0 : LIMITS.clearance;
+  const xAt = (depth) => Math.abs(to - from) <= EPS ? Math.max(p0.x, p1.x)
+    : p0.x + (p1.x - p0.x) * (depth - from) / (to - from);
+  requireOpening(profile, Math.max(0, Math.min(from, to)), deepest,
+    (depth) => Math.max(tool.bar, xAt(depth)) + clearance);
+}
+
+function performInternalCut(st, p0, p1, tool) {
+  const profile = internalGeometry(st.profile);
+  const start = profile.frontZ - p0.z, depth = profile.frontZ - p1.z;
+  const result = { removed: 0, seconds: 0, z0: Math.max(p0.z, p1.z),
+    z1: Math.min(p0.z, p1.z), depth: 0, dry: !st.coolant };
+  if (depth <= Math.max(0, start) + EPS) {
+    checkInternalAir(st, p0, p1, true);
+    return result;
+  }
+  if (p1.z <= -st.stock.length + 2 + EPS) throw err('CHUCK', 'Внутренний инструмент вошёл бы в зону зажима.', true);
+  if (depth > tool.reach + EPS) throw err('BORE_ACCESS', 'Превышен вылет внутреннего инструмента.', true);
+  if (Math.abs(p0.x - p1.x) > EPS) throw err('BORE_ACCESS', 'Выполняйте внутренний проход вдоль Z при постоянном X.', true);
+  if (!st.spindle || st.speedMode !== 97) throw err('SPINDLE', 'Для внутреннего прохода включите шпиндель в режиме G97.', true);
+  const rpm = effectiveRpm(st);
+  const feed = st.feed * st.overrides.feed / 100 / (st.feedMode === 99 ? 1 : rpm);
+  if (rpm <= 0 || feed < tool.feedRange[0] - EPS || feed > tool.feedRange[1] + EPS)
+    throw err('FEED', 'Подача вне диапазона внутреннего инструмента.', false);
+  let cutter;
+  if (tool.id === 5) {
+    if (Math.abs(p1.x) > EPS) throw err('DRILL_AXIS', 'Для сверления задайте X0.', true);
+    checkDrillOpening(profile, start, tool);
+    const cone = Math.min(tool.tip, depth);
+    cutter = [{ length: cone, diameter: tool.diameter * cone / tool.tip, endDiameter: 0 }];
+    if (depth > cone + EPS)
+      cutter.unshift({ length: depth - cone, diameter: tool.diameter, endDiameter: tool.diameter });
+  } else {
+    if (p1.x < tool.bar + LIMITS.clearance - EPS)
+      throw err('BORE_ACCESS', 'Диаметр прохода меньше требуемого для державки.', true);
+    requireOpening(profile, 0, depth, () => tool.bar + LIMITS.clearance);
+    if (start > EPS) requireOpening(profile, start, start, () => p1.x);
+    requireOpening(profile, 0, depth, () => p1.x - 2 * tool.maxDepth, null, true);
+    cutter = [{ length: depth, diameter: p1.x, endDiameter: p1.x }];
+  }
+  let changed;
+  try { changed = internalProfile.enlarge(profile, cutter); }
+  catch (error) { throw err('WALL', error.message, true); }
+  if (changed.minWall !== null && changed.minWall < 1 - EPS)
+    throw err('WALL', 'Стенка стала бы тоньше учебного минимума 1 мм.', true);
+  if (changed.removed > EPS) {
+    st.profile = {
+      ...st.profile,
+      bore: 0,
+      segments: st.profile.segments.map((part) => ({ ...part, bore: 0 })),
+      inner: changed.profile.inner,
+    };
+    result.removed = changed.removed;
+  }
+  return result;
 }
 function cutProfile(profile,zA,zB,pathFn){
   const out=[];let depthMax=0;
@@ -424,11 +548,13 @@ function performRadial(st,p0,p1){
     return {removed:0,seconds:0,z0:p1.z,z1:p1.z,depth:0,dry:false};
   }
   if(dx>=-EPS){if(st.tool===4)checkBladeAir(st,p0,p1,true);return {removed:0,seconds:0,z0:p1.z,z1:p1.z,depth:0,dry:false};}
+  if(st.profile.inner && st.tool===3)throw err('FACE', 'Торцевание профиля после внутренней обработки выходит за пределы этого профиля.', true);
   if(!st.spindle||!(effectiveRpm(st)>0))throw err('SPINDLE','Шпиндель остановлен.',true);
   const f=st.feedMode===99?st.feed:st.feed/effectiveRpm(st,(p0.x+p1.x)/2),actual=f*st.overrides.feed/100;
   if(actual<tool.feedRange[0]-EPS||actual>tool.feedRange[1]+EPS)throw err('FEED','Подача вне диапазона выбранного резца.',false);
   let result;try{result=st.tool===3?radialOps.face(st.profile,L,p1.z,Math.max(st.profile.bore||0,p1.x),tool.maxDepth):radialOps.groove(st.profile,L,p1.z,tool.width,p1.x,tool.maxDepth);}catch(error){throw err('RADIAL',error.message,true);}
-  st.profile=result.profile;return {removed:result.removed,seconds:0,z0:st.tool===3?front:p1.z,z1:st.tool===3?p1.z:p1.z-tool.width,depth:result.depth,dry:!st.coolant};
+  st.profile=st.profile.inner?checkedInternalOutside(result.profile,st.profile.inner):result.profile;
+  return {removed:result.removed,seconds:0,z0:st.tool===3?front:p1.z,z1:st.tool===3?p1.z:p1.z-tool.width,depth:result.depth,dry:!st.coolant};
 }
 function performCut(st, p0, p1) {
   if(st.feedMode===99&&effectiveRpm(st)<=0)
@@ -438,6 +564,7 @@ function performCut(st, p0, p1) {
   const off = st.offsets[String(st.tool)];
   if (!off.calibrated) throw err('OFFSET', 'Инструмент ' + tool.code + ' не привязан: выполните preset', false);
   if (st.feed === null || !(st.feed > 0)) throw err('FEED', 'Для G01 задайте подачу F', false);
+  if (st.tool === 5 || st.tool === 6) return performInternalCut(st, p0, p1, tool);
   if(st.tool===3||st.tool===4)return performRadial(st,p0,p1);
   const front=st.profile.frontZ??0;
   const L = st.stock.length;
@@ -464,7 +591,8 @@ function performCut(st, p0, p1) {
           ' мм/об для ' + tool.code, false);
     }
     const volBefore = profileVolume(st.profile);
-    const newProfile = { segments: built.segments, bore: st.profile.bore||0,...(st.profile.frontZ!==undefined?{frontZ:st.profile.frontZ}:{}) };
+    const outside = { segments: built.segments, bore: st.profile.bore||0,...(st.profile.frontZ!==undefined?{frontZ:st.profile.frontZ}:{}) };
+    const newProfile = st.profile.inner ? checkedInternalOutside(outside, st.profile.inner) : outside;
     removed = volBefore - profileVolume(newProfile);
     if (removed < 1e-9) removed = 0;
     depth = built.depth;
@@ -504,7 +632,7 @@ function doMove(st, wx, wz, rapid, opts) {
     return { removed: 0, seconds: 0, z0: p1.z, z1: p1.z, depth: 0, dry: false };
   }
   const L = st.stock.length;
-  if (p1.x < (st.tool===3?0:LIMITS.axisX.min) - EPS || p1.x > LIMITS.axisX.max + EPS)
+  if (p1.x < ([3,5].includes(st.tool)?0:LIMITS.axisX.min) - EPS || p1.x > LIMITS.axisX.max + EPS)
     throw err('DOMAIN', 'Предел хода X: ' + LIMITS.axisX.min + '..' + LIMITS.axisX.max + ' мм (цель X' + p1.x + ')', true);
   if (p1.z < -L - LIMITS.travelZmargin - EPS || p1.z > LIMITS.frontZMax + EPS)
     throw err('DOMAIN', 'Предел хода Z: ' + r3(-L - LIMITS.travelZmargin) + '..' + LIMITS.frontZMax + ' мм (цель Z' + p1.z + ')', true);
@@ -644,7 +772,10 @@ const ALLOWED = {
 };
 const OVR_RANGE = { feed: LIMITS.overrides.feed, rapid: LIMITS.overrides.rapid, spindle: LIMITS.overrides.spindle };
 
-function normalize(action) {
+function toolAllowed(id,enabled) { return Number.isInteger(id) && id>=1 && id<=(enabled?6:4); }
+const DEPTH_TOOLS = ["depth-gauge","depth-probe"];
+const INNER_TOOLS = ["inside-caliper","bore-gauge","wall-gauge"];
+function normalize(action,enabled=false) {
   if (!action || typeof action !== 'object' || Array.isArray(action)) return null;
   const type = action.type;
   if (typeof type !== 'string' || !Object.hasOwn(ALLOWED,type)) return null;
@@ -659,9 +790,9 @@ function normalize(action) {
     case 'mode':
       return ['JOG', 'MDI', 'AUTO', 'EDIT'].indexOf(action.value) >= 0 ? { type: type, value: action.value } : null;
     case 'tool':
-      return [1,2,3,4].includes(action.tool) ? { type: type, tool: action.tool } : null;
+      return toolAllowed(action.tool,enabled) ? { type: type, tool: action.tool } : null;
     case 'offset': {
-      if (![1,2,3,4].includes(action.tool)) return null;
+      if (!toolAllowed(action.tool,enabled)) return null;
       const out = { type: type, tool: action.tool };
       let any = false;
       for (const k of ['x', 'z']) {
@@ -722,7 +853,7 @@ function normalize(action) {
         ? { type: type, source: action.source } : null;
     case 'measure': {
       if (!isNum(action.z)) return null;
-      if (!['caliper','micrometer','inside-caliper','bore-gauge'].includes(action.instrument)) return null;
+      if (!['caliper','micrometer','inside-caliper','bore-gauge'].includes(action.instrument) && !(enabled && [...DEPTH_TOOLS,'wall-gauge'].includes(action.instrument))) return null;
       return { type: type, z: r3(action.z), instrument: action.instrument };
     }
   }
@@ -740,8 +871,8 @@ function sameShape(a, b) {
 }
 
 /* Строгая проверка канонической формы (для журнала при restore — fail closed) */
-function validateNormalized(a) {
-  const c = normalize(a);
+function validateNormalized(a,enabled) {
+  const c = normalize(a,enabled);
   if (!c) return 'действие не соответствует канонической форме';
   if (!sameShape(c, a)) return 'лишние, отсутствующие или неканоничные поля действия';
   return null;
@@ -776,7 +907,7 @@ function transition(state, action) {
     return { ok: false, message: e && e.message ? e.message : 'Физическая ошибка' };
   };
 
-  const bad = validateNormalized(action);
+  const bad = validateNormalized(action,st.stock.internal);
   if (bad) {
     message = 'Некорректное действие: ' + bad;
   } else {
@@ -859,6 +990,7 @@ function transition(state, action) {
           }
           case 'touch':{
             if(st.mode!=='JOG'||!st.referenced||!st.clamped||!st.tool)message='Для ручной привязки нужны JOG, референс, зажим и выбранный инструмент.';
+            else if(st.tool>=5)message='Для внутреннего инструмента используйте учебный датчик (preset).';
             else if(st.spindle||st.coolant)message='Остановите шпиндель и СОЖ перед касанием.';
             else{
               const p=actualPos(st),o=st.offsets[String(st.tool)];let value=null;
@@ -920,7 +1052,7 @@ function transition(state, action) {
             message = 'Перекрытие ' + action.kind + ' = ' + action.value + '%';
             break;
           case 'load': {
-            const parsed = parseProgram(action.source);
+            const parsed = parseProgram(action.source,st.stock.internal);
             if (!parsed.ok) message = parsed.message; // синтаксическая ошибка не включает аварию станка
             else {
               st.program = { source: action.source, blocks: parsed.blocks, index: 0, status: parsed.blocks.length ? 'ready' : 'empty' };
@@ -935,7 +1067,7 @@ function transition(state, action) {
           case 'mdi': {
             if (st.mode !== 'MDI') message = 'MDI доступен только в режиме MDI';
             else {
-              const parsed = parseProgram(action.source);
+              const parsed = parseProgram(action.source,st.stock.internal);
               if (!parsed.ok) message = parsed.message;
               else if (parsed.blocks.length !== 1)
                 message = 'MDI выполняет ровно один исполняемый кадр (после фильтра комментариев/пустых/N распознано: ' + parsed.blocks.length + ')';
@@ -1009,7 +1141,8 @@ function transition(state, action) {
                 r3(st.stock.diameter + 2) + ' (сейчас X' + r3(st.position.x) + ')';
             } else if (action.z < -L - EPS || action.z > (st.profile.frontZ??0)+EPS) {
               message = 'Зона измерения — открытая часть заготовки: Z от ' + r3(-L) + ' до 0';
-            } else if(['inside-caliper','bore-gauge'].includes(action.instrument)&&!st.profile.bore){message='В заготовке нет отверстия. Выберите наружный замер.';} else {
+            } else if(st.stock.internal){const result=internalMeasure(st,action);message=result.message;ok=result.ok;data=result.data||null;}
+            else if(['inside-caliper','bore-gauge'].includes(action.instrument)&&!st.profile.bore){message='В заготовке нет отверстия. Выберите наружный замер.';} else {
               const inner=['inside-caliper','bore-gauge'].includes(action.instrument),m = inner?{d:st.profile.bore,boundary:false,taper:false}:measureAt(st.profile, action.z);
               if (m.boundary) message = 'Точка измерения на кромке ступени неоднозначна — сдвиньте Z';
               else {
@@ -1058,6 +1191,49 @@ function measureAt(profile, z) {
   return { d: z > 0 ? r.d0 : r.d1, taper: false, boundary: false };
 }
 
+function internalMeasure(st,{z,instrument}) {
+  const profile = internalGeometry(st.profile);
+  const depth = profile.frontZ - z;
+  let value, metric, taper = false;
+  if (DEPTH_TOOLS.includes(instrument)) {
+    const hole = internalProfile.hole(profile);
+    if (Math.abs(depth)>EPS || hole.kind!=='blind')
+      return {ok:false,message:'Глубину измеряют от торца (Z0 в этой установке) в глухом отверстии.'};
+    const bands = internalProfile.innerRanges(profile);
+    if (hole.boreDepth>50 || bands.some(b => b.diameter<2 || (b.endDiameter<2 && b!==bands.at(-1))))
+      return {ok:false,message:'Щуп не достаёт до дна или не проходит через отверстие.'};
+    metric = instrument==='depth-gauge' ? 'fullDepth' : 'tipDepth';
+    value = instrument==='depth-gauge' ? hole.fullDepth : hole.boreDepth;
+    if (value<=EPS) return {ok:false,message:'Нет участка полного диаметра для опоры глубиномера.'};
+  } else {
+    const inside = INNER_TOOLS.includes(instrument);
+    const point = inside ? internalProfile.insideAt(profile,z) : measureAt(st.profile,z);
+    if (!point || point.d<=EPS) return {ok:false,message:'В этом сечении нет доступной поверхности для выбранного прибора.'};
+    if (point.boundary) return {ok:false,message:'На кромке ступени или дна замер неоднозначен. Выберите сечение внутри участка.'};
+    value = point.d;
+    taper = point.taper;
+    metric = inside ? 'innerDiameter' : 'outerDiameter';
+    if (inside) {
+      const jaws=instrument==='inside-caliper';
+      if (depth>(jaws?15:50)+EPS) return {ok:false,message:'Прибор не достаёт до выбранного сечения.'};
+      try { requireOpening(profile,0,depth,()=>jaws?2:6); }
+      catch (error) { return {ok:false,message:error.message}; }
+    }
+    if (instrument==='wall-gauge') {
+      const outer=measureAt(st.profile,z);
+      if (outer.boundary) return {ok:false,message:'Сместите замер с наружной ступени.'};
+      value=(outer.d-value)/2;
+      metric='wall';
+    }
+  }
+  const resolution=['caliper','inside-caliper'].includes(instrument)?.1:.01;
+  const reading=quantizeReading(value,resolution);
+  const entry={z,u:r3(st.stock.length+z),actual:r3(value),resolution,reading,instrument,afterCut:st.cuts.length,metric};
+  st.readings.push(entry);
+  const title={outerDiameter:'Наружный диаметр',innerDiameter:'Внутренний диаметр',fullDepth:'Глубина полного диаметра',tipDepth:'Глубина до вершины',wall:'Толщина стенки'}[metric];
+  return {ok:true,data:entry,message:title+': '+reading.toFixed(resolution===.1?1:2).replace('.',',')+' мм'+(taper?' (учебный замер на конусе)':'')};
+}
+
 function quantizeReading(d, res) {
   const du = umm(d);                    // точный диаметр в целых мкм
   const step = Math.round(res * 1000);  // шаг прибора в мкм
@@ -1090,7 +1266,7 @@ function restoreWork(work) {
   const stock = create(work.stock, true);
   if (!stock) return null;
   if (!Array.isArray(work.events) || work.events.length > MAX_EVENTS) return null;
-  for (const ev of work.events) if (validateNormalized(ev)) return null;
+  for (const ev of work.events) if (validateNormalized(ev,stock.internal)) return null;
   if (!Number.isInteger(work.cursor) || work.cursor < 0 || work.cursor > work.events.length) return null;
   const w = { version: 2, name: name, stock: stock, events: clone(work.events), cursor: work.cursor };
   if (utf8Len(JSON.stringify(w)) > MAX_WORK_BYTES) return null;
@@ -1103,7 +1279,7 @@ function restoreWork(work) {
 }
 
 function execute(work, action) {
-  const norm = normalize(action);
+  const norm = normalize(action,work?.stock?.internal === true);
   const r = restoreWork(work);
   if (!r) return { ok: false, message: 'Работа не проходит проверку целостности журнала', work: work || null, state: null, data: null };
   if(!norm)throw Error('Действие не распознано или содержит неверные значения.');
@@ -1162,7 +1338,7 @@ function graphics(work, source) {
   if (need.length)
     return Object.assign({ ok: false, message: 'Эмуляция невозможна — настройка не завершена: ' + need.join('; ') },
       { path: [], profile: st.profile, alarm: null, position: clone(st.position), steps: 0 });
-  const parsed = parseProgram(typeof source === 'string' ? source : '');
+  const parsed = parseProgram(typeof source === 'string' ? source : '', st.stock.internal);
   if (!parsed.ok)
     return Object.assign({ ok: false, message: parsed.message },
       { path: [], profile: st.profile, alarm: null, position: clone(st.position), steps: 0 });
@@ -1216,6 +1392,7 @@ return {
   execute: execute,
   seek: seek,
   display: display,
-  graphics: graphics
+  graphics: graphics,
+  internalGeometry
 };
 });

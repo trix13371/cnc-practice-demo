@@ -144,3 +144,54 @@ assert.equal(
 console.log(
   "Milling coverage: four new lessons, missed strip, overcut, true measurements, freshness, layers, atomic rejection and review passed.",
 );
+{
+  const { plate } = require("../milling-course-model.js");
+  const { attempt, complete } = require("./milling-plate-fixtures.cjs");
+  const progress = require("../progress-model.js");
+  const step = "milling-" + plate.task.id;
+  const expected = [-1, -1, -2, -2];
+  for (const rightFirst of [false, true]) {
+    const accepted = complete({ rightFirst, restarts: 2 });
+    assert.equal(accepted.done[0].attempt, 3);
+    assert.equal(accepted.done[0].independent, true);
+    assert.deepEqual(Object.values(accepted.done[0].measurements).map((r) => r.value), expected);
+    assert.equal(m.restore(plate.snapshot(accepted)), null);
+  }
+  const work = attempt();
+  work.act({ type: "hint" });
+  work.prepare();
+  work.lane(-4, 22, 5, 1);
+  work.stop();
+  work.measure();
+  assert.equal(work.act({ type: "confirm" }).done.length, 0, "One depth is insufficient");
+  work.setup("door");
+  work.spindle(true);
+  work.lane(64, 36, 9, 1);
+  work.lane(64, 36, 9, 2);
+  work.stop();
+  assert.equal(work.act({ type: "confirm" }).done.length, 0, "Later cutting invalidates previous measurements");
+  work.measure();
+  assert.equal(work.act({ type: "confirm" }).done[0].independent, false);
+  const overcut = attempt();
+  overcut.prepare();
+  overcut.lane(-4, 31, 5, 1);
+  overcut.lane(64, 36, 9, 1);
+  overcut.lane(64, 36, 9, 2);
+  overcut.stop();
+  overcut.measure();
+  assert.equal(overcut.act({ type: "confirm" }).done.length, 0, "Fresh measurements do not hide damage to the web");
+  const restarted = overcut.act({ type: "restart" });
+  assert(restarted.grid.every((z) => z === 0));
+  assert.equal(restarted.attempt, 2);
+  assert.deepEqual(restarted.measurements, {});
+
+  const accepted = progress.empty(), draft = progress.empty();
+  accepted.sections.coursePath.current.millingPlate = plate.snapshot(work.state());
+  draft.sections.coursePath.current.millingPlate = plate.snapshot(plate.create());
+  draft.sections.coursePath.current.millingPlateDraft = "План двух полос";
+  const merged = progress.parse(progress.stringify(progress.merge(draft, accepted)));
+  assert.equal(merged.sections.coursePath.current.millingPlateDraft, "План двух полос");
+  assert(progress.evidence(merged).courseSteps.includes(step), "Historical proof survives a different draft");
+  assert.match(progress.report(merged), /✓ Самостоятельная плита/);
+  console.log("Milling plate: two valid orders, fresh checks, web protection, isolated restart, assistance and archive merge passed.");
+}

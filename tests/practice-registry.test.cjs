@@ -39,7 +39,7 @@ assert.equal(
   c.millingCourse,
 );
 const p = require("../progress-model.js");
-assert.equal(p.ROUTE_VERSION, 6);
+assert.equal(p.ROUTE_VERSION, 9);
 assert.equal(p.summary(p.empty()).routeVersion, p.ROUTE_VERSION);
 console.log(
   "Practice registry: immutable four-book descriptors, legacy activity semantics, Node/browser parity and canonical summary version passed.",

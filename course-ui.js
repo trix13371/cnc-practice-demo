@@ -226,6 +226,7 @@
         save,
         available: () => storageAvailable,
         histories: window.CNCProgressUI?.courseStates?.() || [],
+        direct: routeStep.direct,
       });
       layout.append(article);
       root.append(layout, note);
@@ -877,7 +878,7 @@
     return null;
   }
   window.CNCCourseUI = {
-    openRouteStep(step) {
+    openRouteStep(step, direct = false) {
       const id =
         {
           firstSession: "machine",
@@ -887,7 +888,7 @@
           metrologyCourse: "control",
         }[step.target] || "verification";
       window.CNCWorkshop.openLesson(id, true);
-      view = views.create("route", step);
+      view = views.create("route", { ...step, direct });
       path.activePractice =
         step.target === "diagnosticCourse"
           ? "diagnosticCourse"

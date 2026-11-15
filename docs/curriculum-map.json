@@ -209,6 +209,15 @@
       ]
     },
     {
+      "id": "lathe-hole",
+      "title": "Сверление и расточка на токарном станке",
+      "prerequisites": [
+        "setup",
+        "lathe-coordinates",
+        "tools"
+      ]
+    },
+    {
       "id": "groove",
       "title": "Наружная канавка и отвод пластины",
       "prerequisites": [
@@ -1153,6 +1162,138 @@
       "objective": "Выполнить широкий паз в два слоя, проверить перекрытие, остаток материала и свежесть контроля.",
       "conditionId": "milling-slot-wide-layers",
       "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "hole-read",
+      "title": "Наружный диаметр и отверстие",
+      "family": "holes",
+      "format": "orientation",
+      "competencies": [
+        "metrology"
+      ],
+      "prerequisites": [
+        "drawing"
+      ],
+      "objective": "Выбрать прибор и измерить внутренний диаметр в указанном сечении.",
+      "conditionId": "hole-read",
+      "evidenceScope": "Действия вводного сценария; самостоятельная работа на реальном станке не проверяется."
+    },
+    {
+      "id": "hole-depth",
+      "title": "Две глубины глухого отверстия",
+      "family": "holes",
+      "format": "concept",
+      "competencies": [
+        "lathe-hole",
+        "metrology"
+      ],
+      "prerequisites": [
+        "dimensions"
+      ],
+      "objective": "Предсказать длину цилиндрического участка и проверить две глубины.",
+      "conditionId": "hole-depth",
+      "evidenceScope": "Ответ в учебном объяснении; выполнение операции этим ответом не подтверждается."
+    },
+    {
+      "id": "hole-drill",
+      "title": "Первое глухое отверстие",
+      "family": "holes",
+      "format": "guided-practice",
+      "competencies": [
+        "lathe-hole",
+        "metrology"
+      ],
+      "prerequisites": [
+        "lathe-coordinates"
+      ],
+      "objective": "Просверлить глухое отверстие и измерить диаметр и рабочую глубину.",
+      "conditionId": "hole-drill",
+      "evidenceScope": "Действия и результат учебной модели; использование помощи учитывается существующим журналом."
+    },
+    {
+      "id": "hole-bore",
+      "title": "Расточка сквозного отверстия",
+      "family": "holes",
+      "format": "transfer",
+      "competencies": [
+        "lathe-hole",
+        "allowance"
+      ],
+      "prerequisites": [
+        "metrology"
+      ],
+      "objective": "Увеличить часть сквозного отверстия, сохранить остальной канал и измерить оба участка.",
+      "conditionId": "hole-bore",
+      "evidenceScope": "Другое условие в том же учебном профиле; устойчивость навыка спустя время не проверяется."
+    },
+    {
+      "id": "hole-diagnosis",
+      "title": "Резец задевает дно",
+      "family": "holes",
+      "format": "diagnosis",
+      "competencies": [
+        "lathe-hole",
+        "diagnosis"
+      ],
+      "prerequisites": [
+        "lathe-coordinates"
+      ],
+      "objective": "Обнаружить, почему державка задевает дно, исправить ход и измерить ступень.",
+      "conditionId": "hole-diagnosis",
+      "evidenceScope": "Разбор ошибки и проверка исправления в заданном сценарии; поиск любой неисправности не подтверждается."
+    },
+    {
+      "id": "hole-sleeve",
+      "title": "Проект: втулка с двумя ступенями",
+      "family": "holes",
+      "format": "project",
+      "competencies": [
+        "lathe-hole",
+        "planning",
+        "metrology"
+      ],
+      "prerequisites": [
+        "allowance",
+        "drawing"
+      ],
+      "objective": "Расточить две ступени втулки и подтвердить размеры и стенку свежим контролем.",
+      "conditionId": "hole-sleeve",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "mounting-plate",
+      "title": "Проект: монтажная плита",
+      "family": "milling-2-5d",
+      "format": "project",
+      "competencies": [
+        "mill-removal",
+        "planning",
+        "metrology"
+      ],
+      "prerequisites": [
+        "mill-removal",
+        "mill-setup"
+      ],
+      "objective": "По отдельному чертежу написать программы кармана, наружной полосы и двух отверстий. Подтвердить обработку и сохранение рамы замерами.",
+      "conditionId": "mounting-plate",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
+    },
+    {
+      "id": "milling-plate-two-depths",
+      "title": "Самостоятельная плита · две глубины",
+      "family": "milling-basic",
+      "format": "project",
+      "competencies": [
+        "mill-removal",
+        "metrology"
+      ],
+      "prerequisites": [
+        "mill-removal",
+        "mill-setup"
+      ],
+      "objective": "Самостоятельно обработать две полосы на разной глубине, сохранить перемычку и подтвердить результат в четырёх точках.",
+      "conditionId": "milling-plate-two-depths",
+      "evidenceScope": "Маршрут, результат и контроль заданной детали в модели; это ещё не произвольный производственный проект."
     },
     {
       "id": "milling-xyz-air",
